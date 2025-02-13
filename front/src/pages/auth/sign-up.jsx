@@ -137,7 +137,7 @@
 //         </div>
 
 //         <form className="mt-8 mb-2 mx-auto w-full max-w-screen-lg lg:w-1/2 space-y-6">
-        
+
 //           {/* Name & Surname Fields */}
 //           <div className="flex flex-col xl:flex-row gap-4 w-full">
 //             <div className="flex flex-col w-full">
@@ -230,6 +230,7 @@ import { useState } from "react";
 import axios from "axios";
 
 export function SignUp() {
+  const URL = "https://pds-transport.onrender.com"
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -245,7 +246,7 @@ export function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/signup", formData);
+      const res = await axios.post(`${URL}/signup`, formData);
       alert(res.data.message);
       setFormData({ name: "", surname: "", phone_number: "", email: "", password: "" });
     } catch (err) {
