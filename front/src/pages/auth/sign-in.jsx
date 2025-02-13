@@ -13,11 +13,16 @@ import axios from "axios";
 export function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const navigate = useNavigate(); // Redirect after login
+  const navigate = useNavigate(); // Redirect after login
 
  
   const handleSignIn = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
   
 
     try {
@@ -26,11 +31,11 @@ export function SignIn() {
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token); // Store token
         alert("Login Successful!");
-        // navigate("/dashboard"); // Redirect to dashboard (update path if needed)
+        navigate("/dashboard"); // Redirect to dashboard (update path if needed)
 ;
       }
     } catch (err) {
-      console.log(err.response?.data?.error || "Login failed. Please try again.");
+      alert(err.response?.data?.error || "Login failed. Please try again.");
     }
 
 
@@ -55,6 +60,7 @@ export function SignIn() {
               size="lg"
               placeholder="name@mail.com"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+              value={email}
               labelProps={{
                 className: "before:content-none after:content-none",  
               }}
