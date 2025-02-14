@@ -14,7 +14,7 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch("http://localhost:5000/godowns");
+        const response = await fetch("http://localhost:5000/subgodown");
         if (response.ok) {
           const data = await response.json();
           setGodownList(data);
@@ -46,7 +46,7 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
     if (!isFormValid) return;
 
     try {
-      const response = await fetch("http://localhost:5000/add-mswc-godown", {
+      const response = await fetch("http://localhost:5000/subgodown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -76,7 +76,7 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Searchable Dropdown */}
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">MSWC Godown Name</label>
+              <label className="block text-sm font-medium text-gray-700">MSWC Sub-Godown Name</label>
               <input
                 type="text"
                 name="godownName"
@@ -109,7 +109,7 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
 
             {/* Godown Under Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Godown Under</label>
+              <label className="block text-sm font-medium text-gray-700">Parent Godown</label>
               <input
                 type="text"
                 name="godownUnder"

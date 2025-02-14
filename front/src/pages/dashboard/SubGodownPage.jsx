@@ -9,7 +9,7 @@ const SubGodownPage = () => {
 
   // Fetch Sub-Godowns from backend
   useEffect(() => {
-    fetch("http://localhost:5000/sub-godowns") // Change API URL as per your backend
+    fetch("http://localhost:5000/subgodown") // Change API URL as per your backend
       .then((res) => res.json())
       .then((data) => setSubGodowns(data))
       .catch((err) => console.error("Error fetching Sub-Godowns:", err));
@@ -17,7 +17,7 @@ const SubGodownPage = () => {
 
   // Handle Delete Action
   const deleteSubGodown = (id) => {
-    fetch(`http://localhost:5000/sub-godowns/${id}`, {
+    fetch(`http://localhost:5000/subgodown/${id}`, {
       method: "DELETE",
     })
       .then(() => {

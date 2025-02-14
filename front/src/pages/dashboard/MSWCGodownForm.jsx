@@ -6,39 +6,84 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
     godownUnder: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!isFormValid || loading) return;
+  
+  //   setLoading(true);
+  
+  //   try {
+  //     const response = await fetch("http://localhost:5000/mswcgodown", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+  
+  //     const data = await response.json(); // Parse response
+  
+  //     if (response.ok) {
+  //       alert(data.message || "MSWC Godown added successfully!");
+        
+  //       if (typeof onSave === "function") {
+  //         onSave({ ...formData, id: data.id }); // Ensure `onSave` is only called once
+  //       }
+  
+  //       setFormData({ godownName: "", godownUnder: "" });
+  //       onClose(); // Close the modal after submission
+  //     } else {
+  //       alert(data.message || "Failed to add MSWC Godown");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("Error submitting data");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid) return;
-
+    if (!isFormValid || loading) return; // Prevent duplicate submissions
+  
+    setLoading(true);
+  
     try {
-      const response = await fetch("http://localhost:5000/add-mswc-godown", {
+      const response = await fetch("http://localhost:5000/mswcgodown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
+      const data = await response.json();
+  
       if (response.ok) {
-        alert("MSWC Godown added successfully!");
-        onSave(formData);
-        setFormData({
-          godownName: "",
-          godownUnder: "",
-        });
+        alert(data.message || "MSWC Godown added successfully!");
+  
+        if (typeof onSave === "function") {
+          onSave({ ...formData, id: data.id });
+        }
+  
+        setFormData({ godownName: "", godownUnder: "" });
+        onClose();
       } else {
-        alert("Failed to add MSWC Godown");
+        alert(data.message || "Failed to add MSWC Godown");
       }
     } catch (error) {
       console.error("Error:", error);
       alert("Error submitting data");
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
@@ -71,12 +116,14 @@ const MSWCGodownForm = ({ onClose, onSave }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              disabled={!isFormValid}
+              disabled={!isFormValid || loading}
               className={`py-2 px-4 rounded-lg ${
-                isFormValid ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                isFormValid && !loading
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
             >
-              Submit
+              {loading ? "Submitting..." : "Submit"}
             </button>
             <button
               type="button"

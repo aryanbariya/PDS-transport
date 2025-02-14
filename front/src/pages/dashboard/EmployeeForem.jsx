@@ -26,7 +26,7 @@ const EmployeeForm = ({ onClose, onSave }) => {
     if (!isFormValid) return;
   
     try {
-      const response = await fetch("http://localhost:5000/add-employee", {
+      const response = await fetch("http://localhost:5000/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
