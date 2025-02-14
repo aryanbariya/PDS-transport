@@ -4,10 +4,11 @@ import axios from "axios";
 
 const EmployeePage = () => {
   const [employees, setEmployees] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
 
-  // Fetch employees from database
+  // Fetch Employees
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -21,27 +22,69 @@ const EmployeePage = () => {
     }
   };
 
+  // Delete Employee
+  const deleteEmployee = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/employees/${id}`);
+      setEmployees(employees.filter((emp) => emp.id !== id));
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+    }
+  };
+
+  // Filtered Employees based on search
+  const filteredEmployees = employees.filter(
+    (emp) =>
+      emp.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between items-center mb-4">
-        <button   onClick={fetchEmployees}  className="bg-green-600 text-white py-2 px-4 rounded-lg flex items-center shadow hover:bg-green-700 transition">
-          <span className="mr-2">👥</span> Employees Details
-        </button>
+    <div className="flex flex-col h-full w-full p-4 bg-gray-100">
+      {/* Title Bar */}
+      <div className="bg-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-md w-full">
+        Employees Details
+      </div>
+
+      {/* Search & Add Section */}
+      <div className="flex justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
+        <input
+          type="text"
+          placeholder="Search Employees..."
+          className="border p-2 rounded-md w-full max-w-lg"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <button
-          onClick={() => { setEditingEmployee(null); setShowForm(true); }}
-          className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow flex items-center hover:bg-blue-700 transition"
+          className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          onClick={() => {
+            setEditingEmployee(null);
+            setShowForm(!showForm);
+          }}
         >
-          ➕ Add
+          {showForm ? "Close" : "Add"}
         </button>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+      {/* Show Form when Add/Edit button is clicked */}
+      {showForm && (
+        <div className="mt-3 bg-white p-4 rounded-md shadow-md">
+          <EmployeeForm
+            onClose={() => setShowForm(false)}
+            onSave={fetchEmployees} // Refresh data after adding/updating
+            employee={editingEmployee}
+          />
+        </div>
+      )}
+
+      {/* Table Section */}
+      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
-              <th className="border border-gray-300 p-2">Sr.No</th>
+              <th className="border border-gray-300 p-2">Sr. No</th>
               <th className="border border-gray-300 p-2">Category Name</th>
-              <th className="border border-gray-300 p-2">Employees Name</th>
+              <th className="border border-gray-300 p-2">Employee Name</th>
               <th className="border border-gray-300 p-2">Login Info</th>
               <th className="border border-gray-300 p-2">Bank Info</th>
               <th className="border border-gray-300 p-2">Action</th>
@@ -49,53 +92,67 @@ const EmployeePage = () => {
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp, index) => (
-              <tr key={emp.id} className="text-gray-600 text-center">
-                <td className="border border-gray-300 p-2">{index + 1}</td>
-                <td className="border border-gray-300 p-2">
-                  <div className="font-semibold">{emp.category}</div>
-                  {emp.subGodown && <div className="text-sm text-gray-500">Godown Name: {emp.subGodown}</div>}
+            {filteredEmployees.length > 0 ? (
+              filteredEmployees.map((emp, index) => (
+                <tr key={emp.id} className="text-gray-600 text-center">
+                  <td className="border border-gray-300 p-2">{index + 1}</td>
+                  <td className="border border-gray-300 p-2 font-semibold">
+                    {emp.category}
+                    {emp.subGodown && (
+                      <div className="text-sm text-gray-500">
+                        Godown: {emp.subGodown}
+                      </div>
+                    )}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <div>Name: <span className="font-semibold">{emp.fullName}</span></div>
+                    <div>Address: {emp.address}</div>
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <div>Username: <span className="font-semibold">{emp.username}</span></div>
+                    <div>Password: <span className="font-semibold">{emp.password}</span></div>
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <div>Bank: {emp.bankName || "N/A"}</div>
+                    <div>A/C No: {emp.accountNumber || "N/A"}</div>
+                    <div>IFSC: {emp.ifscCode || "N/A"}</div>
+                    <div>Branch: {emp.branchName || "N/A"}</div>
+                  </td>
+                  <td className="border border-gray-300 p-2 flex justify-center gap-2">
+                    {/* Edit Button */}
+                    <button
+                      onClick={() => {
+                        setEditingEmployee(emp);
+                        setShowForm(true);
+                      }}
+                      className="text-green-500 hover:text-green-700"
+                    >
+                      ✏️
+                    </button>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => deleteEmployee(emp.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      🗑️
+                    </button>
+                  </td>
+                  <td className="border border-gray-300 p-2 text-blue-500 cursor-pointer">
+                    📄
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="p-3 text-center text-gray-500">
+                  No Employees Found
                 </td>
-                <td className="border border-gray-300 p-2">
-                  <div>Name: <span className="font-semibold">{emp.fullName}</span></div>
-                  <div>Address: {emp.address}</div>
-                </td>
-                <td className="border border-gray-300 p-2">
-                  <div>Username: <span className="font-semibold">{emp.username}</span></div>
-                  <div>Password: <span className="font-semibold">{emp.password}</span></div>
-                </td>
-                <td className="border border-gray-300 p-2">
-                  <div>Bank Name: {emp.bankName || "N/A"}</div>
-                  <div>A/C No: {emp.accountNumber || "N/A"}</div>
-                  <div>IFSC Code: {emp.ifscCode || "N/A"}</div>
-                  <div>Branch Name: {emp.branchName || "N/A"}</div>
-                </td>
-                <td className="border border-gray-300 p-2 flex justify-center gap-2">
-                  <button 
-                    onClick={() => { setEditingEmployee(emp); setShowForm(true); }} 
-                    className="text-green-500 hover:text-green-700">
-                    ✏️
-                  </button>
-                  <button 
-                    onClick={() => deleteEmployee(emp.id)} 
-                    className="text-red-500 hover:text-red-700">
-                    🗑️
-                  </button>
-                </td>
-                <td className="border border-gray-300 p-2 text-blue-500 cursor-pointer">📄</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
-
-      {showForm && (
-        <EmployeeForm 
-          onClose={() => setShowForm(false)} 
-          onSave={fetchEmployees} // Refresh data after adding/updating
-          employee={editingEmployee} 
-        />
-      )}
     </div>
   );
 };

@@ -171,8 +171,110 @@ app.delete("/api/employees/:id", (req, res) => {
   });
 });
 
+// **Insert Godown Data**
+app.post("/api/mswcgodown", async (req, res) => {
+  try {
+    const { godownName, godownUnder } = req.body;
+
+    if (!godownName || !godownUnder) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const sqlQuery = "INSERT INTO mswcgodown (godownName, godownUnder) VALUES (@godownName, @godownUnder)";
+    const request = new sql.Request();
+    request.input("godownName", sql.VarChar, godownName);
+    request.input("godownUnder", sql.VarChar, godownUnder);
+
+    await request.query(sqlQuery);
+    res.status(201).json({ message: "Godown added successfully" });
+
+  } catch (error) {
+    console.error("Godown Insert Error:", error);
+    res.status(500).json({ error: "Server error: " + error.message });
+  }
+});
+
+// **Fetch Godown Data**
+app.get("/api/mswcgodown", async (req, res) => {
+  try {
+    const result = await sql.query("SELECT * FROM mswcgodown");
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Godown Fetch Error:", error);
+    res.status(500).json({ error: "Server error: " + error.message });
+  }
+});
+
+// **Delete Godown API**
+app.delete("/api/mswcgodown/:id", (req, res) => {
+  const employeeId = req.params.id;
+  const sql = "DELETE FROM employees WHERE id = ?";
+  db.query(sql, [employeeId], (err, result) => {
+    if (err) {
+      console.error("Error deleting employee:", err);
+      return res.status(500).json({ error: "Failed to delete employee" });
+    }
+    res.status(200).json({ message: "Employee deleted successfully" });
+  });
+});
+
+// **Insert Sub-Godown Data**
+app.post("/api/subgodown", async (req, res) => {
+  try {
+    const { subGodownName, subGodownUnder } = req.body;
+
+    if (!subGodownName || !subGodownUnder) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const sqlQuery =
+      "INSERT INTO subgodown (subGodownName, subGodownUnder) VALUES (@subGodownName, @subGodownUnder)";
+    const request = new sql.Request();
+    request.input("subGodownName", sql.VarChar, subGodownName);
+    request.input("subGodownUnder", sql.VarChar, subGodownUnder);
+
+    await request.query(sqlQuery);
+    res.status(201).json({ message: "Sub-Godown added successfully" });
+
+  } catch (error) {
+    console.error("Sub-Godown Insert Error:", error);
+    res.status(500).json({ error: "Server error: " + error.message });
+  }
+});
+
+// **Fetch Sub-Godown Data**
+app.get("/api/subgodown", async (req, res) => {
+  try {
+    const result = await sql.query("SELECT * FROM subgodown");
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Sub-Godown Fetch Error:", error);
+    res.status(500).json({ error: "Server error: " + error.message });
+  }
+});
+
+// **Delete Sub-Godown API**
+app.delete("/api/subgodown/:id", async (req, res) => {
+  try {
+    const subGodownId = req.params.id;
+    const sqlQuery = "DELETE FROM subgodown WHERE id = @subGodownId";
+    
+    const request = new sql.Request();
+    request.input("subGodownId", sql.Int, subGodownId);
+    
+    await request.query(sqlQuery);
+    res.status(200).json({ message: "Sub-Godown deleted successfully" });
+
+  } catch (error) {
+    console.error("Sub-Godown Delete Error:", error);
+    res.status(500).json({ error: "Failed to delete Sub-Godown: " + error.message });
+  }
+});
+
 // **Server Listening**
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
