@@ -230,7 +230,10 @@ import { useState } from "react";
 import axios from "axios";
 
 export function SignUp() {
-  const URL = "https://pds-transport.onrender.com"
+  // const URL = "https://pds-transport.onrender.com"
+  const URL = "http://localhost:5000"; // Use http, not https
+
+
   const [formData, setFormData] = useState({
     name: "",
     surname: "",

@@ -22,28 +22,65 @@ const EmployeeForm = ({ onClose, onSave }) => {
 
   const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (!isFormValid) return;
+  //   onSave(formData);
+  //   setFormData({
+  //     category: "",
+  //     fullName: "",
+  //     username: "",
+  //     password: "",
+  //     address: "",
+  //     aadharNo: "",
+  //     panNo: "",
+  //     bankName: "",
+  //     accountNumber: "",
+  //     ifscCode: "",
+  //     branchName: "",
+  //     subGodown: "",
+  //   });
+  // };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) return;
-    onSave(formData);
-    setFormData({
-      category: "",
-      fullName: "",
-      username: "",
-      password: "",
-      address: "",
-      aadharNo: "",
-      panNo: "",
-      bankName: "",
-      accountNumber: "",
-      ifscCode: "",
-      branchName: "",
-      subGodown: "",
-    });
+  
+    try {
+      const response = await fetch("http://localhost:5000/add-employee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      if (response.ok) {
+        alert("Employee added successfully!");
+        onSave(formData);
+        setFormData({
+          category: "",
+          fullName: "",
+          username: "",
+          password: "",
+          address: "",
+          aadharNo: "",
+          panNo: "",
+          bankName: "",
+          accountNumber: "",
+          ifscCode: "",
+          branchName: "",
+          subGodown: "",
+        });
+      } else {
+        alert("Failed to add employee");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error submitting data");
+    }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    // <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
         <h2 className="bg-blue-600 text-white text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
           Add Employee
