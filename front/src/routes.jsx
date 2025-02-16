@@ -12,6 +12,7 @@ import EmployeePage from "./pages/dashboard/EmployeePage";
 import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 import SubGodownPage from "./pages/dashboard/SubGodownPage";
 import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
+import GrainPage from "./pages/dashboard/GrainPage";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -63,11 +64,17 @@ export const routes = [
         path: "/EmployeePage",
         element: <EmployeePage />,
       },
+      // {
+      //   icon: <UserCircleIcon {...icon} />,
+      //   name: "OwnerNamePage",
+      //   path: "/OwnerNamePage",
+      //   element: <OwnerNamePage />,
+      // },
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "OwnerNamePage",
-        path: "/OwnerNamePage",
-        element: <OwnerNamePage />,
+        name: "GrainPage",
+        path: "/GrainPage",
+        element: <GrainPage />,
       },
     ],
   },

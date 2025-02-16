@@ -530,6 +530,162 @@ app.delete("/api/owners/:uuid", (req, res) => {
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///start of grain page
+
+app.get("/api/grains", (req, res) => {
+  const sql = "SELECT uuid, grainName, godownName, order_number FROM grains ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching grains:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+app.get("/api/grains/:uuid", (req, res) => {
+  const sql = "SELECT uuid, grainName, godownName, order_number FROM grains WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) {
+      console.error("Error fetching grain:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Grain not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+
+app.post("/api/grains", (req, res) => {
+  console.log("Incoming Request Body:", req.body); // Debugging log
+
+  const { grainName, godownName } = req.body;
+
+  if (!grainName || !godownName) {
+    return res.status(400).json({ error: "Grain name and one Godown selection are required" });
+  }
+
+  const uuid = uuidv4();
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM grains";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO grains (uuid, grainName, godownName, order_number) VALUES (?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, grainName, godownName, nextOrder], (insertErr) => {
+      if (insertErr) {
+        console.error("Error inserting grain:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed" });
+      }
+      res.status(201).json({ message: "Grain added successfully", uuid, order_number: nextOrder });
+    });
+  });
+});
+
+
+
+
+// app.post("/api/grains", (req, res) => {
+//   const { grainName, mswcGodown, subGodown } = req.body;
+  
+//   if (!grainName || (!mswcGodown && !subGodown)) {
+//     return res.status(400).json({ error: "Grain name and one Godown selection are required" });
+//   }
+
+//   const godownName = mswcGodown || subGodown; // Store only one
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM grains";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO grains (uuid, grainName, godownName, order_number) VALUES (?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, grainName, godownName, nextOrder], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting grain:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({ message: "Grain added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+
+app.put("/api/grains/:uuid", (req, res) => {
+  const { grainName, mswcGodown, subGodown } = req.body;
+  if (!grainName || (!mswcGodown && !subGodown)) {
+    return res.status(400).json({ error: "Grain name and one Godown selection are required" });
+  }
+
+  const godownName = mswcGodown || subGodown;
+
+  const sql = "UPDATE grains SET grainName = ?, godownName = ? WHERE uuid = ?";
+
+  db.query(sql, [grainName, godownName, req.params.uuid], (err, result) => {
+    if (err) {
+      console.error("Error updating grain:", err);
+      return res.status(500).json({ error: "Database update error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Grain not found" });
+    }
+    res.json({ message: "Grain updated successfully" });
+  });
+});
+
+app.delete("/api/grains/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  const deleteSql = "DELETE FROM grains WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error deleting grain:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Grain not found" });
+    }
+
+    console.log(`✅ Deleted Grain with UUID: ${uuid}`);
+
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE grains SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting order numbers:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Grain deleted and order numbers reset successfully!" });
+      });
+    });
+  });
+});
+///end of grain
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // **Server Listening**
