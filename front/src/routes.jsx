@@ -8,10 +8,10 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
-import EmployeeForm from "./pages/dashboard/EmployeePage";
 import EmployeePage from "./pages/dashboard/EmployeePage";
 import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 import SubGodownPage from "./pages/dashboard/SubGodownPage";
+import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -62,6 +62,12 @@ export const routes = [
         name: "EmploeePage",
         path: "/EmployeePage",
         element: <EmployeePage />,
+      },
+      {
+        icon: <UserCircleIcon {...icon} />,
+        name: "OwnerNamePage",
+        path: "/OwnerNamePage",
+        element: <OwnerNamePage />,
       },
     ],
   },

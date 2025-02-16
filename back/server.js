@@ -405,6 +405,132 @@ app.delete("/api/subgodown/:uuid", (req, res) => {
 });
 
 
+//////////////////////////////////////////
+//start of ownerpage
+
+app.get("/api/owners", (req, res) => {
+  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching owners:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+
+app.get("/api/owners/:uuid", (req, res) => {
+  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) {
+      console.error("Error fetching owner:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+
+app.post("/api/owners", (req, res) => {
+  const { ownerName, contact, address, emailID } = req.body;
+  if (!ownerName || !contact || !address || !emailID) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const uuid = uuidv4();
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM owners";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, ownerName, contact, address, emailID, nextOrder], (insertErr) => {
+      if (insertErr) {
+        console.error("Error inserting owner:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed" });
+      }
+      res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
+    });
+  });
+});
+
+
+app.put("/api/owners/:uuid", (req, res) => {
+  const { ownerName, contact, address, emailID } = req.body;
+  if (!ownerName || !contact || !address || !emailID) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
+
+  db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
+    if (err) {
+      console.error("Error updating owner:", err);
+      return res.status(500).json({ error: "Database update error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+    res.json({ message: "Owner updated successfully" });
+  });
+});
+
+
+
+
+app.delete("/api/owners/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  // Step 1: Delete the specific record
+  const deleteSql = "DELETE FROM owners WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error deleting owner:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+
+    console.log(`✅ Deleted Owner with UUID: ${uuid}`);
+
+    // Step 2: Reset order numbers sequentially
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE owners SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting order numbers:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Owner deleted and order numbers reset successfully!" });
+      });
+    });
+  });
+});
+//endof ownerpage
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // **Server Listening**
 const PORT = process.env.PORT || 5000;
