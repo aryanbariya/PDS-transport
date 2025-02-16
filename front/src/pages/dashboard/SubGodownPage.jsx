@@ -1,48 +1,74 @@
 import React, { useState, useEffect } from "react";
-import SubGodownForm from "./SubGodownForm"; // Import the form component
+import SubGodownForm from "./SubGodownForm";
 
 const SubGodownPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [subGodowns, setSubGodowns] = useState([]);
+  const [godowns, setGodowns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [editingSubGodown, setEditingSubGodown] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch Sub-Godowns from backend
-  useEffect(() => {
-    fetch("http://localhost:5000/subgodown") // Change API URL as per your backend
-      .then((res) => res.json())
-      .then((data) => setSubGodowns(data))
-      .catch((err) => console.error("Error fetching Sub-Godowns:", err));
-  }, []);
-
-  // Handle Delete Action
-  const deleteSubGodown = (id) => {
-    fetch(`http://localhost:5000/subgodown/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        setSubGodowns(subGodowns.filter((subGodown) => subGodown.id !== id));
-      })
-      .catch((err) => console.error("Error deleting Sub-Godown:", err));
+  const fetchGodowns = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/subgodown");
+      if (!response.ok) throw new Error("Failed to fetch data");
+      const data = await response.json();
+      setGodowns(data || []);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
   };
 
-  // Filtered Sub-Godowns based on search input
-  const filteredSubGodowns = subGodowns.filter((subGodown) =>
-    subGodown.sub_godown_name.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    fetchGodowns();
+  }, []);
+
+  const handleDelete = async (uuid) => {
+    if (!window.confirm("Are you sure you want to delete this godown?")) return;
+    try {
+      const response = await fetch(`http://localhost:5000/api/subgodown/${uuid}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        alert("Godown deleted successfully!");
+        fetchGodowns();
+      } else {
+        alert("Failed to delete godown.");
+      }
+    } catch (err) {
+      console.error("Error deleting godown:", err);
+      alert("Error deleting data.");
+    }
+  };
+
+  const handleEdit = (godown) => {
+    setEditData(godown);
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    setShowForm(false);
+    setEditData(null);
+    fetchGodowns();
+  };
+
+  const filteredGodowns = godowns.filter((g) =>
+    g.parentGodown.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    g.subGodownName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      {/* Title Bar */}
       <div className="bg-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-md w-full">
-        Fetch Sub-Godowns
+        Parent Godown List
       </div>
-
-      {/* Search & Add Section */}
       <div className="flex justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
         <input
           type="text"
-          placeholder="Search Sub-Godown..."
+          placeholder="Search Parent Godown..."
           className="border p-2 rounded-md w-full max-w-lg"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -50,7 +76,7 @@ const SubGodownPage = () => {
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
-            setEditingSubGodown(null);
+            setEditData(null);
             setShowForm(!showForm);
           }}
         >
@@ -58,72 +84,54 @@ const SubGodownPage = () => {
         </button>
       </div>
 
-      {/* Show Form when Add/Edit button is clicked */}
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
-          <SubGodownForm
-            onClose={() => setShowForm(false)}
-            existingData={editingSubGodown}
-          />
+          <SubGodownForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
         </div>
       )}
 
-      {/* Table Section */}
-      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700">
-              <th className="border border-gray-300 p-2">Sr. No</th>
-              <th className="border border-gray-300 p-2">Sub-Godown Name</th>
-              <th className="border border-gray-300 p-2">Parent Godown</th>
-              <th className="border border-gray-300 p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSubGodowns.length > 0 ? (
-              filteredSubGodowns.map((subGodown, index) => (
-                <tr key={subGodown.id} className="text-gray-600 text-center">
-                  <td className="border border-gray-300 p-2">{index + 1}</td>
-                  <td className="border border-gray-300 p-2 font-semibold">
-                    {subGodown.sub_godown_name}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {subGodown.parent_godown}
-                  </td>
-                  <td className="border border-gray-300 p-2 flex justify-center gap-2">
-                    {/* Edit Button */}
-                    <button
-                      onClick={() => {
-                        setEditingSubGodown(subGodown);
-                        setShowForm(true);
-                      }}
-                      className="text-green-500 hover:text-green-700"
-                    >
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      <table className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border p-2">ID</th>
+            <th className="border p-2">Parent Godown</th>
+            <th className="border p-2">Sub Godown Name</th>
+            <th className="border p-2">Status</th>
+            <th className="border p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredGodowns.length > 0 ? (
+            filteredGodowns.map((g) => (
+              <tr key={g.uuid} className="text-center hover:bg-gray-100">
+                <td className="border p-2">{g.order_number}</td>
+                <td className="border p-2">{g.parentGodown}</td>
+                <td className="border p-2">{g.subGodownName || "N/A"}</td>
+                <td className="border p-2">{g.status || "N/A"}</td>
+                <td className="border p-2">
+                  <div className="flex justify-center space-x-2">
+                    <button onClick={() => handleEdit(g)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
                       ✏️
                     </button>
-
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => deleteSubGodown(subGodown.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
+                    <button onClick={() => handleDelete(g.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
                       🗑️
                     </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="p-3 text-center text-gray-500">
-                  No Sub-Godowns found
+                  </div>
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center p-4">No records found</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
 export default SubGodownPage;
+

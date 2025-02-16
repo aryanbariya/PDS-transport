@@ -94,7 +94,7 @@ const EmployeePage = () => {
           <tbody>
             {filteredEmployees.length > 0 ? (
               filteredEmployees.map((emp, index) => (
-                <tr key={emp.id} className="text-gray-600 text-center">
+                <tr key={emp.id} className="text-gray-600 text-center hover:bg-gray-100">
                   <td className="border border-gray-300 p-2">{index + 1}</td>
                   <td className="border border-gray-300 p-2 font-semibold">
                     {emp.category}
