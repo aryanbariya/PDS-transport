@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD
 
 const TruckForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -170,3 +171,182 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 };
 
 export default TruckForm;
+=======
+import axios from "axios";
+
+const TruckForm = ({ fetchTrucks, selectedTruck, setSelectedTruck }) => {
+    const [formData, setFormData] = useState({
+        order_number:"",
+        truck_no: "",
+        company: "",
+        gvw: "",
+        registration_date: "",
+        owner: "",
+        unloaded_weight: "",
+        tax_validity: "",
+        insurance_validity: "",
+        fitness_validity: "",
+        permit_validity: "",
+        direct_truck: "",
+        created_at: "", // Added the "Created At" field
+    });
+
+    useEffect(() => {
+        if (selectedTruck) setFormData(selectedTruck);
+    }, [selectedTruck]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const endpoint = selectedTruck
+            ? `http://localhost:5000/api/trucks/${selectedTruck.uuid}` // Using UUID for the PUT request
+            : "http://localhost:5000/api/trucks";
+
+        try {
+            if (selectedTruck) {
+                // Update existing truck
+                await axios.put(endpoint, formData);
+            } else {
+                // Add new truck
+                await axios.post(endpoint, formData);
+            }
+            fetchTrucks();
+            resetForm();
+        } catch (error) {
+            console.error("Error submitting the form:", error);
+            alert("Failed to submit the form.");
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            order_number:"",
+            truck_no: "",
+            company: "",
+            gvw: "",
+            registration_date: "",
+            owner: "",
+            unloaded_weight: "",
+            tax_validity: "",
+            insurance_validity: "",
+            fitness_validity: "",
+            permit_validity: "",
+            direct_truck: "",
+            created_at: "", // Reset "Created At" field
+        });
+        setSelectedTruck(null);
+    };
+
+    const isFormValid = Object.values(formData).every((field) => field !== "");
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="Truck Number"
+                value={formData.truck_no}
+                onChange={(e) => setFormData({ ...formData, truck_no: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="Company"
+                value={formData.company}
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="GVW"
+                value={formData.gvw}
+                onChange={(e) => setFormData({ ...formData, gvw: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Registration Date"
+                value={formData.registration_date}
+                onChange={(e) => setFormData({ ...formData, registration_date: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="Owner"
+                value={formData.owner}
+                onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="Unloaded Weight"
+                value={formData.unloaded_weight}
+                onChange={(e) => setFormData({ ...formData, unloaded_weight: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Tax Validity"
+                value={formData.tax_validity}
+                onChange={(e) => setFormData({ ...formData, tax_validity: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Insurance Validity"
+                value={formData.insurance_validity}
+                onChange={(e) => setFormData({ ...formData, insurance_validity: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Fitness Validity"
+                value={formData.fitness_validity}
+                onChange={(e) => setFormData({ ...formData, fitness_validity: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Permit Validity"
+                value={formData.permit_validity}
+                onChange={(e) => setFormData({ ...formData, permit_validity: e.target.value })}
+                required
+            />
+            <input
+                type="text"
+                className="border p-2 w-full"
+                placeholder="Direct Truck"
+                value={formData.direct_truck}
+                onChange={(e) => setFormData({ ...formData, direct_truck: e.target.value })}
+                required
+            />
+            <input
+                type="date"
+                className="border p-2 w-full"
+                placeholder="Created At"
+                value={formData.created_at}
+                onChange={(e) => setFormData({ ...formData, created_at: e.target.value })}
+                required
+            />
+            <button
+                type="submit"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md w-full hover:bg-blue-700"
+                disabled={!isFormValid}
+            >
+                {selectedTruck ? "Update" : "Add"} Truck
+            </button>
+        </form>
+    );
+};
+
+export default TruckForm;
+
+>>>>>>> 59f95b0 (Resolved merge conflicts)

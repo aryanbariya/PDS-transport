@@ -14,7 +14,10 @@ import SubGodownPage from "./pages/dashboard/SubGodownPage";
 import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
 import GrainPage from "./pages/dashboard/GrainPage";
 import TruckPage from "./pages/dashboard/TruckPage";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 59f95b0 (Resolved merge conflicts)
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -71,17 +74,32 @@ export const routes = [
         path: "/EmployeePage",
         element: <EmployeePage />,
       },
+<<<<<<< HEAD
       {
         icon: <UserCircleIcon {...icon} />,
         name: "OwnerNamePage",
         path: "/OwnerNamePage",
         element: <OwnerNamePage />,
       },
+=======
+      // {
+      //   icon: <UserCircleIcon {...icon} />,
+      //   name: "OwnerNamePage",
+      //   path: "/OwnerNamePage",
+      //   element: <OwnerNamePage />,
+      // },
+      // {
+      //   icon: <UserCircleIcon {...icon} />,
+      //   name: "GrainPage",
+      //   path: "/GrainPage",
+      //   element: <GrainPage />,
+      // },
+>>>>>>> 59f95b0 (Resolved merge conflicts)
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "GrainPage",
-        path: "/GrainPage",
-        element: <GrainPage />,
+        name: "TruckPage",
+        path: "/TruckPage",
+        element: <TruckPage />,
       },
       {
         icon: <InformationCircleIcon {...icon} />,

@@ -1,21 +1,34 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD
+=======
+import axios from "axios";
+>>>>>>> 59f95b0 (Resolved merge conflicts)
 import TruckForm from "./TruckForm";
 
 const TruckPage = () => {
   const [trucks, setTrucks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   const [editData, setEditData] = useState(null);
+=======
+  const [selectedTruck, setSelectedTruck] = useState(null);
+>>>>>>> 59f95b0 (Resolved merge conflicts)
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchTrucks = async () => {
     try {
+<<<<<<< HEAD
       const response = await fetch("http://localhost:5000/api/truck");
       if (!response.ok) throw new Error("Failed to fetch trucks");
       const data = await response.json();
       console.log('fafad',data)
       setTrucks(data || []);
+=======
+      const response = await axios.get("http://localhost:5000/api/trucks");
+      setTrucks(response.data || []);
+>>>>>>> 59f95b0 (Resolved merge conflicts)
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -30,10 +43,15 @@ const TruckPage = () => {
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this truck?")) return;
     try {
+<<<<<<< HEAD
       const response = await fetch(`http://localhost:5000/api/truck/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {
+=======
+      const response = await axios.delete(`http://localhost:5000/api/trucks/${uuid}`);
+      if (response.status === 200) {
+>>>>>>> 59f95b0 (Resolved merge conflicts)
         alert("Truck deleted successfully!");
         fetchTrucks();
       } else {
@@ -46,6 +64,7 @@ const TruckPage = () => {
   };
 
   const handleEdit = (truck) => {
+<<<<<<< HEAD
     setEditData(truck);
     setShowForm(true);
   };
@@ -58,6 +77,17 @@ const TruckPage = () => {
 
   const filteredTrucks = trucks.filter(
     (t) => t.truckNo.toLowerCase().includes(searchTerm.toLowerCase())
+=======
+    setSelectedTruck(truck);
+    setShowForm(true);
+  };
+
+  const filteredTrucks = trucks.filter(
+    (t) =>
+      t.truck_no.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.owner.toLowerCase().includes(searchTerm.toLowerCase())
+>>>>>>> 59f95b0 (Resolved merge conflicts)
   );
 
   return (
@@ -77,17 +107,29 @@ const TruckPage = () => {
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
+<<<<<<< HEAD
             setEditData(null);
             setShowForm(!showForm);
           }}
         >
           {showForm ? "Close" : "Add Truck"}
+=======
+            setSelectedTruck(null);  // Reset selectedTruck when adding a new truck
+            setShowForm(!showForm);
+          }}
+        >
+          {showForm ? "Close" : "Add"}
+>>>>>>> 59f95b0 (Resolved merge conflicts)
         </button>
       </div>
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
+<<<<<<< HEAD
           <TruckForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+=======
+          <TruckForm fetchTrucks={fetchTrucks} selectedTruck={selectedTruck} setSelectedTruck={setSelectedTruck} />
+>>>>>>> 59f95b0 (Resolved merge conflicts)
         </div>
       )}
 
@@ -97,15 +139,32 @@ const TruckPage = () => {
       <table className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
         <thead>
           <tr className="bg-gray-200">
+<<<<<<< HEAD
             <th className="border p-2">Truck No</th>
             <th className="border p-2">Company</th>
             <th className="border p-2">GVW</th>
             <th className="border p-2">Owner</th>
+=======
+            <th className="border p-2">Order Number</th>
+            <th className="border p-2">Truck No</th>
+            <th className="border p-2">Company</th>
+            <th className="border p-2">GVW</th>
+            <th className="border p-2">Registration Date</th>
+            <th className="border p-2">Owner</th>
+            <th className="border p-2">Unloaded Weight</th>
+            <th className="border p-2">Tax Validity</th>
+            <th className="border p-2">Insurance Validity</th>
+            <th className="border p-2">Fitness Validity</th>
+            <th className="border p-2">Permit Validity</th>
+            <th className="border p-2">Direct Truck</th>
+            <th className="border p-2">Created At</th>
+>>>>>>> 59f95b0 (Resolved merge conflicts)
             <th className="border p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredTrucks.length > 0 ? (
+<<<<<<< HEAD
             filteredTrucks.map((t) => (
               <tr key={t.uuid} className="text-center hover:bg-gray-100">
                 <td className="border p-2">{t.truckNo}</td>
@@ -118,6 +177,35 @@ const TruckPage = () => {
                       ✏️
                     </button>
                     <button onClick={() => handleDelete(t.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
+=======
+            filteredTrucks.map((truck) => (
+              <tr key={truck.uuid} className="text-center hover:bg-gray-100">
+                <td className="border p-2">{truck.order_number}</td>
+                <td className="border p-2">{truck.truck_no}</td>
+                <td className="border p-2">{truck.company}</td>
+                <td className="border p-2">{truck.gvw}</td>
+                <td className="border p-2">{truck.registration_date}</td>
+                <td className="border p-2">{truck.owner}</td>
+                <td className="border p-2">{truck.unloaded_weight}</td>
+                <td className="border p-2">{truck.tax_validity}</td>
+                <td className="border p-2">{truck.insurance_validity}</td>
+                <td className="border p-2">{truck.fitness_validity}</td>
+                <td className="border p-2">{truck.permit_validity}</td>
+                <td className="border p-2">{truck.direct_truck}</td>
+                <td className="border p-2">{truck.created_at}</td>
+                <td className="border p-2">
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(truck)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDelete(truck.uuid)}  // Using UUID for delete
+                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                    >
+>>>>>>> 59f95b0 (Resolved merge conflicts)
                       🗑️
                     </button>
                   </div>
@@ -126,7 +214,11 @@ const TruckPage = () => {
             ))
           ) : (
             <tr>
+<<<<<<< HEAD
               <td colSpan="5" className="text-center p-4">No records found</td>
+=======
+              <td colSpan="13" className="text-center p-4">No records found</td>
+>>>>>>> 59f95b0 (Resolved merge conflicts)
             </tr>
           )}
         </tbody>
@@ -135,4 +227,8 @@ const TruckPage = () => {
   );
 };
 
+<<<<<<< HEAD
 export default TruckPage;
+=======
+export default TruckPage;
+>>>>>>> 59f95b0 (Resolved merge conflicts)

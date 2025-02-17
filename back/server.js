@@ -533,30 +533,7 @@ app.delete("/api/owners/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///start of grain page
 
-app.get("/api/grains", (req, res) => {
-  const sql = "SELECT uuid, grainName, godownName, order_number FROM grains ORDER BY order_number";
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error fetching grains:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    res.json(results);
-  });
-});
 
-app.get("/api/grains/:uuid", (req, res) => {
-  const sql = "SELECT uuid, grainName, godownName, order_number FROM grains WHERE uuid = ?";
-  db.query(sql, [req.params.uuid], (err, results) => {
-    if (err) {
-      console.error("Error fetching grain:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Grain not found" });
-    }
-    res.json(results[0]);
-  });
-});
 
 
 app.post("/api/grains", (req, res) => {
@@ -591,37 +568,6 @@ app.post("/api/grains", (req, res) => {
 });
 
 
-
-
-// app.post("/api/grains", (req, res) => {
-//   const { grainName, mswcGodown, subGodown } = req.body;
-  
-//   if (!grainName || (!mswcGodown && !subGodown)) {
-//     return res.status(400).json({ error: "Grain name and one Godown selection are required" });
-//   }
-
-//   const godownName = mswcGodown || subGodown; // Store only one
-//   const uuid = uuidv4();
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM grains";
-
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error getting next order number:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-
-//     const nextOrder = result[0].next_order;
-//     const insertSql = "INSERT INTO grains (uuid, grainName, godownName, order_number) VALUES (?, ?, ?, ?)";
-
-//     db.query(insertSql, [uuid, grainName, godownName, nextOrder], (insertErr) => {
-//       if (insertErr) {
-//         console.error("Error inserting grain:", insertErr);
-//         return res.status(500).json({ error: "Database insertion failed" });
-//       }
-//       res.status(201).json({ message: "Grain added successfully", uuid, order_number: nextOrder });
-//     });
-//   });
-// });
 
 
 app.put("/api/grains/:uuid", (req, res) => {
@@ -684,6 +630,322 @@ app.delete("/api/grains/:uuid", (req, res) => {
 });
 ///end of grain
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// start of truck page
+
+app.get("/api/trucks", (req, res) => {
+  // const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck FROM trucks ORDER BY order_number";
+  const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number FROM trucks ORDER BY order_number";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching trucks:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+app.get("/api/trucks/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck FROM trucks WHERE uuid = ?";
+  db.query(sql, [uuid], (err, results) => {
+    if (err) {
+      console.error("Error fetching truck:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+app.post("/api/trucks", (req, res) => {
+  const {
+    truck_no,
+    company,
+    gvw,
+    registration_date,
+    owner,
+    unloaded_weight,
+    tax_validity,
+    insurance_validity,
+    fitness_validity,
+    permit_validity,
+    direct_truck,
+    order_number,
+    created_at,
+  } = req.body;
+
+  if (
+    !truck_no ||
+    !company ||
+    !gvw ||
+    !registration_date ||
+    !owner ||
+    !unloaded_weight ||
+    !tax_validity ||
+    !insurance_validity ||
+    !fitness_validity ||
+    !permit_validity ||
+    !direct_truck ||
+    !order_number ||
+    !created_at
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const uuid = uuidv4();
+
+  // Get the last order_number
+  const getLastOrderSql = "SELECT MAX(order_number) AS last_order_number FROM trucks";
+  
+  db.query(getLastOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error fetching last order number:", err);
+      return res.status(500).json({ error: "Error fetching last order number" });
+    }
+
+    const lastOrderNumber = result[0].last_order_number || 0;
+    const newOrderNumber = lastOrderNumber + 1; // Increment by 1
+
+    // Corrected insert query
+    const insertSql =
+      "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+  
+    db.query(
+      insertSql,
+      [
+        uuid,
+        truck_no,
+        company,
+        gvw,
+        registration_date,
+        owner,
+        unloaded_weight,
+        tax_validity,
+        insurance_validity,
+        fitness_validity,
+        permit_validity,
+        direct_truck,
+        newOrderNumber, // Correct order_number
+        created_at,
+      ],
+      (err) => {
+        if (err) {
+          console.error("Error inserting truck:", err);
+          return res.status(500).json({ error: "Database insertion failed" });
+        }
+        res.status(201).json({ message: "Truck added successfully", uuid });
+      }
+    );
+  });
+});
+
+
+
+// app.post("/api/trucks", (req, res) => {
+//   const {
+//     truck_no,
+//     company,
+//     gvw,
+//     registration_date,
+//     owner,
+//     unloaded_weight,
+//     tax_validity,
+//     insurance_validity,
+//     fitness_validity,
+//     permit_validity,
+//     direct_truck,
+//     order_number,
+//     created_at,
+//   } = req.body;
+
+//   if (
+//     !truck_no ||
+//     !company ||
+//     !gvw ||
+//     !registration_date ||
+//     !owner ||
+//     !unloaded_weight ||
+//     !tax_validity ||
+//     !insurance_validity ||
+//     !fitness_validity ||
+//     !permit_validity ||
+//     !direct_truck ||
+//     !order_number ||
+//     !created_at
+//   ) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const uuid = uuidv4();
+
+//   // Get the last order_number
+//   const getLastOrderSql = "SELECT MAX(order_number) AS last_order_number FROM trucks";
+  
+//   db.query(getLastOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error fetching last order number:", err);
+//       return res.status(500).json({ error: "Error fetching last order number" });
+//     }
+
+//     const lastOrderNumber = result[0].last_order_number || 0;
+//     const newOrderNumber = lastOrderNumber + 1; // Increment by 1
+
+//     // Insert the new truck with the calculated order_number
+//     // const insertSql =
+//     //   "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//     const insertSql =
+//     "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, newOrderNumber, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+  
+//     db.query(
+//       insertSql,
+//       [
+//         uuid,
+//         truck_no,
+//         company,
+//         gvw,
+//         registration_date,
+//         owner,
+//         unloaded_weight,
+//         tax_validity,
+//         insurance_validity,
+//         fitness_validity,
+//         permit_validity,
+//         direct_truck,
+//         created_at,
+//         newOrderNumber,// Add order_number
+//       ],
+//       (err) => {
+//         if (err) {
+//           console.error("Error inserting truck:", err);
+//           return res.status(500).json({ error: "Database insertion failed" });
+//         }
+//         res.status(201).json({ message: "Truck added successfully", uuid });
+//       }
+//     );
+//   });
+// });
+
+
+app.put("/api/trucks/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const {
+    truck_no,
+    company,
+    gvw,
+    registration_date,
+    owner,
+    unloaded_weight,
+    tax_validity,
+    insurance_validity,
+    fitness_validity,
+    permit_validity,
+    direct_truck,
+  } = req.body;
+
+  if (
+    !truck_no ||
+    !company ||
+    !gvw ||
+    !registration_date ||
+    !owner ||
+    !unloaded_weight ||
+    !tax_validity ||
+    !insurance_validity ||
+    !fitness_validity ||
+    !permit_validity ||
+    !direct_truck
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const updateSql =
+    "UPDATE trucks SET truck_no = ?, order_number = ?, company = ?, gvw = ?, registration_date = ?, owner = ?, unloaded_weight = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_truck = ? WHERE uuid = ?";
+
+  db.query(
+    updateSql,
+    [
+      truck_no,
+      company,
+      gvw,
+      registration_date,
+      owner,
+      unloaded_weight,
+      tax_validity,
+      insurance_validity,
+      fitness_validity,
+      permit_validity,
+      direct_truck,
+      uuid,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating truck:", err);
+        return res.status(500).json({ error: "Database update error" });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Truck not found" });
+      }
+      res.json({ message: "Truck updated successfully" });
+    }
+  );
+});
+
+
+app.delete("/api/trucks/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  // Step 1: Delete the truck from the database
+  const deleteSql = "DELETE FROM trucks WHERE uuid = ?";
+  
+  db.query(deleteSql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error deleting truck:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+
+    // Step 2: Re-adjust the order_number for the remaining trucks
+    const reOrderSql = "SELECT uuid FROM trucks ORDER BY order_number";
+    
+    db.query(reOrderSql, (err, trucks) => {
+      if (err) {
+        console.error("Error fetching trucks after deletion:", err);
+        return res.status(500).json({ error: "Database fetch error" });
+      }
+
+      // Step 3: Loop through the remaining trucks and update their order_number
+      const updateSql =
+        "UPDATE trucks SET order_number = ? WHERE uuid = ?";
+      
+      trucks.forEach((truck, index) => {
+        const newOrderNumber = index + 1; // Start from 1 and increment
+        db.query(updateSql, [newOrderNumber, truck.uuid], (err) => {
+          if (err) {
+            console.error("Error updating order_number:", err);
+            return res.status(500).json({ error: "Database update error" });
+          }
+        });
+      });
+
+      // Step 4: Send success response
+      res.json({ message: "Truck deleted and order numbers re-adjusted successfully" });
+    });
+  });
+});
+
+
+
+
+///end of truck
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
