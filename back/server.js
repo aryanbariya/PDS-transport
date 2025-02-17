@@ -784,7 +784,7 @@ router.put("/api/truck/:truck_id", (req, res) => {
   }
 
   const sql = `
-    UPDATE tbl_truck 
+    UPDATE truck 
     SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, 
         truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, 
         fitness_validity = ?, permit_validity = ?, direct_sale = ? 
@@ -809,7 +809,7 @@ router.put("/api/truck/:truck_id", (req, res) => {
 
 // ✅ Delete a truck
 router.delete("/api/truck/:truck_id", (req, res) => {
-  const sql = "DELETE FROM tbl_truck WHERE truck_id = ?";
+  const sql = "DELETE FROM truck WHERE truck_id = ?";
 
   db.query(sql, [req.params.truck_id], (err, result) => {
     if (err) {
@@ -834,7 +834,7 @@ module.exports = router;
 router.get("/api/packaging", (req, res) => {
   const sql = `
     SELECT pack_id, material_name, weight, status, created_at, updated_at
-    FROM tbl_packaging
+    FROM packaging
     ORDER BY pack_id
   `;
 
@@ -851,7 +851,7 @@ router.get("/api/packaging", (req, res) => {
 router.get("/api/packaging/:pack_id", (req, res) => {
   const sql = `
     SELECT pack_id, material_name, weight, status, created_at, updated_at
-    FROM tbl_packaging
+    FROM packaging
     WHERE pack_id = ?
   `;
 
@@ -876,7 +876,7 @@ router.post("/api/packaging", (req, res) => {
   }
 
   const sql = `
-    INSERT INTO tbl_packaging (material_name, weight, status, created_at, updated_at)
+    INSERT INTO packaging (material_name, weight, status, created_at, updated_at)
     VALUES (?, ?, ?, NOW(), NOW())
   `;
 
@@ -898,7 +898,7 @@ router.put("/api/packaging/:pack_id", (req, res) => {
   }
 
   const sql = `
-    UPDATE tbl_packaging
+    UPDATE packaging
     SET material_name = ?, weight = ?, status = ?, updated_at = NOW()
     WHERE pack_id = ?
   `;
