@@ -13,6 +13,7 @@ import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 import SubGodownPage from "./pages/dashboard/SubGodownPage";
 import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
 import GrainPage from "./pages/dashboard/GrainPage";
+import TruckPage from "./pages/dashboard/TruckPage";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -52,6 +53,12 @@ export const routes = [
         path: "/MSWCGodownPage",
         element: <MSWCGodownPage />,
       },
+      // {
+      //   icon: <HomeIcon {...icon} />,
+      //   name: "Pannel",
+      //   path: "/Pannel",
+      //   element: <Pannel />,
+      // },
       {
         icon: <HomeIcon {...icon} />,
         name: "SubGodownPage",
@@ -64,18 +71,30 @@ export const routes = [
         path: "/EmployeePage",
         element: <EmployeePage />,
       },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "OwnerNamePage",
-      //   path: "/OwnerNamePage",
-      //   element: <OwnerNamePage />,
-      // },
+      {
+        icon: <UserCircleIcon {...icon} />,
+        name: "OwnerNamePage",
+        path: "/OwnerNamePage",
+        element: <OwnerNamePage />,
+      },
       {
         icon: <UserCircleIcon {...icon} />,
         name: "GrainPage",
         path: "/GrainPage",
         element: <GrainPage />,
       },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: "TruckPage",
+        path: "/TruckPage",
+        element: <TruckPage />,
+      },
+      // {
+      //   icon: <InformationCircleIcon {...icon} />,
+      //   name: "PackagingPage",
+      //   path: "/PackagingPage",
+      //   element: <PackagingPage />,
+      // },
     ],
   },
   {

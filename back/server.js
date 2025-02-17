@@ -688,6 +688,256 @@ app.delete("/api/grains/:uuid", (req, res) => {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+///start of truck page
+const router = express.Router();
+
+// ✅ Fetch all trucks
+router.get("/api/truck", (req, res) => {
+  const sql = `
+    SELECT truck_id, truck_name, truck_status, empty_weight, company, gvw, reg_date,
+           truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale
+    FROM truck
+    ORDER BY truck_id
+  `;
+console.log('faefda',sql)
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching trucks:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// ✅ Fetch a single truck by ID
+router.get("/api/truck/:truck_id", (req, res) => {
+  const sql = `
+    SELECT truck_id, truck_name, truck_status, empty_weight, company, gvw, reg_date,
+           truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale
+    FROM truck
+    WHERE truck_id = ?
+  `;
+
+  db.query(sql, [req.params.truck_id], (err, results) => {
+    if (err) {
+      console.error("Error fetching truck:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+// ✅ Add a new truck
+router.post("/api/truck", (req, res) => {
+  const {
+    truck_name, truck_status, empty_weight, company, gvw, reg_date,
+    truck_owner_name, owner_id, tax_validity, insurance_validity,
+    fitness_validity, permit_validity, direct_sale
+  } = req.body;
+
+  if (
+    !truck_name || !empty_weight || !company || !gvw || !reg_date ||
+    !truck_owner_name || !owner_id || !tax_validity || !insurance_validity ||
+    !fitness_validity || !permit_validity || !direct_sale
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    INSERT INTO truck 
+    (truck_name, truck_status, empty_weight, company, gvw, reg_date, 
+     truck_owner_name, owner_id, tax_validity, insurance_validity, 
+     fitness_validity, permit_validity, direct_sale) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [
+    truck_name, truck_status || "Start", empty_weight, company, gvw, reg_date,
+    truck_owner_name, owner_id, tax_validity, insurance_validity,
+    fitness_validity, permit_validity, direct_sale
+  ], (err, result) => {
+    if (err) {
+      console.error("Error inserting truck:", err);
+      return res.status(500).json({ error: "Database insertion failed" });
+    }
+    res.status(201).json({ message: "Truck added successfully", truck_id: result.insertId });
+  });
+});
+
+// ✅ Update an existing truck
+router.put("/api/truck/:truck_id", (req, res) => {
+  const {
+    truck_name, truck_status, empty_weight, company, gvw, reg_date,
+    truck_owner_name, owner_id, tax_validity, insurance_validity,
+    fitness_validity, permit_validity, direct_sale
+  } = req.body;
+
+  if (
+    !truck_name || !empty_weight || !company || !gvw || !reg_date ||
+    !truck_owner_name || !owner_id || !tax_validity || !insurance_validity ||
+    !fitness_validity || !permit_validity || !direct_sale
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    UPDATE tbl_truck 
+    SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, 
+        truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, 
+        fitness_validity = ?, permit_validity = ?, direct_sale = ? 
+    WHERE truck_id = ?
+  `;
+
+  db.query(sql, [
+    truck_name, truck_status, empty_weight, company, gvw, reg_date,
+    truck_owner_name, owner_id, tax_validity, insurance_validity,
+    fitness_validity, permit_validity, direct_sale, req.params.truck_id
+  ], (err, result) => {
+    if (err) {
+      console.error("Error updating truck:", err);
+      return res.status(500).json({ error: "Database update error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+    res.json({ message: "Truck updated successfully" });
+  });
+});
+
+// ✅ Delete a truck
+router.delete("/api/truck/:truck_id", (req, res) => {
+  const sql = "DELETE FROM tbl_truck WHERE truck_id = ?";
+
+  db.query(sql, [req.params.truck_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting truck:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+    res.json({ message: "Truck deleted successfully" });
+  });
+});
+
+module.exports = router;
+///end of truck
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ✅ Fetch all packaging records
+router.get("/api/packaging", (req, res) => {
+  const sql = `
+    SELECT pack_id, material_name, weight, status, created_at, updated_at
+    FROM tbl_packaging
+    ORDER BY pack_id
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching packaging records:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// ✅ Fetch a single packaging record by ID
+router.get("/api/packaging/:pack_id", (req, res) => {
+  const sql = `
+    SELECT pack_id, material_name, weight, status, created_at, updated_at
+    FROM tbl_packaging
+    WHERE pack_id = ?
+  `;
+
+  db.query(sql, [req.params.pack_id], (err, results) => {
+    if (err) {
+      console.error("Error fetching packaging record:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+// ✅ Add a new packaging record
+router.post("/api/packaging", (req, res) => {
+  const { material_name, weight, status } = req.body;
+
+  if (!material_name || !weight || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    INSERT INTO tbl_packaging (material_name, weight, status, created_at, updated_at)
+    VALUES (?, ?, ?, NOW(), NOW())
+  `;
+
+  db.query(sql, [material_name, weight, status], (err, result) => {
+    if (err) {
+      console.error("Error inserting packaging record:", err);
+      return res.status(500).json({ error: "Database insertion failed" });
+    }
+    res.status(201).json({ message: "Packaging record added successfully", pack_id: result.insertId });
+  });
+});
+
+// ✅ Update an existing packaging record
+router.put("/api/packaging/:pack_id", (req, res) => {
+  const { material_name, weight, status } = req.body;
+
+  if (!material_name || !weight || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    UPDATE tbl_packaging
+    SET material_name = ?, weight = ?, status = ?, updated_at = NOW()
+    WHERE pack_id = ?
+  `;
+
+  db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error updating packaging record:", err);
+      return res.status(500).json({ error: "Database update error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json({ message: "Packaging record updated successfully" });
+  });
+});
+
+// ✅ Delete a packaging record
+router.delete("/api/packaging/:pack_id", (req, res) => {
+  const sql = "DELETE FROM tbl_packaging WHERE pack_id = ?";
+
+  db.query(sql, [req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting packaging record:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json({ message: "Packaging record deleted successfully" });
+  });
+});
+
+module.exports = router;
+///end of packaging
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
 // **Server Listening**
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
