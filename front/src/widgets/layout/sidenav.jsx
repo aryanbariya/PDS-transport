@@ -127,6 +127,11 @@ export function Sidenav({ open, setOpen, routes }) {
   const sidenavColor = "blue"; // Default color for active links
   const sidenavType = "white"; // Default sidenav type
 
+  const handleWheel = (event) => {
+    // Stop the scroll event from propagating to the parent element
+    event.stopPropagation();
+  };
+
   return (
     <aside
       className={`${sidenavTypes[sidenavType]} ${
@@ -134,7 +139,7 @@ export function Sidenav({ open, setOpen, routes }) {
       } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
       {/* Logo */}
-      <div className="relative p-4">
+      <div className="relative p-4" >
         <Link to="/" className="flex flex-col items-center space-y-3">
           <img src="/img/pds-logo.png" alt="PDS" className="h-20 w-20" />
           <Typography variant="h6" className="text-4xl">
@@ -155,7 +160,7 @@ export function Sidenav({ open, setOpen, routes }) {
       </div>
 
       {/* Navigation Links */}
-      <div className="m-4">
+      <div className="m-4 flex flex-col max-h-[calc(80vh-120px)] overflow-y-auto" onWheel={handleWheel}>
         {routes.map(({ layout, title, pages }, key) => (
           <ul key={key} className="mb-4 flex flex-col gap-1">
             {title && (

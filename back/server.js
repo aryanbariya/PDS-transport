@@ -533,6 +533,36 @@ app.delete("/api/owners/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///start of grain page
 
+// Get all grains
+app.get("/api/grains", (req, res) => {
+  const sql = "SELECT * FROM grains ORDER BY order_number";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching grains:", err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    res.json(results);
+  });
+});
+
+// Get a specific grain by UUID
+app.get("/api/grains/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const sql = "SELECT * FROM grains WHERE uuid = ?";
+
+  db.query(sql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error fetching grain:", err);
+      return res.status(500).json({ error: "Database query failed" });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Grain not found" });
+    }
+    res.json(result[0]);
+  });
+});
+
 
 
 
@@ -634,433 +664,52 @@ app.delete("/api/grains/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// start of truck page
 
-app.get("/api/trucks", (req, res) => {
-  // const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck FROM trucks ORDER BY order_number";
-  const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number FROM trucks ORDER BY order_number";
 
+// Get all trucks
+app.get("/api/truck", (req, res) => {
+  const sql = "SELECT * FROM truck";
   db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error fetching trucks:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
+    if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
-app.get("/api/trucks/:uuid", (req, res) => {
-  const { uuid } = req.params;
-  const sql = "SELECT uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck FROM trucks WHERE uuid = ?";
-  db.query(sql, [uuid], (err, results) => {
-    if (err) {
-      console.error("Error fetching truck:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Truck not found" });
-    }
+// Get a specific truck by UUID
+app.get("/api/truck/:uuid", (req, res) => {
+  const sql = "SELECT * FROM truck WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Truck not found" });
     res.json(results[0]);
   });
 });
 
-app.post("/api/trucks", (req, res) => {
-  const {
-    truck_no,
-    company,
-    gvw,
-    registration_date,
-    owner,
-    unloaded_weight,
-    tax_validity,
-    insurance_validity,
-    fitness_validity,
-    permit_validity,
-    direct_truck,
-    order_number,
-    created_at,
-  } = req.body;
-
-  if (
-    !truck_no ||
-    !company ||
-    !gvw ||
-    !registration_date ||
-    !owner ||
-    !unloaded_weight ||
-    !tax_validity ||
-    !insurance_validity ||
-    !fitness_validity ||
-    !permit_validity ||
-    !direct_truck ||
-    !order_number ||
-    !created_at
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
+// Add a new truck
+app.post("/api/truck", (req, res) => {
+  const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale } = req.body;
   const uuid = uuidv4();
 
-  // Get the last order_number
-  const getLastOrderSql = "SELECT MAX(order_number) AS last_order_number FROM trucks";
+  const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   
-  db.query(getLastOrderSql, (err, result) => {
-    if (err) {
-      console.error("Error fetching last order number:", err);
-      return res.status(500).json({ error: "Error fetching last order number" });
+  db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale], (insertErr) => {
+    if (insertErr) {
+      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
     }
-
-    const lastOrderNumber = result[0].last_order_number || 0;
-    const newOrderNumber = lastOrderNumber + 1; // Increment by 1
-
-    // Corrected insert query
-    const insertSql =
-      "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-  
-    db.query(
-      insertSql,
-      [
-        uuid,
-        truck_no,
-        company,
-        gvw,
-        registration_date,
-        owner,
-        unloaded_weight,
-        tax_validity,
-        insurance_validity,
-        fitness_validity,
-        permit_validity,
-        direct_truck,
-        newOrderNumber, // Correct order_number
-        created_at,
-      ],
-      (err) => {
-        if (err) {
-          console.error("Error inserting truck:", err);
-          return res.status(500).json({ error: "Database insertion failed" });
-        }
-        res.status(201).json({ message: "Truck added successfully", uuid });
-      }
-    );
+    res.json({ message: "Truck added successfully", uuid });
   });
 });
 
-
-
-// app.post("/api/trucks", (req, res) => {
-//   const {
-//     truck_no,
-//     company,
-//     gvw,
-//     registration_date,
-//     owner,
-//     unloaded_weight,
-//     tax_validity,
-//     insurance_validity,
-//     fitness_validity,
-//     permit_validity,
-//     direct_truck,
-//     order_number,
-//     created_at,
-//   } = req.body;
-
-//   if (
-//     !truck_no ||
-//     !company ||
-//     !gvw ||
-//     !registration_date ||
-//     !owner ||
-//     !unloaded_weight ||
-//     !tax_validity ||
-//     !insurance_validity ||
-//     !fitness_validity ||
-//     !permit_validity ||
-//     !direct_truck ||
-//     !order_number ||
-//     !created_at
-//   ) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   const uuid = uuidv4();
-
-//   // Get the last order_number
-//   const getLastOrderSql = "SELECT MAX(order_number) AS last_order_number FROM trucks";
+// Update an existing truck
+app.put("/api/truck/:uuid", (req, res) => {
+  const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale } = req.body;
   
-//   db.query(getLastOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error fetching last order number:", err);
-//       return res.status(500).json({ error: "Error fetching last order number" });
-//     }
-
-//     const lastOrderNumber = result[0].last_order_number || 0;
-//     const newOrderNumber = lastOrderNumber + 1; // Increment by 1
-
-//     // Insert the new truck with the calculated order_number
-//     // const insertSql =
-//     //   "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//     const insertSql =
-//     "INSERT INTO trucks (uuid, truck_no, company, gvw, registration_date, owner, unloaded_weight, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_truck, newOrderNumber, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+  const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
   
-//     db.query(
-//       insertSql,
-//       [
-//         uuid,
-//         truck_no,
-//         company,
-//         gvw,
-//         registration_date,
-//         owner,
-//         unloaded_weight,
-//         tax_validity,
-//         insurance_validity,
-//         fitness_validity,
-//         permit_validity,
-//         direct_truck,
-//         created_at,
-//         newOrderNumber,// Add order_number
-//       ],
-//       (err) => {
-//         if (err) {
-//           console.error("Error inserting truck:", err);
-//           return res.status(500).json({ error: "Database insertion failed" });
-//         }
-//         res.status(201).json({ message: "Truck added successfully", uuid });
-//       }
-//     );
-//   });
-// });
-
-
-app.put("/api/trucks/:uuid", (req, res) => {
-  const { uuid } = req.params;
-  const {
-    truck_no,
-    company,
-    gvw,
-    registration_date,
-    owner,
-    unloaded_weight,
-    tax_validity,
-    insurance_validity,
-    fitness_validity,
-    permit_validity,
-    direct_truck,
-  } = req.body;
-
-  if (
-    !truck_no ||
-    !company ||
-    !gvw ||
-    !registration_date ||
-    !owner ||
-    !unloaded_weight ||
-    !tax_validity ||
-    !insurance_validity ||
-    !fitness_validity ||
-    !permit_validity ||
-    !direct_truck
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  const updateSql =
-    "UPDATE trucks SET truck_no = ?, order_number = ?, company = ?, gvw = ?, registration_date = ?, owner = ?, unloaded_weight = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_truck = ? WHERE uuid = ?";
-
-  db.query(
-    updateSql,
-    [
-      truck_no,
-      company,
-      gvw,
-      registration_date,
-      owner,
-      unloaded_weight,
-      tax_validity,
-      insurance_validity,
-      fitness_validity,
-      permit_validity,
-      direct_truck,
-      uuid,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("Error updating truck:", err);
-        return res.status(500).json({ error: "Database update error" });
-      }
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: "Truck not found" });
-      }
-      res.json({ message: "Truck updated successfully" });
-    }
-  );
-});
-
-
-app.delete("/api/trucks/:uuid", (req, res) => {
-  const { uuid } = req.params;
-
-  // Step 1: Delete the truck from the database
-  const deleteSql = "DELETE FROM trucks WHERE uuid = ?";
-  
-  db.query(deleteSql, [uuid], (err, result) => {
+  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, req.params.uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting truck:", err);
-      return res.status(500).json({ error: "Database deletion failed" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Truck not found" });
-    }
-
-    // Step 2: Re-adjust the order_number for the remaining trucks
-    const reOrderSql = "SELECT uuid FROM trucks ORDER BY order_number";
-    
-    db.query(reOrderSql, (err, trucks) => {
-      if (err) {
-        console.error("Error fetching trucks after deletion:", err);
-        return res.status(500).json({ error: "Database fetch error" });
-      }
-
-      // Step 3: Loop through the remaining trucks and update their order_number
-      const updateSql =
-        "UPDATE trucks SET order_number = ? WHERE uuid = ?";
-      
-      trucks.forEach((truck, index) => {
-        const newOrderNumber = index + 1; // Start from 1 and increment
-        db.query(updateSql, [newOrderNumber, truck.uuid], (err) => {
-          if (err) {
-            console.error("Error updating order_number:", err);
-            return res.status(500).json({ error: "Database update error" });
-          }
-        });
-      });
-
-      // Step 4: Send success response
-      res.json({ message: "Truck deleted and order numbers re-adjusted successfully" });
-    });
-  });
-});
-
-
-
-
-///end of truck
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-///start of truck page
-const router = express.Router();
-
-// ✅ Fetch all trucks
-router.get("/api/truck", (req, res) => {
-  const sql = `
-    SELECT truck_id, truck_name, truck_status, empty_weight, company, gvw, reg_date,
-           truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale
-    FROM truck
-    ORDER BY truck_id
-  `;
-console.log('faefda',sql)
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error fetching trucks:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    res.json(results);
-  });
-});
-
-// ✅ Fetch a single truck by ID
-router.get("/api/truck/:truck_id", (req, res) => {
-  const sql = `
-    SELECT truck_id, truck_name, truck_status, empty_weight, company, gvw, reg_date,
-           truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale
-    FROM truck
-    WHERE truck_id = ?
-  `;
-
-  db.query(sql, [req.params.truck_id], (err, results) => {
-    if (err) {
-      console.error("Error fetching truck:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Truck not found" });
-    }
-    res.json(results[0]);
-  });
-});
-
-// ✅ Add a new truck
-router.post("/api/truck", (req, res) => {
-  const {
-    truck_name, truck_status, empty_weight, company, gvw, reg_date,
-    truck_owner_name, owner_id, tax_validity, insurance_validity,
-    fitness_validity, permit_validity, direct_sale
-  } = req.body;
-
-  if (
-    !truck_name || !empty_weight || !company || !gvw || !reg_date ||
-    !truck_owner_name || !owner_id || !tax_validity || !insurance_validity ||
-    !fitness_validity || !permit_validity || !direct_sale
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  const sql = `
-    INSERT INTO truck 
-    (truck_name, truck_status, empty_weight, company, gvw, reg_date, 
-     truck_owner_name, owner_id, tax_validity, insurance_validity, 
-     fitness_validity, permit_validity, direct_sale) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  db.query(sql, [
-    truck_name, truck_status || "Start", empty_weight, company, gvw, reg_date,
-    truck_owner_name, owner_id, tax_validity, insurance_validity,
-    fitness_validity, permit_validity, direct_sale
-  ], (err, result) => {
-    if (err) {
-      console.error("Error inserting truck:", err);
-      return res.status(500).json({ error: "Database insertion failed" });
-    }
-    res.status(201).json({ message: "Truck added successfully", truck_id: result.insertId });
-  });
-});
-
-// ✅ Update an existing truck
-router.put("/api/truck/:truck_id", (req, res) => {
-  const {
-    truck_name, truck_status, empty_weight, company, gvw, reg_date,
-    truck_owner_name, owner_id, tax_validity, insurance_validity,
-    fitness_validity, permit_validity, direct_sale
-  } = req.body;
-
-  if (
-    !truck_name || !empty_weight || !company || !gvw || !reg_date ||
-    !truck_owner_name || !owner_id || !tax_validity || !insurance_validity ||
-    !fitness_validity || !permit_validity || !direct_sale
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  const sql = `
-    UPDATE truck 
-    SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, 
-        truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, 
-        fitness_validity = ?, permit_validity = ?, direct_sale = ? 
-    WHERE truck_id = ?
-  `;
-
-  db.query(sql, [
-    truck_name, truck_status, empty_weight, company, gvw, reg_date,
-    truck_owner_name, owner_id, tax_validity, insurance_validity,
-    fitness_validity, permit_validity, direct_sale, req.params.truck_id
-  ], (err, result) => {
-    if (err) {
-      console.error("Error updating truck:", err);
-      return res.status(500).json({ error: "Database update error" });
+      console.error("Error updating:", err);
+      return res.status(500).json({ error: "Database error" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Truck not found" });
@@ -1069,14 +718,14 @@ router.put("/api/truck/:truck_id", (req, res) => {
   });
 });
 
-// ✅ Delete a truck
-router.delete("/api/truck/:truck_id", (req, res) => {
-  const sql = "DELETE FROM truck WHERE truck_id = ?";
-
-  db.query(sql, [req.params.truck_id], (err, result) => {
+// Delete a truck
+app.delete("/api/truck/:uuid", (req, res) => {
+  const deleteSql = "DELETE FROM truck WHERE uuid = ?";
+  const uuid = uuidv4();
+  db.query(deleteSql, [req.params.uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting truck:", err);
-      return res.status(500).json({ error: "Database deletion failed" });
+      console.error("Error deleting:", err.sqlMessage || err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Truck not found" });
@@ -1085,115 +734,120 @@ router.delete("/api/truck/:truck_id", (req, res) => {
   });
 });
 
-module.exports = router;
+
+
 ///end of truck
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // ✅ Fetch all packaging records
-router.get("/api/packaging", (req, res) => {
-  const sql = `
-    SELECT pack_id, material_name, weight, status, created_at, updated_at
-    FROM packaging
-    ORDER BY pack_id
-  `;
+// router.get("/api/packaging", (req, res) => {
+//   const sql = `
+//     SELECT pack_id, material_name, weight, status, created_at, updated_at
+//     FROM packaging
+//     ORDER BY pack_id
+//   `;
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Error fetching packaging records:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    res.json(results);
-  });
-});
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching packaging records:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
 
-// ✅ Fetch a single packaging record by ID
-router.get("/api/packaging/:pack_id", (req, res) => {
-  const sql = `
-    SELECT pack_id, material_name, weight, status, created_at, updated_at
-    FROM packaging
-    WHERE pack_id = ?
-  `;
+// // ✅ Fetch a single packaging record by ID
+// router.get("/api/packaging/:pack_id", (req, res) => {
+//   const sql = `
+//     SELECT pack_id, material_name, weight, status, created_at, updated_at
+//     FROM packaging
+//     WHERE pack_id = ?
+//   `;
 
-  db.query(sql, [req.params.pack_id], (err, results) => {
-    if (err) {
-      console.error("Error fetching packaging record:", err);
-      return res.status(500).json({ error: "Database fetch error" });
-    }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Packaging record not found" });
-    }
-    res.json(results[0]);
-  });
-});
+//   db.query(sql, [req.params.pack_id], (err, results) => {
+//     if (err) {
+//       console.error("Error fetching packaging record:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     if (results.length === 0) {
+//       return res.status(404).json({ message: "Packaging record not found" });
+//     }
+//     res.json(results[0]);
+//   });
+// });
 
-// ✅ Add a new packaging record
-router.post("/api/packaging", (req, res) => {
-  const { material_name, weight, status } = req.body;
+// // ✅ Add a new packaging record
+// router.post("/api/packaging", (req, res) => {
+//   const { material_name, weight, status } = req.body;
 
-  if (!material_name || !weight || !status) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+//   if (!material_name || !weight || !status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
 
-  const sql = `
-    INSERT INTO packaging (material_name, weight, status, created_at, updated_at)
-    VALUES (?, ?, ?, NOW(), NOW())
-  `;
+//   const sql = `
+//     INSERT INTO packaging (material_name, weight, status, created_at, updated_at)
+//     VALUES (?, ?, ?, NOW(), NOW())
+//   `;
 
-  db.query(sql, [material_name, weight, status], (err, result) => {
-    if (err) {
-      console.error("Error inserting packaging record:", err);
-      return res.status(500).json({ error: "Database insertion failed" });
-    }
-    res.status(201).json({ message: "Packaging record added successfully", pack_id: result.insertId });
-  });
-});
+//   db.query(sql, [material_name, weight, status], (err, result) => {
+//     if (err) {
+//       console.error("Error inserting packaging record:", err);
+//       return res.status(500).json({ error: "Database insertion failed" });
+//     }
+//     res.status(201).json({ message: "Packaging record added successfully", pack_id: result.insertId });
+//   });
+// });
 
-// ✅ Update an existing packaging record
-router.put("/api/packaging/:pack_id", (req, res) => {
-  const { material_name, weight, status } = req.body;
+// // ✅ Update an existing packaging record
+// router.put("/api/packaging/:pack_id", (req, res) => {
+//   const { material_name, weight, status } = req.body;
 
-  if (!material_name || !weight || !status) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+//   if (!material_name || !weight || !status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
 
-  const sql = `
-    UPDATE packaging
-    SET material_name = ?, weight = ?, status = ?, updated_at = NOW()
-    WHERE pack_id = ?
-  `;
+//   const sql = `
+//     UPDATE packaging
+//     SET material_name = ?, weight = ?, status = ?, updated_at = NOW()
+//     WHERE pack_id = ?
+//   `;
 
-  db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
-    if (err) {
-      console.error("Error updating packaging record:", err);
-      return res.status(500).json({ error: "Database update error" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Packaging record not found" });
-    }
-    res.json({ message: "Packaging record updated successfully" });
-  });
-});
+//   db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+//     if (err) {
+//       console.error("Error updating packaging record:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging record not found" });
+//     }
+//     res.json({ message: "Packaging record updated successfully" });
+//   });
+// });
 
-// ✅ Delete a packaging record
-router.delete("/api/packaging/:pack_id", (req, res) => {
-  const sql = "DELETE FROM tbl_packaging WHERE pack_id = ?";
+// // ✅ Delete a packaging record
+// router.delete("/api/packaging/:pack_id", (req, res) => {
+//   const sql = "DELETE FROM tbl_packaging WHERE pack_id = ?";
 
-  db.query(sql, [req.params.pack_id], (err, result) => {
-    if (err) {
-      console.error("Error deleting packaging record:", err);
-      return res.status(500).json({ error: "Database deletion failed" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Packaging record not found" });
-    }
-    res.json({ message: "Packaging record deleted successfully" });
-  });
-});
+//   db.query(sql, [req.params.pack_id], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting packaging record:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging record not found" });
+//     }
+//     res.json({ message: "Packaging record deleted successfully" });
+//   });
+// });
 
-module.exports = router;
+// module.exports = router;
 ///end of packaging
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
