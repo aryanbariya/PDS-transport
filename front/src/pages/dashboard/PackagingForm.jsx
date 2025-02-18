@@ -4,7 +4,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     materialName: "",
     weight: "",
-    status: "Start",
+    status: "Active",
   });
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
         alert("Error submitting form");
       }
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.log("Error submitting data:", error);
       alert("Error submitting form");
     }
   };
@@ -91,6 +91,21 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
               className="p-2 border rounded-lg w-full"
             />
           </div>
+
+           {/* New Status Field */}
+           <div>
+              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                required
+                className="p-2 border rounded-lg w-full"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
 
           {/* Buttons */}
           <div className="col-span-2 flex justify-between mt-4">

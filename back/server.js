@@ -209,7 +209,7 @@ app.post("/api/mswcgodown", (req, res) => {
     }
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
+    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, go+downUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
 
     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
       if (insertErr) {
@@ -747,6 +747,106 @@ app.delete("/api/truck/:uuid", (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////
 // ✅ Fetch all packaging records
+// ✅ Fetch all packaging records
+app.get("/api/packaging", (req, res) => {
+  const sql = `
+    SELECT pack_id, material_name, weight, status
+    FROM packaging
+    ORDER BY pack_id
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching packaging records:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// ✅ Fetch a single packaging record by ID
+app.get("/api/packaging/:pack_id", (req, res) => {
+  const sql = `
+    SELECT pack_id, material_name, weight, status
+    FROM packaging
+    WHERE pack_id = ?
+  `;
+
+  db.query(sql, [req.params.pack_id], (err, results) => {
+    if (err) {
+      console.error("Error fetching packaging record:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+// ✅ Add a new packaging record
+app.post("/api/packaging", (req, res) => {
+  const { material_name, weight, status } = req.body;
+
+  if (!material_name || !weight || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    INSERT INTO packaging (pack_id, material_name, weight, status)
+    VALUES (?, ?, ?)
+  `;
+
+  db.query(sql, [material_name, weight, status], (err, result) => {
+    if (err) {
+      console.error("Error inserting packaging record:", err);
+      return res.status(500).json({ error: "Database insertion failed" });
+    }
+    res.status(201).json({ message: "Packaging record added successfully", pack_id: result.insertId });
+  });
+});
+
+// ✅ Update an existing packaging record
+app.put("/api/packaging/:pack_id", (req, res) => {
+  const { material_name, weight, status } = req.body;
+
+  if (!material_name || !weight || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `
+    UPDATE packaging
+    SET material_name = ?, weight = ?, status = ?
+    WHERE pack_id = ?
+  `;
+
+  db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error updating packaging record:", err);
+      return res.status(500).json({ error: "Database update error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json({ message: "Packaging record updated successfully" });
+  });
+});
+
+// ✅ Delete a packaging record
+app.delete("/api/packaging/:pack_id", (req, res) => {
+  const sql = "DELETE FROM packaging WHERE pack_id = ?";
+
+  db.query(sql, [req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting packaging record:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging record not found" });
+    }
+    res.json({ message: "Packaging record deleted successfully" });
+  });
+});
 // router.get("/api/packaging", (req, res) => {
 //   const sql = `
 //     SELECT pack_id, material_name, weight, status, created_at, updated_at
