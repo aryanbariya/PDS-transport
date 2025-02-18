@@ -734,8 +734,6 @@ app.delete("/api/truck/:uuid", (req, res) => {
   });
 });
 
-
-
 ///end of truck
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -746,114 +744,229 @@ app.delete("/api/truck/:uuid", (req, res) => {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// ✅ Fetch all packaging records
-// router.get("/api/packaging", (req, res) => {
-//   const sql = `
-//     SELECT pack_id, material_name, weight, status, created_at, updated_at
-//     FROM packaging
-//     ORDER BY pack_id
-//   `;
+///** Start of Packaging */
 
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching packaging records:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
+//✅ Fetch all packaging records
+app.get("/api/packaging", (req, res) => {
+  const sql = "SELECT * FROM packaging";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
-// // ✅ Fetch a single packaging record by ID
-// router.get("/api/packaging/:pack_id", (req, res) => {
-//   const sql = `
-//     SELECT pack_id, material_name, weight, status, created_at, updated_at
-//     FROM packaging
-//     WHERE pack_id = ?
-//   `;
+// Get a specific packaging material by pack_id
+app.get("/api/packaging/:pack_id", (req, res) => {
+  const sql = "SELECT * FROM packaging WHERE pack_id = ?";
+  db.query(sql, [req.params.pack_id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Packaging material not found" });
+    res.json(results[0]);
+  });
+});
 
-//   db.query(sql, [req.params.pack_id], (err, results) => {
-//     if (err) {
-//       console.error("Error fetching packaging record:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     if (results.length === 0) {
-//       return res.status(404).json({ message: "Packaging record not found" });
-//     }
-//     res.json(results[0]);
-//   });
-// });
+// Add a new packaging material
+app.post("/api/packaging", (req, res) => {
+  const { material_name, weight, status = "Start" } = req.body;
 
-// // ✅ Add a new packaging record
-// router.post("/api/packaging", (req, res) => {
-//   const { material_name, weight, status } = req.body;
+  const insertSql = "INSERT INTO packaging (material_name, weight, status) VALUES (?, ?, ?)";
+  
+  db.query(insertSql, [material_name, weight, status], (insertErr, result) => {
+    if (insertErr) {
+      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+    }
+    res.json({ message: "Packaging material added successfully", pack_id: result.insertId });
+  });
+});
 
-//   if (!material_name || !weight || !status) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
+// Update an existing packaging material
+app.put("/api/packaging/:pack_id", (req, res) => {
+  const { material_name, weight, status } = req.body;
+  
+  const sql = "UPDATE packaging SET material_name = ?, weight = ?, status = ? WHERE pack_id = ?";
+  
+  db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error updating:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging material not found" });
+    }
+    res.json({ message: "Packaging material updated successfully" });
+  });
+});
 
-//   const sql = `
-//     INSERT INTO packaging (material_name, weight, status, created_at, updated_at)
-//     VALUES (?, ?, ?, NOW(), NOW())
-//   `;
+// Delete a packaging material
+app.delete("/api/packaging/:pack_id", (req, res) => {
+  const deleteSql = "DELETE FROM packaging WHERE pack_id = ?";
+  db.query(deleteSql, [req.params.pack_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting:", err.sqlMessage || err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Packaging material not found" });
+    }
+    res.json({ message: "Packaging material deleted successfully" });
+  });
+});
 
-//   db.query(sql, [material_name, weight, status], (err, result) => {
-//     if (err) {
-//       console.error("Error inserting packaging record:", err);
-//       return res.status(500).json({ error: "Database insertion failed" });
-//     }
-//     res.status(201).json({ message: "Packaging record added successfully", pack_id: result.insertId });
-//   });
-// });
-
-// // ✅ Update an existing packaging record
-// router.put("/api/packaging/:pack_id", (req, res) => {
-//   const { material_name, weight, status } = req.body;
-
-//   if (!material_name || !weight || !status) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   const sql = `
-//     UPDATE packaging
-//     SET material_name = ?, weight = ?, status = ?, updated_at = NOW()
-//     WHERE pack_id = ?
-//   `;
-
-//   db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
-//     if (err) {
-//       console.error("Error updating packaging record:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Packaging record not found" });
-//     }
-//     res.json({ message: "Packaging record updated successfully" });
-//   });
-// });
-
-// // ✅ Delete a packaging record
-// router.delete("/api/packaging/:pack_id", (req, res) => {
-//   const sql = "DELETE FROM tbl_packaging WHERE pack_id = ?";
-
-//   db.query(sql, [req.params.pack_id], (err, result) => {
-//     if (err) {
-//       console.error("Error deleting packaging record:", err);
-//       return res.status(500).json({ error: "Database deletion failed" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Packaging record not found" });
-//     }
-//     res.json({ message: "Packaging record deleted successfully" });
-//   });
-// });
-
-// module.exports = router;
-///end of packaging
+//end of packaging
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+//**Start Categories**
+// Get all categories
+app.get("/api/categories", (req, res) => {
+  const sql = "SELECT * FROM categories";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+// Get a specific category by category_id
+app.get("/api/categories/:category_id", (req, res) => {
+  const sql = "SELECT * FROM categories WHERE category_id = ?";
+  db.query(sql, [req.params.category_id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Category not found" });
+    res.json(results[0]);
+  });
+});
+
+// Add a new category
+app.post("/api/categories", (req, res) => {
+  const { category_name, description } = req.body;
+
+  const insertSql = "INSERT INTO categories (category_name, description) VALUES (?, ?)";
+  
+  db.query(insertSql, [category_name, description], (insertErr, result) => {
+    if (insertErr) {
+      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+    }
+    res.json({ message: "Category added successfully", category_id: result.insertId });
+  });
+});
+
+// Update an existing category
+app.put("/api/categories/:category_id", (req, res) => {
+  const { category_name, description } = req.body;
+  
+  const sql = "UPDATE categories SET category_name = ?, description = ? WHERE category_id = ?";
+  
+  db.query(sql, [category_name, description, req.params.category_id], (err, result) => {
+    if (err) {
+      console.error("Error updating:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category updated successfully" });
+  });
+});
+
+// Delete a category
+app.delete("/api/categories/:category_id", (req, res) => {
+  const deleteSql = "DELETE FROM categories WHERE category_id = ?";
+  db.query(deleteSql, [req.params.category_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting:", err.sqlMessage || err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category deleted successfully" });
+  });
+});
+
+//end of categories
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// **Start Schemes**
+
+// Get all schemes
+app.get("/api/scheme", (req, res) => {
+  const sql = "SELECT * FROM scheme";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+// Get a specific scheme by scheme_id
+app.get("/api/scheme/:scheme_id", (req, res) => {
+  const sql = "SELECT * FROM scheme WHERE scheme_id = ?";
+  db.query(sql, [req.params.scheme_id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
+    res.json(results[0]);
+  });
+});
+
+// Add a new scheme
+app.post("/api/scheme", (req, res) => {
+  const { scheme_name, scheme_status } = req.body;
+
+  const insertSql = "INSERT INTO scheme (scheme_name, scheme_status) VALUES (?, ?)";
+
+  db.query(insertSql, [scheme_name, scheme_status], (insertErr, result) => {
+    if (insertErr) {
+      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+    }
+    res.json({ message: "Scheme added successfully", scheme_id: result.insertId });
+  });
+});
+
+// Update an existing scheme
+app.put("/api/scheme/:scheme_id", (req, res) => {
+  const { scheme_name, scheme_status } = req.body;
+
+  const sql = "UPDATE scheme SET scheme_name = ?, scheme_status = ? WHERE scheme_id = ?";
+
+  db.query(sql, [scheme_name, scheme_status, req.params.scheme_id], (err, result) => {
+    if (err) {
+      console.error("Error updating:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Scheme not found" });
+    }
+    res.json({ message: "Scheme updated successfully" });
+  });
+});
+
+// Delete a scheme
+app.delete("/api/scheme/:scheme_id", (req, res) => {
+  const deleteSql = "DELETE FROM scheme WHERE scheme_id = ?";
+  db.query(deleteSql, [req.params.scheme_id], (err, result) => {
+    if (err) {
+      console.error("Error deleting:", err.sqlMessage || err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Scheme not found" });
+    }
+    res.json({ message: "Scheme deleted successfully" });
+  });
+});
+
+// **End of Schemes**
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 // **Server Listening**
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
