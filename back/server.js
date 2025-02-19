@@ -209,7 +209,7 @@ app.post("/api/mswcgodown", (req, res) => {
     }
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
+    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, go+downUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
 
     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
       if (insertErr) {

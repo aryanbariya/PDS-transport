@@ -9,7 +9,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: BanknotesIcon,
-    title: "Today's Money",
+    title: "OWNERS",
     value: "$53k",
     footer: {
       color: "text-green-500",
@@ -20,7 +20,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: UsersIcon,
-    title: "Today's Users",
+    title: "EMPLOYEES",
     value: "2,300",
     footer: {
       color: "text-green-500",
@@ -31,7 +31,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: UserPlusIcon,
-    title: "New Clients",
+    title: "MSWC",
     value: "3,462",
     footer: {
       color: "text-red-500",
@@ -42,7 +42,51 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: ChartBarIcon,
-    title: "Sales",
+    title: "GODOWN",
+    value: "$103,430",
+    footer: {
+      color: "text-green-500",
+      value: "+5%",
+      label: "than yesterday",
+    },
+  },
+  {
+    color: "gray",
+    icon: ChartBarIcon,
+    title: "DRIVERS",
+    value: "$103,430",
+    footer: {
+      color: "text-green-500",
+      value: "+5%",
+      label: "than yesterday",
+    },
+  },
+  {
+    color: "gray",
+    icon: ChartBarIcon,
+    title: "TRUCKS",
+    value: "$103,430",
+    footer: {
+      color: "text-green-500",
+      value: "+5%",
+      label: "than yesterday",
+    },
+  },
+  {
+    color: "gray",
+    icon: ChartBarIcon,
+    title: "SCHEMES",
+    value: "$103,430",
+    footer: {
+      color: "text-green-500",
+      value: "+5%",
+      label: "than yesterday",
+    },
+  },
+  {
+    color: "gray",
+    icon: ChartBarIcon,
+    title: "PACKAGING",
     value: "$103,430",
     footer: {
       color: "text-green-500",
