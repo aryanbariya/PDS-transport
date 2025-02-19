@@ -6,19 +6,19 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 
 export function SignIn() {
   // const URL = "https://pds-transport.onrender.com"
-  const URL = "http://localhost:5000"; 
+  const URL = "http://localhost:5000";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // Redirect after login
 
- 
+
   const handleSignIn = async (e) => {
     e.preventDefault();
 
@@ -26,7 +26,7 @@ export function SignIn() {
       alert("Please enter email and password");
       return;
     }
-  
+
 
     try {
       const response = await axios.post(`${URL}/signin`, { email, password });
@@ -35,7 +35,7 @@ export function SignIn() {
         localStorage.setItem("token", response.data.token); // Store token
         alert("Login Successful!");
         navigate("/dashboard"); // Redirect to dashboard (update path if needed)
-;
+        ;
       }
     } catch (err) {
       alert(err.response?.data?.error || "Login failed. Please try again.");
@@ -65,7 +65,7 @@ export function SignIn() {
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               value={email}
               labelProps={{
-                className: "before:content-none after:content-none",  
+                className: "before:content-none after:content-none",
               }}
               onChange={(e) => setEmail(e.target.value)}
             />

@@ -96,6 +96,7 @@ const PackagingPage = () => {
       <table className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
         <thead>
           <tr className="bg-gray-200">
+          <th className="border p-2">ID</th>
             <th className="border p-2">Material Name</th>
             <th className="border p-2">Weight</th>
             <th className="border p-2">Status</th>
@@ -106,6 +107,7 @@ const PackagingPage = () => {
           {filteredPackaging.length > 0 ? (
             filteredPackaging.map((p) => (
               <tr key={p.pack_id} className="text-center hover:bg-gray-100">
+                <td className="border p-2">{p.pack_id}</td>
                 <td className="border p-2">{p.material_name}</td>
                 <td className="border p-2">{p.weight}</td>
                 <td className="border p-2">{p.status}</td>
