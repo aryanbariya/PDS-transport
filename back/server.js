@@ -209,7 +209,7 @@ app.post("/api/mswcgodown", (req, res) => {
     }
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, go+downUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
+    const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
 
     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
       if (insertErr) {
@@ -305,7 +305,7 @@ app.get("/api/godowns", (req, res) => {
 
 
 app.get("/api/subgodown", (req, res) => {
-  const sql = "SELECT uuid, parentGodown, subGodown AS subGodownName, status, order_number FROM sub_godown ORDER BY order_number";
+  const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -313,7 +313,7 @@ app.get("/api/subgodown", (req, res) => {
 });
 
 app.get("/api/subgodown/:uuid", (req, res) => {
-  const sql = "SELECT uuid, parentGodown, subGodown AS subGodownName, status, order_number FROM sub_godown WHERE uuid = ?";
+  const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
@@ -322,7 +322,7 @@ app.get("/api/subgodown/:uuid", (req, res) => {
 });
 
 app.post("/api/subgodown", (req, res) => {
-  const { parentGodown, subGodownName, status = "Active" } = req.body;
+  const { parentGodown, subGodown, status = "Active" } = req.body;
   const uuid = uuidv4();
 
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM sub_godown";
@@ -336,7 +336,7 @@ app.post("/api/subgodown", (req, res) => {
     const nextOrder = result[0].next_order;
     const insertSql = "INSERT INTO sub_godown (uuid, parentGodown, subGodown, status, order_number) VALUES (?, ?, ?, ?, ?)";
     
-    db.query(insertSql, [uuid, parentGodown, subGodownName, status, nextOrder], (err, result) => {
+    db.query(insertSql, [uuid, parentGodown, subGodown, status, nextOrder], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.status(201).json({ message: "Sub-Godown added successfully", uuid });
     });

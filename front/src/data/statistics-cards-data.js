@@ -19,7 +19,7 @@ export const statisticsCardsData = [
   },
   {
     color: "gray",
-    icon: UsersIcon,
+    icon: UsersIcon, 
     title: "EMPLOYEES",
     value: "2,300",
     footer: {
