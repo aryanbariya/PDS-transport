@@ -120,9 +120,9 @@ const StatisticsCardsData = () => {
       title: "OWNERS",
       value: statistics.ownercount || "NIL",
       footer: {
-        color: "text-green-500",
-        value: "+55%",
-        label: "than last week",
+      // color: "text-green-500",
+      // value: "+55%",
+      // label: "than last week",
       },
     },
     {
@@ -131,9 +131,9 @@ const StatisticsCardsData = () => {
       title: "EMPLOYEES",
       value: statistics.employeecount || "NIL",
       footer: {
-        color: "text-green-500",
-        value: "+3%",
-        label: "than last month",
+        // color: "text-green-500",
+        // value: "+3%",
+        // label: "than last month",
       },
     },
     {
@@ -142,9 +142,9 @@ const StatisticsCardsData = () => {
       title: "MSWC",
       value: statistics.mswccount || "NIL",
       footer: {
-        color: "text-red-500",
-        value: "-2%",
-        label: "than yesterday",
+        // color: "text-red-500",
+        // value: "-2%",
+        // label: "than yesterday",
       },
     },
     {
@@ -153,9 +153,9 @@ const StatisticsCardsData = () => {
       title: "GODOWN",
       value: statistics.godowncount || "NIL",
       footer: {
-        color: "text-green-500",
-        value: "+5%",
-        label: "than yesterday",
+        // color: "text-green-500",
+        // value: "+5%",
+        // label: "than yesterday",
       },
     },
     {
@@ -164,9 +164,9 @@ const StatisticsCardsData = () => {
       title:"DRIVERS",
       value:  statistics. drivercount || "NIL",
       footer: {
-        color: "text-green-500",
-        value: "+5%",
-        label: "than yesterday",
+        // color: "text-green-500",
+        // value: "+5%",
+        // label: "than yesterday",
       },
     },
     {
@@ -175,9 +175,9 @@ const StatisticsCardsData = () => {
       title: "TRUCKS",
       value:  statistics.truckcount ||"NIL",
       footer: {
-        color: "text-green-500",
-        value: "+5%",
-        label: "than yesterday",
+        // color: "text-green-500",
+        // value: "+5%",
+        // label: "than yesterday",
       },
     },
     {
@@ -186,9 +186,9 @@ const StatisticsCardsData = () => {
       title: "SCHEMES",
       value: statistics.schemecount || "NIL",
       footer: {
-        color: "text-green-500",
-        value: "+5%",
-        label: "than yesterday",
+        // color: "text-green-500",
+        // value: "+5%",
+        // label: "than yesterday",
       },
     },
     {
@@ -197,9 +197,9 @@ const StatisticsCardsData = () => {
       title:  "PACKAGING",
       value: statistics.packagingcount ||"NIL",
       footer: {
-        color: "text-green-500",
-        value: "+5%",
-        label: "than yesterday",
+        // color: "text-green-500",
+        // value: "+5%",
+        // label: "than yesterday",
       },
     },
   ];

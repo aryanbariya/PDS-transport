@@ -663,7 +663,36 @@ app.delete("/api/grains/:uuid", (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// start of truck page
+// // Get all trucks with pagination
+// app.get("/api/truck", (req, res) => {
+//   let { page, limit } = req.query;
+//   page = parseInt(page) || 1; 
+//   limit = parseInt(limit) || 10; 
+//   const offset = (page - 1) * limit;
 
+//   const countSql = "SELECT COUNT(*) AS total FROM truck";
+//   db.query(countSql, (countErr, countResult) => {
+//     if (countErr) return res.status(500).json({ error: countErr.message });
+
+//     const totalRecords = countResult[0].total;
+//     const totalPages = Math.ceil(totalRecords / limit);
+
+//     const sql = "SELECT * FROM truck LIMIT ? OFFSET ?";
+//     db.query(sql, [limit, offset], (err, results) => {
+//       if (err) return res.status(500).json({ error: err.message });
+
+//       res.json({
+//         data: results,
+//         pagination: {
+//           totalRecords,
+//           totalPages,
+//           currentPage: page,
+//           limit,
+//         },
+//       });
+//     });
+//   });
+// });
 
 // Get all trucks
 app.get("/api/truck", (req, res) => {
