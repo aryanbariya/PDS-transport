@@ -964,6 +964,41 @@ app.delete("/api/scheme/:scheme_id", (req, res) => {
 
 // **End of Schemes**
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///  COUNT OF CARDS
+
+// API to fetch row counts from multiple tables
+app.get("/api/getRowCounts", (req, res) => {
+  const query = `
+    SELECT 
+      (SELECT COUNT(*) FROM owners) AS table1_count,
+      (SELECT COUNT(*) FROM employees) AS table2_count,
+      (SELECT COUNT(*) FROM mswc_godowns) AS table3_count,
+      (SELECT COUNT(*) FROM sub_godown) AS table4_count,
+      (SELECT COUNT(*) FROM truck) AS table6_count,
+      (SELECT COUNT(*) FROM scheme) AS table7_count,
+      (SELECT COUNT(*) FROM packaging) AS table8_count
+  `;
+  // (SELECT COUNT(*) FROM drivers) AS table5_count,
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    const counts = results[0]; // Results will have row counts
+    res.json({
+      ownercount: counts.table1_count,
+      employeecount: counts.table2_count,
+      mswccount: counts.table3_count,
+      godowncount: counts.table4_count,
+      // drivercount: counts.table5_count,
+      truckcount: counts.table6_count,
+      schemecount: counts.table7_count,
+      packagingcount: counts.table8_count,
+    });
+  });
+});
 
 
 
