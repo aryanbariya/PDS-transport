@@ -103,11 +103,20 @@
 
 // Adjust path based on location
 import {
-  BanknotesIcon,
-  UserPlusIcon,
+  // BanknotesIcon,
+  // UserPlusIcon,
   UsersIcon,
-  ChartBarIcon,
+  TruckIcon,
+  BuildingOffice2Icon,
+  UserCircleIcon,
+  ArchiveBoxIcon,
+  ClipboardDocumentListIcon,
+
+
 } from "@heroicons/react/24/solid";
+
+import { GiSteeringWheel } from "react-icons/gi";
+import { MdWarehouse } from "react-icons/md";
 import { useMaterialTailwindController } from "@/context";
 
 const StatisticsCardsData = () => {
@@ -116,9 +125,10 @@ const StatisticsCardsData = () => {
   const statisticsCardsData = [
     {
       color: "gray",
-      icon: BanknotesIcon,
+      icon: UserCircleIcon,
       title: "OWNERS",
       value: statistics.ownercount || "NIL",
+      link: "/owners",
       footer: {
       // color: "text-green-500",
       // value: "+55%",
@@ -130,6 +140,7 @@ const StatisticsCardsData = () => {
       icon: UsersIcon,
       title: "EMPLOYEES",
       value: statistics.employeecount || "NIL",
+      link: "/employee",
       footer: {
         // color: "text-green-500",
         // value: "+3%",
@@ -138,9 +149,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: UserPlusIcon,
+      icon: BuildingOffice2Icon,
       title: "MSWC",
       value: statistics.mswccount || "NIL",
+      link: "/mswc",
       footer: {
         // color: "text-red-500",
         // value: "-2%",
@@ -149,9 +161,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: ChartBarIcon,
+      icon: MdWarehouse,
       title: "GODOWN",
       value: statistics.godowncount || "NIL",
+      link: "/godown",
       footer: {
         // color: "text-green-500",
         // value: "+5%",
@@ -160,9 +173,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: ChartBarIcon,
+      icon: GiSteeringWheel,
       title:"DRIVERS",
       value:  statistics. drivercount || "NIL",
+      link: "/driver",
       footer: {
         // color: "text-green-500",
         // value: "+5%",
@@ -171,9 +185,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: ChartBarIcon,
+      icon: TruckIcon,
       title: "TRUCKS",
       value:  statistics.truckcount ||"NIL",
+      link: "/truck",
       footer: {
         // color: "text-green-500",
         // value: "+5%",
@@ -182,9 +197,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: ChartBarIcon,
+      icon: ClipboardDocumentListIcon,
       title: "SCHEMES",
       value: statistics.schemecount || "NIL",
+      link: "/scheme",
       footer: {
         // color: "text-green-500",
         // value: "+5%",
@@ -193,9 +209,10 @@ const StatisticsCardsData = () => {
     },
     {
       color: "gray",
-      icon: ChartBarIcon,
+      icon: ArchiveBoxIcon,
       title:  "PACKAGING",
       value: statistics.packagingcount ||"NIL",
+      link: "/packaging",
       footer: {
         // color: "text-green-500",
         // value: "+5%",

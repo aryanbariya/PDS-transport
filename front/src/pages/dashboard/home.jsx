@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Typography,
   Card,
@@ -33,21 +34,37 @@ export function Home() {
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {data.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
+        {data.map(({ icon, title, link, footer, ...rest }) => (
+                    <Link to={link} key={title}> {/* Wrap Card inside Link */}
+                    <StatisticsCard
+                      {...rest}
+                      title={title}
+                      icon={React.createElement(icon, {
+                        className: "w-6 h-6 text-white",
+                      })}
+                      footer={
+                        <Typography className="font-normal text-blue-gray-600">
+                          <strong className={footer.color}>{footer.value}</strong>
+                          &nbsp;{footer.label}
+                        </Typography>
+                      }
+                    />
+                  </Link>
+           
+          // <StatisticsCard
+          //   key={title}
+          //   {...rest}
+          //   title={title}
+          //   icon={React.createElement(icon, {
+          //     className: "w-6 h-6 text-white",
+          //   })}
+          //   footer={
+          //     <Typography className="font-normal text-blue-gray-600">
+          //       <strong className={footer.color}>{footer.value}</strong>
+          //       &nbsp;{footer.label}
+          //     </Typography>
+          //   }
+          // />
         ))}
       </div>
       <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
