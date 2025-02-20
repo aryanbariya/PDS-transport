@@ -119,6 +119,7 @@ const StatisticsCardsData = () => {
       icon: BanknotesIcon,
       title: "OWNERS",
       value: statistics.ownercount || "NIL",
+      link: "/owners",
       footer: {
         color: "text-green-500",
         value: "+55%",
@@ -130,6 +131,7 @@ const StatisticsCardsData = () => {
       icon: UsersIcon,
       title: "EMPLOYEES",
       value: statistics.employeecount || "NIL",
+      link: "/employee",
       footer: {
         color: "text-green-500",
         value: "+3%",
@@ -141,6 +143,7 @@ const StatisticsCardsData = () => {
       icon: UserPlusIcon,
       title: "MSWC",
       value: statistics.mswccount || "NIL",
+      link: "/mswc",
       footer: {
         color: "text-red-500",
         value: "-2%",
@@ -152,6 +155,7 @@ const StatisticsCardsData = () => {
       icon: ChartBarIcon,
       title: "GODOWN",
       value: statistics.godowncount || "NIL",
+      link: "/godown",
       footer: {
         color: "text-green-500",
         value: "+5%",
@@ -163,6 +167,7 @@ const StatisticsCardsData = () => {
       icon: ChartBarIcon,
       title:"DRIVERS",
       value:  statistics. drivercount || "NIL",
+      link: "/driver",
       footer: {
         color: "text-green-500",
         value: "+5%",
@@ -174,6 +179,7 @@ const StatisticsCardsData = () => {
       icon: ChartBarIcon,
       title: "TRUCKS",
       value:  statistics.truckcount ||"NIL",
+      link: "/truck",
       footer: {
         color: "text-green-500",
         value: "+5%",
@@ -185,6 +191,7 @@ const StatisticsCardsData = () => {
       icon: ChartBarIcon,
       title: "SCHEMES",
       value: statistics.schemecount || "NIL",
+      link: "/scheme",
       footer: {
         color: "text-green-500",
         value: "+5%",
@@ -196,6 +203,7 @@ const StatisticsCardsData = () => {
       icon: ChartBarIcon,
       title:  "PACKAGING",
       value: statistics.packagingcount ||"NIL",
+      link: "/packaging",
       footer: {
         color: "text-green-500",
         value: "+5%",
