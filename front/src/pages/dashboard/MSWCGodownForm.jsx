@@ -7,6 +7,7 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
     status: "Active", // Default value
   });
 
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,20 +22,34 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
+  const validate = () => {
+    let newErrors = {};
+
+    if (!formData.godownName.trim()) {
+      newErrors.godownName = "MSWC Godown Name is required";
+    } else if (formData.godownName.length < 3) {
+      newErrors.godownName = "Must be at least 3 characters";
+    }
+
+    if (!formData.godownUnder.trim()) {
+      newErrors.godownUnder = "Godown Under is required";
+    } else if (formData.godownUnder.length < 3) {
+      newErrors.godownUnder = "Must be at least 3 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isFormValid = Object.values(formData).every((value) =>
-    typeof value === "string" ? value.trim() !== "" : false
-  );
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid || loading) return;
+    if (!validate() || loading) return;
 
     setLoading(true);
-
     try {
       const response = await fetch(
         editData
@@ -46,7 +61,6 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
           body: JSON.stringify(formData),
         }
       );
-
       const data = await response.json();
 
       if (response.ok) {
@@ -72,32 +86,28 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { name: "godownName", label: "MSWC Godown Name", type: "text" },
-              { name: "godownUnder", label: "Godown Under", type: "text" },
-            ].map((field) => (
+            {[{ name: "godownName", label: "MSWC Godown Name" }, { name: "godownUnder", label: "Godown Under" }].map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-medium text-gray-700">{field.label}</label>
                 <input
-                  type={field.type}
+                  type="text"
                   name={field.name}
                   placeholder={`Enter ${field.label}`}
                   value={formData[field.name]}
                   onChange={handleChange}
-                  required
                   className="p-2 border rounded-lg w-full"
                 />
+                {errors[field.name] && <p className="text-red-500 text-sm">{errors[field.name]}</p>}
               </div>
             ))}
 
-            {/* New Status Field */}
+            {/* Status Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Status</label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                required
                 className="p-2 border rounded-lg w-full"
               >
                 <option value="Active">Active</option>
@@ -109,11 +119,9 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
           <div className="flex justify-between">
             <button
               type="submit"
-              disabled={!isFormValid || loading}
+              disabled={loading}
               className={`py-2 px-4 rounded-lg ${
-                isFormValid && !loading
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                !loading ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}

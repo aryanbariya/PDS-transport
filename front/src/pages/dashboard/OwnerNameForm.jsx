@@ -8,6 +8,13 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     emailID: "",
   });
 
+  const [errors, setErrors] = useState({
+    ownerName: "",
+    contact: "",
+    address: "",
+    emailID: "",
+  });
+
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -21,16 +28,50 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const validateField = (name, value) => {
+    let errorMsg = "";
+
+    switch (name) {
+      case "ownerName":
+        if (!/^[A-Za-z ]{3,}$/.test(value)) {
+          errorMsg = "Owner Name must be at least 3 letters (no numbers).";
+        }
+        break;
+      case "contact":
+        if (!/^\d{10}$/.test(value)) {
+          errorMsg = "Contact must be exactly 10 digits.";
+        }
+        break;
+      case "address":
+        if (value.trim().length < 5) {
+          errorMsg = "Address must be at least 5 characters.";
+        }
+        break;
+      case "emailID":
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+          errorMsg = "Enter a valid email address.";
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: errorMsg }));
   };
 
-  const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    validateField(name, value);
+  };
+
+  const isFormValid = Object.values(errors).every((error) => error === "") &&
+                      Object.values(formData).every((value) => value.trim() !== "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      alert("Please fill in all fields.");
+      alert("Please fill in all fields correctly.");
       return;
     }
 
@@ -80,6 +121,9 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
                 required
                 className="p-2 border rounded-lg w-full"
               />
+              {errors[field] && (
+                <p className="text-red-600 text-sm mt-1">{errors[field]}</p>
+              )}
             </div>
           ))}
           <div className="flex justify-between">

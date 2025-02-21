@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
+
 const PackagingForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     material_name: "",
     weight: "",
     status: "Active",
   });
+
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (editData) {
@@ -14,13 +17,27 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
         status: editData.status || "Active",
       });
     } else {
-      setFormData({
-        material_name: "",
-        weight: "",
-        status: "Active",
-      });
+      setFormData({ material_name: "", weight: "", status: "Active" });
     }
   }, [editData]);
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!formData.material_name.trim()) {
+      newErrors.material_name = "Material name is required";
+    } else if (!/^[a-zA-Z\s]{3,}$/.test(formData.material_name)) {
+      newErrors.material_name = "Material name must be at least 3 characters and contain only letters";
+    }
+
+    if (!formData.weight.trim()) {
+      newErrors.weight = "Weight is required";
+    } else if (isNaN(formData.weight) || Number(formData.weight) <= 0) {
+      newErrors.weight = "Weight must be a positive number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,7 +45,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.material_name.trim() || !formData.weight.trim()) return;
+    if (!validateForm()) return;
 
     try {
       const response = await fetch(
@@ -45,7 +62,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
       if (response.ok) {
         alert(editData ? "Packaging updated successfully!" : "Packaging added successfully!");
         onSave();
-        onClose(); // Close form after saving
+        onClose();
       } else {
         const data = await response.json();
         alert(data.message || "Failed to submit form");
@@ -74,6 +91,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
               className="p-2 border rounded-lg w-full"
               required
             />
+            {errors.material_name && <p className="text-red-500 text-sm">{errors.material_name}</p>}
           </div>
 
           <div className="col-span-2">
@@ -87,10 +105,17 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
               className="p-2 border rounded-lg w-full"
               required
             />
+            {errors.weight && <p className="text-red-500 text-sm">{errors.weight}</p>}
           </div>
 
           <div className="col-span-2 flex justify-between">
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded-lg ${
+                Object.keys(errors).length === 0 ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
+              }`}
+              disabled={Object.keys(errors).length > 0}
+            >
               {editData ? "Update" : "Submit"}
             </button>
             <button onClick={onClose} className="bg-red-600 text-white px-4 py-2 rounded-lg">

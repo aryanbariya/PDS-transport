@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-
-
+import React, { useState, useEffect } from "react";
 
 const TruckForm = ({ onClose, onSave, editData }) => {
   const [truck, setTruck] = useState({
     truck_name: "",
-    truck_status: "Active", // Default value
+    truck_status: "Active",
     empty_weight: "",
     company: "",
     gvw: "",
@@ -19,84 +17,75 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     direct_sale: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-
-  // If editData is provided, set the form data
-  React.useEffect(() => {
+  useEffect(() => {
     if (editData) {
-      setTruck({
-        truck_name: editData.truck_name || "",
-        truck_status: editData.truck_status || "Active",
-        empty_weight: editData.empty_weight || "",
-        company: editData.company || "",
-        gvw: editData.gvw || "",
-        reg_date: editData.reg_date || "",
-        truck_owner_name: editData.truck_owner_name || "",
-        owner_id: editData.owner_id || "",
-        tax_validity: editData.tax_validity || "",
-        insurance_validity: editData.insurance_validity || "",
-        fitness_validity: editData.fitness_validity || "",
-        permit_validity: editData.permit_validity || "",
-        direct_sale: editData.direct_sale || "",
-      });
-    } else {
-      setTruck({
-        truck_name: "",
-        truck_status: "Active",
-        empty_weight: "",
-        company: "",
-        gvw: "",
-        reg_date: "",
-        truck_owner_name: "",
-        owner_id: "",
-        tax_validity: "",
-        insurance_validity: "",
-        fitness_validity: "",
-        permit_validity: "",
-        direct_sale: "",
-      });
+      setTruck(editData);
     }
   }, [editData]);
 
-  const handleChange = (e) => {
-    setTruck({ ...truck, [e.target.name]: e.target.value });
+  const validateField = (name, value) => {
+    let error = "";
+    if (!value.trim()) {
+      error = `${name.replace(/_/g, ' ')} is required.`;
+    } else {
+      switch (name) {
+        case "empty_weight":
+        case "gvw":
+          if (isNaN(value) || Number(value) <= 0) {
+            error = `${name.replace(/_/g, ' ')} must be a positive number.`;
+          }
+          break;
+        case "reg_date":
+        case "tax_validity":
+        case "insurance_validity":
+        case "fitness_validity":
+        case "permit_validity":
+          if (new Date(value) < new Date("2000-01-01")) {
+            error = `Invalid ${name.replace(/_/g, ' ')}.`;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  const isFormValid = Object.values(truck).every(
-    (value) => typeof value === "string" ? value.trim() !== "" : false
-  );
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTruck({ ...truck, [name]: value });
+    validateField(name, value);
+  };
+
+  const isFormValid = Object.values(errors).every((err) => !err) &&
+                      Object.values(truck).every((val) => val.trim() !== "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid || loading) return;
 
     setLoading(true);
-    console.log('data fetch start')
-
     try {
       const response = await fetch(
-        editData
-          ? `http://localhost:5000/api/truck/${editData.uuid}`
-          : "http://localhost:5000/api/truck",
+        editData ? `http://localhost:5000/api/truck/${editData.uuid}` : "http://localhost:5000/api/truck",
         {
           method: editData ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(truck),
         }
       );
-
       const data = await response.json();
-
       if (response.ok) {
         alert(editData ? "Truck updated successfully!" : "Truck added successfully!");
         onSave();
-        onClose(); // Close the modal after successful submit
+        onClose();
       } else {
         alert(data.message || "Failed to submit form");
       }
     } catch (error) {
-      console.error("Error:", error);
       alert("Error submitting data");
     } finally {
       setLoading(false);
@@ -111,43 +100,26 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { name: "truck_name", label: "Truck Name", type: "text" },
-              { name: "truck_status", label: "Truck Status", type: "text" },
-              { name: "empty_weight", label: "Empty Weight", type: "text" },
-              { name: "company", label: "Company", type: "text" },
-              { name: "gvw", label: "GVW", type: "text" },
-              { name: "reg_date", label: "Registration Date", type: "date" },
-              { name: "truck_owner_name", label: "Truck Owner Name", type: "text" },
-              { name: "owner_id", label: "Owner ID", type: "text" },
-              { name: "tax_validity", label: "Tax Validity", type: "date" },
-              { name: "insurance_validity", label: "Insurance Validity", type: "date" },
-              { name: "fitness_validity", label: "Fitness Validity", type: "date" },
-              { name: "permit_validity", label: "Permit Validity", type: "date" },
-              { name: "direct_sale", label: "Direct Sale", type: "text" },
-            ].map((field) => (
-              <div key={field.name}>
-                <label className="block text-sm font-medium text-gray-700">{field.label}</label>
+            {["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id", "tax_validity", "insurance_validity", "fitness_validity", "permit_validity", "direct_sale"].map((field) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">{field.replace(/_/g, ' ')}</label>
                 <input
-                  type={field.type}
-                  name={field.name}
-                  placeholder={`Enter ${field.label}`}
-                  value={truck[field.name]}
+                  type={field.includes("date") ? "date" : "text"}
+                  name={field}
+                  value={truck[field]}
                   onChange={handleChange}
-                  required
                   className="p-2 border rounded-lg w-full"
                 />
+                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
               </div>
             ))}
 
-            {/* New Status Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <label className="block text-sm font-medium text-gray-700">Truck Status</label>
               <select
                 name="truck_status"
                 value={truck.truck_status}
                 onChange={handleChange}
-                required
                 className="p-2 border rounded-lg w-full"
               >
                 <option value="Active">Active</option>
@@ -160,18 +132,14 @@ const TruckForm = ({ onClose, onSave, editData }) => {
             <button
               type="submit"
               disabled={!isFormValid || loading}
-              className={`py-2 px-4 rounded-lg ${
-                isFormValid && !loading
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
+              className={`py-2 px-4 rounded-lg ${isFormValid && !loading ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
             </button>
             <button
               type="button"
               className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-              onClick={onClose} // Triggers the onClose prop when clicked
+              onClick={onClose}
             >
               Close
             </button>
