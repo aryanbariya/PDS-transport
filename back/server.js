@@ -120,58 +120,126 @@ app.post("/signin", async (req, res) => {
   });
 });
 
-// **Insert Employee Data API**
-app.post("/employees", async (req, res) => {
-  try {
-    const { category, fullName, username, password, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown } = req.body;
 
-    if (!category || !fullName || !username || !password || !aadharNo || !panNo || !bankName || !accountNumber || !ifscCode || !branchName || !subGodown) {
-      return res.status(400).json({ error: "All fields are required" });
+
+
+// **Get All Employees API**
+app.get("/api/employees", (req, res) => {
+  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number FROM employee ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching employees:", err);
+      return res.status(500).json({ error: "Database fetch error" });
     }
+    res.json(results);
+  });
+});
 
-    // Hash the password before storing
+// **Get Employee by UUID API**
+app.get("/api/employees/:uuid", (req, res) => {
+  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number FROM employee WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) {
+      console.error("Error fetching employee:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    res.json(results[0]);
+  });
+});
+
+// **Insert Employee API**
+app.post("/api/employees", async (req, res) => {
+  const { category, fullName, username, password, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown } = req.body;
+  if (!category || !fullName || !username || !password || !aadharNo || !panNo || !bankName || !accountNumber || !ifscCode || !branchName || !subGodown) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const sql = `INSERT INTO employees (category, fullName, username, password, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-    db.query(sql, [category, fullName, username, hashedPassword, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown], (err, result) => {
+    const uuid = uuidv4();
+    const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM employee";
+    
+    db.query(getMaxOrderSql, (err, result) => {
       if (err) {
-        console.error("Error inserting employee data:", err);
-        return res.status(500).json({ error: "Database insertion failed" });
+        console.error("Error getting next order number:", err);
+        return res.status(500).json({ error: "Database error" });
       }
-      res.status(201).json({ message: "Employee added successfully" });
+      
+      const nextOrder = result[0].next_order;
+      const insertSql = "INSERT INTO employee (uuid, category, fullName, username, password, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+      db.query(insertSql, [uuid, category, fullName, username, hashedPassword, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, nextOrder], (insertErr) => {
+        if (insertErr) {
+          console.error("Error inserting employee:", insertErr);
+          return res.status(500).json({ error: "Database insertion failed" });
+        }
+        res.status(201).json({ message: "Employee added successfully", uuid, order_number: nextOrder });
+      });
     });
   } catch (error) {
     res.status(500).json({ error: "Server error: " + error.message });
   }
 });
 
-// **Get All Employees API**
-app.get("/employees", (req, res) => {
-  const sql = "SELECT id, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown FROM employees";
-  db.query(sql, (err, results) => {
+// **Update Employee API**
+app.put("/api/employees/:uuid", (req, res) => {
+  const { category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown } = req.body;
+  if (!category || !fullName || !username || !address || !aadharNo || !panNo || !bankName || !accountNumber || !ifscCode || !branchName || !subGodown) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, subGodown = ? WHERE uuid = ?";
+
+  db.query(sql, [category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, req.params.uuid], (err, result) => {
     if (err) {
-      console.error("Error fetching employees:", err);
-      return res.status(500).json({ error: "Database fetch failed" });
+      console.error("Error updating employee:", err);
+      return res.status(500).json({ error: "Database update error" });
     }
-    res.status(200).json(results);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    res.json({ message: "Employee updated successfully" });
   });
 });
 
 // **Delete Employee API**
-app.delete("/employees/:id", (req, res) => {
-  const employeeId = req.params.id;
-  const sql = "DELETE FROM employees WHERE id = ?";
-  db.query(sql, [employeeId], (err, result) => {
+app.delete("/api/employees/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const deleteSql = "DELETE FROM employee WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
     if (err) {
       console.error("Error deleting employee:", err);
-      return res.status(500).json({ error: "Failed to delete employee" });
+      return res.status(500).json({ error: "Database deletion failed" });
     }
-    res.status(200).json({ message: "Employee deleted successfully" });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    
+    console.log(`✅ Deleted Employee with UUID: ${uuid}`);
+    
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE employee SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting order numbers:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Employee deleted and order numbers reset successfully!" });
+      });
+    });
   });
 });
-//end of employe
 
 
 
@@ -1000,7 +1068,7 @@ app.get("/api/getRowCounts", (req, res) => {
   const query = `
     SELECT 
       (SELECT COUNT(*) FROM owners) AS table1_count,
-      (SELECT COUNT(*) FROM employees) AS table2_count,
+      (SELECT COUNT(*) FROM employee) AS table2_count,
       (SELECT COUNT(*) FROM mswc_godowns) AS table3_count,
       (SELECT COUNT(*) FROM sub_godown) AS table4_count,
       (SELECT COUNT(*) FROM truck) AS table6_count,
