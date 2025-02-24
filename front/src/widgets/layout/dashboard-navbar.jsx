@@ -125,6 +125,7 @@ import {
 import { UserCircleIcon, BellIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { Bars3Icon as OutlineBars3Icon } from "@heroicons/react/24/outline";
 
+
 export function DashboardNavbar({ setOpenSidenav }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -166,7 +167,9 @@ export function DashboardNavbar({ setOpenSidenav }) {
 
           {/* Conditional Sign In / Admin Button */}
           {isLoggedIn ? (
+           
             <div className="relative">
+               
               <Button
                 variant="text"
                 color="blue-gray"
@@ -188,6 +191,7 @@ export function DashboardNavbar({ setOpenSidenav }) {
                   </Button>
                 </div>
               )}
+          
             </div>
           ) : (
             <Link to="/auth/sign-in">
