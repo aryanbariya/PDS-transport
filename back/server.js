@@ -762,9 +762,81 @@ app.delete("/api/grains/:uuid", (req, res) => {
 //   });
 // });
 
-// Get all trucks
+// // Get all trucks
+// app.get("/api/truck", (req, res) => {
+//   const sql = "SELECT * FROM truck";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// // Get a specific truck by UUID
+// app.get("/api/truck/:uuid", (req, res) => {
+//   const sql = "SELECT * FROM truck WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Truck not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // Add a new truck
+// app.post("/api/truck", (req, res) => {
+//   const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+//   const uuid = uuidv4();
+
+//   const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  
+//   db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale], (insertErr) => {
+//     if (insertErr) {
+//       console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+//       return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//     }
+//     res.json({ message: "Truck added successfully", uuid });
+//     console.log(req.body);
+//   });
+// });
+
+// // Update an existing truck
+// app.put("/api/truck/:uuid", (req, res) => {
+//   const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  
+//   const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
+  
+//   db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Truck not found" });
+//     }
+//     res.json({ message: "Truck updated successfully" });
+//   });
+// });
+
+// // Delete a truck
+// app.delete("/api/truck/:uuid", (req, res) => {
+//   const deleteSql = "DELETE FROM truck WHERE uuid = ?";
+//   const uuid = uuidv4();
+//   db.query(deleteSql, [req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Truck not found" });
+//     }
+//     res.json({ message: "Truck deleted successfully" });
+//   });
+// });
+
+
+
+// Get all trucks ordered by order_number
 app.get("/api/truck", (req, res) => {
-  const sql = "SELECT * FROM truck";
+  const sql = "SELECT * FROM truck ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -783,53 +855,65 @@ app.get("/api/truck/:uuid", (req, res) => {
 
 // Add a new truck
 app.post("/api/truck", (req, res) => {
-  const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale } = req.body;
-  const uuid = uuidv4();
+  const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+    return res.status(400).json({ error: "All required fields must be filled" });
+  }
 
-  const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  
-  db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale], (insertErr) => {
-    if (insertErr) {
-      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
-      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
-    }
-    res.json({ message: "Truck added successfully", uuid });
+  const uuid = uuidv4();
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM truck";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, nextOrder], (insertErr) => {
+      if (insertErr) return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+      res.json({ message: "Truck added successfully", uuid, order_number: nextOrder });
+    });
   });
 });
 
 // Update an existing truck
 app.put("/api/truck/:uuid", (req, res) => {
-  const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale } = req.body;
-  
+  const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+    return res.status(400).json({ error: "All required fields must be filled" });
+  }
+
   const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
   
-  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, req.params.uuid], (err, result) => {
-    if (err) {
-      console.error("Error updating:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Truck not found" });
-    }
+  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, req.params.uuid], (err, result) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
     res.json({ message: "Truck updated successfully" });
   });
 });
 
-// Delete a truck
+// Delete a truck and reset order numbers
 app.delete("/api/truck/:uuid", (req, res) => {
   const deleteSql = "DELETE FROM truck WHERE uuid = ?";
-  const uuid = uuidv4();
   db.query(deleteSql, [req.params.uuid], (err, result) => {
-    if (err) {
-      console.error("Error deleting:", err.sqlMessage || err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Truck not found" });
-    }
-    res.json({ message: "Truck deleted successfully" });
+    if (err) return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
+
+    // Reset order numbers
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE truck SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) return res.status(500).json({ error: "Failed to reset order numbering" });
+      
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) return res.status(500).json({ error: "Failed to reset order numbers" });
+        res.json({ message: "Truck deleted and order numbers reset successfully!" });
+      });
+    });
   });
 });
+
 
 ///end of truck
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -843,47 +927,70 @@ app.delete("/api/truck/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////
 ///** Start of Packaging */
 
-//✅ Fetch all packaging records
+
+
+// ✅ Fetch all packaging records (Ordered by order_number)
 app.get("/api/packaging", (req, res) => {
-  const sql = "SELECT * FROM packaging";
+  const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
-// Get a specific packaging material by pack_id
-app.get("/api/packaging/:pack_id", (req, res) => {
-  const sql = "SELECT * FROM packaging WHERE pack_id = ?";
-  db.query(sql, [req.params.pack_id], (err, results) => {
+// ✅ Get a specific packaging material by uuid
+app.get("/api/packaging/:uuid", (req, res) => {
+  const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Packaging material not found" });
     res.json(results[0]);
   });
 });
 
-// Add a new packaging material
+// ✅ Add a new packaging material
 app.post("/api/packaging", (req, res) => {
   const { material_name, weight, status = "Start" } = req.body;
+  if (!material_name || !weight) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
-  const insertSql = "INSERT INTO packaging (material_name, weight, status) VALUES (?, ?, ?)";
-  
-  db.query(insertSql, [material_name, weight, status], (insertErr, result) => {
-    if (insertErr) {
-      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
-      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+  const uuid = uuidv4();
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM packaging";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error" });
     }
-    res.json({ message: "Packaging material added successfully", pack_id: result.insertId });
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO packaging (uuid, material_name, weight, status, order_number) VALUES (?, ?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, material_name, weight, status, nextOrder], (insertErr, insertResult) => {
+      if (insertErr) {
+        console.error("Error inserting packaging material:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed" });
+      }
+      res.status(201).json({
+        message: "Packaging material added successfully",
+        uuid,
+        order_number: nextOrder,
+      });
+    });
   });
 });
 
-// Update an existing packaging material
-app.put("/api/packaging/:pack_id", (req, res) => {
+// ✅ Update an existing packaging material
+app.put("/api/packaging/:uuid", (req, res) => {
   const { material_name, weight, status } = req.body;
-  
-  const sql = "UPDATE packaging SET material_name = ?, weight = ?, status = ? WHERE pack_id = ?";
-  
-  db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+  if (!material_name || !weight || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = "UPDATE packaging SET material_name = ?, weight = ?, status = ? WHERE uuid = ?";
+
+  db.query(sql, [material_name, weight, status, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating:", err);
       return res.status(500).json({ error: "Database error" });
@@ -895,20 +1002,113 @@ app.put("/api/packaging/:pack_id", (req, res) => {
   });
 });
 
-// Delete a packaging material
-app.delete("/api/packaging/:pack_id", (req, res) => {
-  const deleteSql = "DELETE FROM packaging WHERE pack_id = ?";
-  db.query(deleteSql, [req.params.pack_id], (err, result) => {
+// ✅ Delete a packaging material and reset order numbers
+app.delete("/api/packaging/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  const deleteSql = "DELETE FROM packaging WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting:", err.sqlMessage || err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+      console.error("Error deleting packaging material:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Packaging material not found" });
     }
-    res.json({ message: "Packaging material deleted successfully" });
+
+    console.log(`✅ Deleted Packaging Material with UUID: ${uuid}`);
+
+    // Reset order numbers sequentially
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE packaging SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting order numbers:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Packaging material deleted and order numbers reset successfully!" });
+      });
+    });
   });
 });
+
+
+
+// //✅ Fetch all packaging records
+// app.get("/api/packaging", (req, res) => {
+//   const sql = "SELECT * FROM packaging";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// // Get a specific packaging material by pack_id
+// app.get("/api/packaging/:pack_id", (req, res) => {
+//   const sql = "SELECT * FROM packaging WHERE pack_id = ?";
+//   db.query(sql, [req.params.pack_id], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Packaging material not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // Add a new packaging material
+// app.post("/api/packaging", (req, res) => {
+//   const { material_name, weight, status = "Start" } = req.body;
+
+//   const insertSql = "INSERT INTO packaging (material_name, weight, status) VALUES (?, ?, ?)";
+  
+//   db.query(insertSql, [material_name, weight, status], (insertErr, result) => {
+//     if (insertErr) {
+//       console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+//       return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//     }
+//     res.json({ message: "Packaging material added successfully", pack_id: result.insertId });
+//   });
+// });
+
+// // Update an existing packaging material
+// app.put("/api/packaging/:pack_id", (req, res) => {
+//   const { material_name, weight, status } = req.body;
+  
+//   const sql = "UPDATE packaging SET material_name = ?, weight = ?, status = ? WHERE pack_id = ?";
+  
+//   db.query(sql, [material_name, weight, status, req.params.pack_id], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging material not found" });
+//     }
+//     res.json({ message: "Packaging material updated successfully" });
+//   });
+// });
+
+// // Delete a packaging material
+// app.delete("/api/packaging/:pack_id", (req, res) => {
+//   const deleteSql = "DELETE FROM packaging WHERE pack_id = ?";
+//   db.query(deleteSql, [req.params.pack_id], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging material not found" });
+//     }
+//     res.json({ message: "Packaging material deleted successfully" });
+//   });
+// });
 
 //end of packaging
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -994,7 +1194,7 @@ app.delete("/api/categories/:category_id", (req, res) => {
 
 // Get all schemes
 app.get("/api/scheme", (req, res) => {
-  const sql = "SELECT * FROM scheme";
+  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -1002,8 +1202,8 @@ app.get("/api/scheme", (req, res) => {
 });
 
 // Get a specific scheme by scheme_id
-app.get("/api/scheme/:scheme_id", (req, res) => {
-  const sql = "SELECT * FROM scheme WHERE scheme_id = ?";
+app.get("/api/scheme/:uuid", (req, res) => {
+  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
   db.query(sql, [req.params.scheme_id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
@@ -1011,28 +1211,54 @@ app.get("/api/scheme/:scheme_id", (req, res) => {
   });
 });
 
-// Add a new scheme
+
+
+
 app.post("/api/scheme", (req, res) => {
   const { scheme_name, scheme_status } = req.body;
+  if (!scheme_name || !scheme_status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
-  const insertSql = "INSERT INTO scheme (scheme_name, scheme_status) VALUES (?, ?)";
+  const uuid = uuidv4(); // Generate a unique UUID
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
 
-  db.query(insertSql, [scheme_name, scheme_status], (insertErr, result) => {
-    if (insertErr) {
-      console.error("Error inserting:", insertErr.sqlMessage || insertErr);
-      return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error" });
     }
-    res.json({ message: "Scheme added successfully", scheme_id: result.insertId });
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, order_number) VALUES (?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, scheme_name, scheme_status, nextOrder], (insertErr, insertResult) => {
+      if (insertErr) {
+        console.error("Error inserting scheme:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed" });
+      }
+      res.status(201).json({ 
+        message: "Scheme added successfully", 
+        uuid, 
+        order_number: nextOrder 
+      });
+    });
   });
 });
 
-// Update an existing scheme
-app.put("/api/scheme/:scheme_id", (req, res) => {
+
+
+
+
+app.put("/api/scheme/:uuid", (req, res) => {
   const { scheme_name, scheme_status } = req.body;
+  if (!scheme_name || !scheme_status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
-  const sql = "UPDATE scheme SET scheme_name = ?, scheme_status = ? WHERE scheme_id = ?";
+  const sql = "UPDATE scheme SET scheme_name = ?, scheme_status = ? WHERE uuid = ?";
 
-  db.query(sql, [scheme_name, scheme_status, req.params.scheme_id], (err, result) => {
+  db.query(sql, [scheme_name, scheme_status, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating:", err);
       return res.status(500).json({ error: "Database error" });
@@ -1044,26 +1270,138 @@ app.put("/api/scheme/:scheme_id", (req, res) => {
   });
 });
 
-// Delete a scheme
-app.delete("/api/scheme/:scheme_id", (req, res) => {
-  const deleteSql = "DELETE FROM scheme WHERE scheme_id = ?";
-  db.query(deleteSql, [req.params.scheme_id], (err, result) => {
+
+
+
+app.delete("/api/scheme/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  // Step 1: Delete the specific scheme
+  const deleteSql = "DELETE FROM scheme WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting:", err.sqlMessage || err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+      console.error("Error deleting scheme:", err);
+      return res.status(500).json({ error: "Database deletion failed" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Scheme not found" });
     }
-    res.json({ message: "Scheme deleted successfully" });
+
+    console.log(`✅ Deleted Scheme with UUID: ${uuid}`);
+
+    // Step 2: Reset order numbers sequentially
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE scheme SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting order numbers:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Scheme deleted and order numbers reset successfully!" });
+      });
+    });
   });
 });
+
+
 
 // **End of Schemes**
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
 
 // API to fetch row counts from multiple tables
+// app.get("/api/getRowCounts", (req, res) => {
+//   const query = `
+//     SELECT 
+//       (SELECT COUNT(*) FROM owners) AS table1_count,
+//       (SELECT COUNT(*) FROM employee) AS table2_count,
+//       (SELECT COUNT(*) FROM mswc_godowns) AS table3_count,
+//       (SELECT COUNT(*) FROM sub_godown) AS table4_count,
+//       (SELECT COUNT(*) FROM truck) AS table6_count,
+//       (SELECT COUNT(*) FROM scheme) AS table7_count,
+//       (SELECT COUNT(*) FROM packaging) AS table8_count,
+//       (SELECT MAX(last_modified) FROM packaging) AS last_modified
+//   `;
+//   // (SELECT COUNT(*) FROM drivers) AS table5_count,
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Database error:", err);
+//       return res.status(500).json({ error: "Internal Server Error" });
+//     }
+
+//     const counts = results[0]; // Results will have row counts
+//     res.json({
+//       ownercount: counts.table1_count,
+//       employeecount: counts.table2_count,
+//       mswccount: counts.table3_count,
+//       godowncount: counts.table4_count,
+//       // drivercount: counts.table5_count,
+//       truckcount: counts.table6_count,
+//       schemecount: counts.table7_count,
+//       packagingcount: counts.table8_count,
+//       lastModifiedPackaging: counts.last_modified, 
+//     });
+//   });
+// });
+
+// app.get("/api/getRowCounts", (req, res) => {
+//   const query = `
+//     SELECT 
+//       (SELECT COUNT(*) FROM owners) AS table1_count,
+//       (SELECT COUNT(*) FROM employee) AS table2_count,
+//       (SELECT COUNT(*) FROM mswc_godowns) AS table3_count,
+//       (SELECT COUNT(*) FROM sub_godown) AS table4_count,
+//       (SELECT COUNT(*) FROM truck) AS table6_count,
+//       (SELECT COUNT(*) FROM scheme) AS table7_count,
+//       (SELECT COUNT(*) FROM packaging) AS table8_count,
+//       (SELECT MAX(last_modified) FROM packaging) AS last_modified
+//   `;
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Database error:", err);
+//       return res.status(500).json({ error: "Internal Server Error" });
+//     }
+
+//     const counts = results[0]; // Results will have row counts
+    
+//     // Convert last_modified timestamp into a readable format
+//     const lastModifiedFormatted = counts.last_modified
+//       ? new Date(counts.last_modified).toLocaleString("en-US", { 
+//           timeZone: "Asia/Kolkata", // Set timezone to IST or adjust as needed
+//           year: "numeric",
+//           month: "short",
+//           day: "2-digit",
+//           hour: "2-digit",
+//           minute: "2-digit",
+//           second: "2-digit"
+//         })
+//       : "N/A";
+
+//     res.json({
+//       ownercount: counts.table1_count,
+//       employeecount: counts.table2_count,
+//       mswccount: counts.table3_count,
+//       godowncount: counts.table4_count,
+//       // drivercount: counts.table5_count,
+//       truckcount: counts.table6_count,
+//       schemecount: counts.table7_count,
+//       packagingcount: counts.table8_count,
+//       lastModifiedPackaging: lastModifiedFormatted,
+//     });
+//   });
+// });
+
 app.get("/api/getRowCounts", (req, res) => {
   const query = `
     SELECT 
@@ -1073,9 +1411,16 @@ app.get("/api/getRowCounts", (req, res) => {
       (SELECT COUNT(*) FROM sub_godown) AS table4_count,
       (SELECT COUNT(*) FROM truck) AS table6_count,
       (SELECT COUNT(*) FROM scheme) AS table7_count,
-      (SELECT COUNT(*) FROM packaging) AS table8_count
+      (SELECT COUNT(*) FROM packaging) AS table8_count,
+      
+      (SELECT MAX(last_modified) FROM owners) AS last_modified_owners,
+      (SELECT MAX(last_modified) FROM employee) AS last_modified_employee,
+      (SELECT MAX(last_modified) FROM mswc_godowns) AS last_modified_mswc,
+      (SELECT MAX(last_modified) FROM sub_godown) AS last_modified_sub_godown,
+      (SELECT MAX(last_modified) FROM truck) AS last_modified_truck,
+      (SELECT MAX(last_modified) FROM scheme) AS last_modified_scheme,
+      (SELECT MAX(last_modified) FROM packaging) AS last_modified_packaging
   `;
-  // (SELECT COUNT(*) FROM drivers) AS table5_count,
 
   db.query(query, (err, results) => {
     if (err) {
@@ -1083,19 +1428,44 @@ app.get("/api/getRowCounts", (req, res) => {
       return res.status(500).json({ error: "Internal Server Error" });
     }
 
-    const counts = results[0]; // Results will have row counts
+    const counts = results[0]; // Extract results
+
+    // Function to format timestamps into a readable format
+    const formatDateTime = (timestamp) => {
+      return timestamp
+        ? new Date(timestamp).toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata", // Convert to IST (India Standard Time)
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+          })
+        : "N/A"; // If NULL, return "N/A"
+    };
+
     res.json({
       ownercount: counts.table1_count,
       employeecount: counts.table2_count,
       mswccount: counts.table3_count,
       godowncount: counts.table4_count,
-      // drivercount: counts.table5_count,
       truckcount: counts.table6_count,
       schemecount: counts.table7_count,
       packagingcount: counts.table8_count,
+
+      lastModifiedOwners: formatDateTime(counts.last_modified_owners),
+      lastModifiedEmployee: formatDateTime(counts.last_modified_employee),
+      lastModifiedMSWC: formatDateTime(counts.last_modified_mswc),
+      lastModifiedSubGodown: formatDateTime(counts.last_modified_sub_godown),
+      lastModifiedTruck: formatDateTime(counts.last_modified_truck),
+      lastModifiedScheme: formatDateTime(counts.last_modified_scheme),
+      lastModifiedPackaging: formatDateTime(counts.last_modified_packaging),
     });
   });
 });
+
+
 
 
 

@@ -130,9 +130,9 @@ const StatisticsCardsData = () => {
       value: statistics.ownercount || "NIL",
       link: "/owners",
       footer: {
-      // color: "text-green-500",
-      // value: "+55%",
-      // label: "than last week",
+      color: "text-green-500",
+      value:  statistics.lastModifiedOwners||"NIL",
+      label: "Last updated",
       },
     },
     {
@@ -142,9 +142,9 @@ const StatisticsCardsData = () => {
       value: statistics.employeecount || "NIL",
       link: "/employee",
       footer: {
-        // color: "text-green-500",
-        // value: "+3%",
-        // label: "than last month",
+        color: "text-green-500",
+        value: statistics.lastModifiedEmployee||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -154,9 +154,9 @@ const StatisticsCardsData = () => {
       value: statistics.mswccount || "NIL",
       link: "/mswc",
       footer: {
-        // color: "text-red-500",
-        // value: "-2%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedMSWC||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -166,9 +166,9 @@ const StatisticsCardsData = () => {
       value: statistics.godowncount || "NIL",
       link: "/godown",
       footer: {
-        // color: "text-green-500",
-        // value: "+5%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedSubGodown||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -178,9 +178,9 @@ const StatisticsCardsData = () => {
       value:  statistics. drivercount || "NIL",
       link: "/driver",
       footer: {
-        // color: "text-green-500",
-        // value: "+5%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedDriver||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -190,9 +190,9 @@ const StatisticsCardsData = () => {
       value:  statistics.truckcount ||"NIL",
       link: "/truck",
       footer: {
-        // color: "text-green-500",
-        // value: "+5%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedTruck||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -202,9 +202,9 @@ const StatisticsCardsData = () => {
       value: statistics.schemecount || "NIL",
       link: "/scheme",
       footer: {
-        // color: "text-green-500",
-        // value: "+5%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedScheme||"NIL",
+        label: "Last updated",
       },
     },
     {
@@ -214,9 +214,9 @@ const StatisticsCardsData = () => {
       value: statistics.packagingcount ||"NIL",
       link: "/packaging",
       footer: {
-        // color: "text-green-500",
-        // value: "+5%",
-        // label: "than yesterday",
+        color: "text-green-500",
+        value: statistics.lastModifiedPackaging||"NIL",
+        label: "Last updated",
       },
     },
   ];

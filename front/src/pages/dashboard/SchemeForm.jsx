@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 
 const SchemeForm = ({ onClose, onSave, editData }) => {
-  const initialState = { scheme_name: "", scheme_status: "Start" };
-  const [formData, setFormData] = useState(initialState);
+  
+  const [formData, setFormData] = useState({
+     scheme_name: "", 
+     scheme_status: "Start",
+
+  });
 
   useEffect(() => {
     if (editData) {
@@ -11,26 +15,64 @@ const SchemeForm = ({ onClose, onSave, editData }) => {
         scheme_status: editData.scheme_status || "Start",
       });
     } else {
-      setFormData(initialState);
+      setFormData({ scheme_name: "", scheme_status: "Start"});
     }
   }, [editData]);
 
+  // const handleChange = (e) => {
+  //   setFormData({ ...formData, [e.target.name]: e.target.value });
+  // };
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    // validateField(name, value);
   };
 
+
   const isFormValid = formData.scheme_name.trim() !== "";
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!isFormValid) {
+  //     alert("Please enter the Scheme Name.");
+  //     return;
+  //   }
+
+  //   const method = editData ? "PUT" : "POST";
+  //   const url = editData
+  //     ? `http://localhost:5000/api/scheme/${editData.scheme_id}`
+  //     : "http://localhost:5000/api/scheme";
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method,
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     if (response.ok) {
+  //       alert(editData ? "Scheme updated successfully!" : "Scheme added successfully!");
+  //       onSave();
+  //       onClose();
+  //     } else {
+  //       alert("Error submitting the form. Please try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //     alert("An error occurred while submitting the form.");
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      alert("Please enter the Scheme Name.");
+      alert("Please fill in all fields correctly.");
       return;
     }
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/scheme/${editData.scheme_id}`
+      ? `http://localhost:5000/api/scheme/${editData.uuid}`
       : "http://localhost:5000/api/scheme";
 
     try {
@@ -45,13 +87,14 @@ const SchemeForm = ({ onClose, onSave, editData }) => {
         onSave();
         onClose();
       } else {
-        alert("Error submitting the form. Please try again.");
+        alert("Error submitting form");
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      alert("An error occurred while submitting the form.");
+      alert("Error submitting form");
     }
   };
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

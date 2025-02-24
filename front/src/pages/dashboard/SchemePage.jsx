@@ -15,7 +15,6 @@ const SchemePage = () => {
     try {
       const response = await fetch("http://localhost:5000/api/scheme");
       if (!response.ok) throw new Error("Failed to fetch scheme");
-
       const data = await response.json();
       setSchemes(data || []);
       setLoading(false);
@@ -30,11 +29,11 @@ const SchemePage = () => {
   }, []);
 
   // Delete scheme
-  const handleDelete = async (id) => {
+  const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this scheme?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/scheme/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/scheme/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -125,8 +124,8 @@ const SchemePage = () => {
           <tbody>
             {filteredSchemes.length > 0 ? (
               filteredSchemes.map((scheme) => (
-                <tr key={scheme.scheme_id} className="text-center hover:bg-gray-100">
-                  <td className="border p-2">{scheme.scheme_id}</td>
+                <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
+                  <td className="border p-2">{scheme.order_number}</td>
                   <td className="border p-2">{scheme.scheme_name}</td>
                   <td className="border p-2">{scheme.status}</td>
                   <td className="border p-2">
@@ -138,7 +137,7 @@ const SchemePage = () => {
                         ✏️
                       </button>
                       <button
-                        onClick={() => handleDelete(scheme.scheme_id)}
+                        onClick={() => handleDelete(scheme.uuid)}
                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                       >
                         🗑️

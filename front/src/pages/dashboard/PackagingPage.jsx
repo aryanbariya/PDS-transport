@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PackagingForm from "./PackagingForm";
+import { Unpublished } from "@mui/icons-material";
 
 const PackagingPage = () => {
   const [packagingList, setPackagingList] = useState([]);
@@ -26,10 +27,10 @@ const PackagingPage = () => {
     fetchPackaging();
   }, []);
 
-  const handleDelete = async (pack_id) => {
+  const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this packaging record?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/packaging/${pack_id}`, {
+      const response = await fetch(`http://localhost:5000/api/packaging/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -106,8 +107,8 @@ const PackagingPage = () => {
         <tbody>
           {filteredPackaging.length > 0 ? (
             filteredPackaging.map((p) => (
-              <tr key={p.pack_id} className="text-center hover:bg-gray-100">
-                <td className="border p-2">{p.pack_id}</td>
+              <tr key={p.uuid} className="text-center hover:bg-gray-100">
+                <td className="border p-2">{p.order_number}</td>
                 <td className="border p-2">{p.material_name}</td>
                 <td className="border p-2">{p.weight}</td>
                 <td className="border p-2">{p.status}</td>
@@ -120,7 +121,7 @@ const PackagingPage = () => {
                       ✏️
                     </button>
                     <button
-                      onClick={() => handleDelete(p.pack_id)}
+                      onClick={() => handleDelete(p.uuid)}
                       className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                     >
                       🗑️
