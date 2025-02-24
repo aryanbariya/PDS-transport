@@ -17,7 +17,7 @@ const secretKey = process.env.JWT_SECRET || "be5c701d7b261e7cec659a9e361dcded665
 const db = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
+  password: process.env.DB_PASS || "",
   database: process.env.DB_NAME || "pdsmanagement",
 });
 
