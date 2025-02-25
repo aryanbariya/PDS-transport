@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PackagingForm from "./PackagingForm";
 import { Unpublished } from "@mui/icons-material";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const PackagingPage = () => {
   const [packagingList, setPackagingList] = useState([]);
@@ -12,7 +13,7 @@ const PackagingPage = () => {
 
   const fetchPackaging = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/packaging");
+      const response = await fetch(`${URL}/api/packaging`);
       if (!response.ok) throw new Error("Failed to fetch packaging records");
       const data = await response.json();
       setPackagingList(data || []);
@@ -30,7 +31,7 @@ const PackagingPage = () => {
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this packaging record?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/packaging/${uuid}`, {
+      const response = await fetch(`${URL}/api/packaging/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {

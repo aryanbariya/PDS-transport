@@ -165,7 +165,7 @@
 
 import React, { useState, useEffect } from "react";
 import EmployeeForm from "./EmployeeForem";
-import axios from "axios";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const EmployeePage = () => {
   const [employees, setEmployees] = useState([]);
@@ -179,7 +179,7 @@ const EmployeePage = () => {
   // Fetch Employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/employees");
+      const response = await fetch(`${URL}/api/employees`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setEmployees(data || []);
@@ -196,7 +196,7 @@ const EmployeePage = () => {
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this employee?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/employees/${uuid}`, {
+      const response = await fetch(`${URL}/api/employees/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {

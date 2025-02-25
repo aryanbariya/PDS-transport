@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SubGodownForm from "./SubGodownForm";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const SubGodownPage = () => {
   const [godowns, setGodowns] = useState([]);
@@ -11,7 +12,7 @@ const SubGodownPage = () => {
 
   const fetchGodowns = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/subgodown");
+      const response = await fetch(`${URL}/api/subgodown`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setGodowns(data || []);
@@ -29,7 +30,7 @@ const SubGodownPage = () => {
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this godown?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/subgodown/${uuid}`, {
+      const response = await fetch(`${URL}/api/subgodown/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {

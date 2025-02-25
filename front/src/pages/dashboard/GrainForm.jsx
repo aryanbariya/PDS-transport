@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const GrainForm = ({ onClose, onSave, editData }) => {
     const [formData, setFormData] = useState({
@@ -19,13 +20,13 @@ const GrainForm = ({ onClose, onSave, editData }) => {
         }
 
         // ✅ Fetch MSWC Godowns
-        fetch("http://localhost:5000/api/mswcgodown")
+        fetch(`${URL}/api/mswcgodown`)
             .then((res) => res.json())
             .then((data) => setMswcGodowns(data))
             .catch((err) => console.error("Error fetching MSWC Godowns:", err));
 
         // ✅ Fetch Sub-Godowns
-        fetch("http://localhost:5000/api/subgodown")
+        fetch(`${URL}/api/subgodown`)
             .then((res) => res.json())
             .then((data) => setSubGodowns(data))
             .catch((err) => console.error("Error fetching Sub-Godowns:", err));
@@ -69,8 +70,8 @@ const GrainForm = ({ onClose, onSave, editData }) => {
 
         const method = editData ? "PUT" : "POST";
         const url = editData
-            ? `http://localhost:5000/api/grains/${editData.uuid}`
-            : "http://localhost:5000/api/grains";
+            ? `${URL}/api/grains/${editData.uuid}`
+            : `${URL}/api/grains`;
 
         try {
             const response = await fetch(url, {

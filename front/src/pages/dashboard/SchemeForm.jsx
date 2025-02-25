@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const SchemeForm = ({ onClose, onSave, editData }) => {
   
@@ -72,8 +73,8 @@ const SchemeForm = ({ onClose, onSave, editData }) => {
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/scheme/${editData.uuid}`
-      : "http://localhost:5000/api/scheme";
+      ? `${URL}/api/scheme/${editData.uuid}`
+      : `${URL}/api/scheme`;
 
     try {
       const response = await fetch(url, {

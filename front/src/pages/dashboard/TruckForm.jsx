@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const TruckForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -50,8 +51,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/truck/${editData.uuid}`
-      : "http://localhost:5000/api/truck";
+      ? `${URL}/api/truck/${editData.uuid}`
+      : `${URL}/api/truck`;
 
     try {
       const response = await fetch(url, {

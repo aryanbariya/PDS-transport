@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const CategoryForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -32,8 +33,8 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/categories/${editData.uuid}`
-      : "http://localhost:5000/api/categories";
+      ? `${URL}/api/categories/${editData.uuid}`
+      : `${URL}/api/categories`;
 
     try {
       const response = await fetch(url, {

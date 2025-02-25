@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const OwnerNameForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -77,8 +78,8 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/owners/${editData.uuid}`
-      : "http://localhost:5000/api/owners";
+      ? `${URL}/api/owners/${editData.uuid}`
+      : `${URL}/api/owners`;
 
     try {
       const response = await fetch(url, {

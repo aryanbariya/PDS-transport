@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import SchemeForm from "./SchemeForm";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const SchemePage = () => {
   const [schemes, setSchemes] = useState([]);
@@ -13,7 +14,7 @@ const SchemePage = () => {
   const fetchSchemes = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/scheme");
+      const response = await fetch(`${URL}/api/scheme`);
       if (!response.ok) throw new Error("Failed to fetch scheme");
       const data = await response.json();
       setSchemes(data || []);
@@ -33,7 +34,7 @@ const SchemePage = () => {
     if (!window.confirm("Are you sure you want to delete this scheme?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/scheme/${uuid}`, {
+      const response = await fetch(`${URL}/api/scheme/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {

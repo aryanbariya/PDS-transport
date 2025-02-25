@@ -87,6 +87,7 @@
 
 import React, { createContext, useContext, useReducer, useState, useEffect } from "react";
 import PropTypes from "prop-types";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 // Create context
 export const MaterialTailwind = createContext(null);
@@ -143,7 +144,8 @@ export function MaterialTailwindControllerProvider({ children }) {
   useEffect(() => {
     const fetchStatistics = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/getRowCounts");
+        const response = await fetch(`${URL}/api/getRowCounts`);
+        // const response = await fetch("http://localhost:5000/api/getRowCounts");
         const data = await response.json();
         setStatistics(data);
       } catch (error) {

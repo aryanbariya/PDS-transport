@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MSWCGodownForm from "./MSWCGodownForm"; // Import form component
-const URL = import.meta.env.VITE_API_BASE_URL;
+const URL = import.meta.env.VITE_API_BACK_URL;
 
 const MSWCGodownPage = () => {
   const [godowns, setGodowns] = useState([]);
@@ -12,8 +12,7 @@ const MSWCGodownPage = () => {
 
   const fetchGodowns = async () => {
     try {
-      // const response = await fetch(`${URL}/api/mswcgodown`);
-      const response = await fetch("http://localhost:5000/api/mswcgodown");
+      const response = await fetch(`${URL}/api/mswcgodown`);
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
@@ -33,7 +32,7 @@ const MSWCGodownPage = () => {
     if (!window.confirm("Are you sure you want to delete this godown?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/mswcgodown/${uuid}`, {
+      const response = await fetch(`${URL}/api/mswcgodown/${uuid}`, {
         method: "DELETE",
       });
 

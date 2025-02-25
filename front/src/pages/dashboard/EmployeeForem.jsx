@@ -172,6 +172,7 @@
 
 
 import React, { useState, useEffect } from "react";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const EmployeeForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -270,8 +271,8 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `http://localhost:5000/api/employees/${editData.uuid}`
-      : "http://localhost:5000/api/employees";
+      ? `${URL}/api/employees/${editData.uuid}`
+      : `${URL}/api/employees`;
 
     try {
       const response = await fetch(url, {

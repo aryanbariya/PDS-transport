@@ -1,127 +1,9 @@
-// import React, { useState, useEffect } from "react";
-// import TruckForm from "./TruckForm";
-// import { formatDate } from "@/util/libs/formatDate";
-
-// const TruckPage = () => {
-//   const [trucks, setTrucks] = useState([]);
-//   const [editData, setEditData] = useState(null);
-//   const [showForm, setShowForm] = useState(false);
-
-//   useEffect(() => {
-//     fetchTrucks();
-//   }, []);
-
-//   const fetchTrucks = async () => {
-//     try {
-//       const response = await fetch("http://localhost:5000/api/truck");
-//       const data = await response.json();
-//       setTrucks(data);
-//     } catch (error) {
-//       console.error("Error fetching trucks:", error);
-//     }
-//   };
-
-//   const handleSave = () => {
-//     fetchTrucks();
-//     setShowForm(false);
-//     setEditData(null);
-//   };
-
-//   const handleEdit = (truck) => {
-//     setEditData(truck);
-//     setShowForm(true);
-//   };
-
-//   const handleDelete = async (uuid) => {
-//     if (window.confirm("Are you sure you want to delete this truck?")) {
-//       try {
-//         await fetch(`http://localhost:5000/api/truck/${uuid}`, { method: "DELETE" });
-//         fetchTrucks();
-//       } catch (error) {
-//         console.error("Error deleting truck:", error);
-//       }
-//     }
-//   };
-
-//   return (
-
-//     <>
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Truck Management</h1>
-//       <button onClick={() => setShowForm(true)} className="bg-green-600 text-white py-2 px-4 rounded-lg mb-4">
-//         Add Truck
-//       </button>
-//       {showForm && <TruckForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />}
-//       <div className="overflow-x-auto">
-//         <table className="min-w-full bg-white border border-gray-300">
-//           <thead>
-//             <tr className="bg-gray-200">
-//               <th className="border px-4 py-2">Name</th>
-//               <th className="border px-4 py-2">Status</th>
-//               <th className="border px-4 py-2">Empty Weight</th>
-//               <th className="border px-4 py-2">Company</th>
-//               <th className="border px-4 py-2">GVW</th>
-//               <th className="border px-4 py-2">Reg Date</th>
-//               <th className="border px-4 py-2">Owner</th>
-//               <th className="border px-4 py-2">Owner ID</th>
-//               <th className="border px-4 py-2">Tax Validity</th>
-//               <th className="border px-4 py-2">Insurance Validity</th>
-//               <th className="border px-4 py-2">Fitness Validity</th>
-//               <th className="border px-4 py-2">Permit Validity</th>
-//               <th className="border px-4 py-2">Direct Sale</th>
-//               <th className="border px-4 py-2">Actions</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {trucks.map((truck) => (
-//               <tr key={truck.uuid} className="border">
-//                 <td className="border px-4 py-2">{truck.truck_name}</td>
-//                 <td className="border px-4 py-2">{truck.truck_status}</td>
-//                 <td className="border px-4 py-2">{truck.empty_weight}</td>
-//                 <td className="border px-4 py-2">{truck.company}</td>
-//                 <td className="border px-4 py-2">{truck.gvw}</td>
-//                 <td className="border px-4 py-2">{formatDate(truck.reg_date)}</td>
-//                 <td className="border px-4 py-2">{truck.truck_owner_name}</td>
-//                 <td className="border px-4 py-2">{truck.owner_id}</td>
-//                 <td className="border px-4 py-2">{formatDate(truck.tax_validity)}</td>
-//                 <td className="border px-4 py-2">{formatDate(truck.insurance_validity)}</td>
-//                 <td className="border px-4 py-2">{formatDate(truck.fitness_validity)}</td>
-//                 <td className="border px-4 py-2">{formatDate(truck.permit_validity)}</td>
-//                 <td className="border px-4 py-2">{truck.direct_sale}</td>
-//                 <td className="border px-4 py-2 flex space-x-2">
-//                   <button
-//                     onClick={() => handleEdit(truck)}
-//                     className="bg-blue-600 text-white px-3 py-1 rounded-lg"
-//                   >
-//                     Edit
-//                   </button>
-//                   <button
-//                     onClick={() => handleDelete(truck.uuid)}
-//                     className="bg-red-600 text-white px-3 py-1 rounded-lg"
-//                   >
-//                     Delete
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//     </>
-//   );
-// };
-
-// export default TruckPage;
-
-
-
-
 
 
 import React, { useState, useEffect } from "react";
 import TruckForm from "./TruckForm";
 import { formatDate } from "@/util/libs/formatDate";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const TruckPage = () => {
   const [trucks, setTrucks] = useState([]);
@@ -137,7 +19,7 @@ const TruckPage = () => {
 
   const fetchTrucks = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/truck");
+      const response = await fetch(`${URL}/api/truck`);
       const data = await response.json();
       setTrucks(data);
       setLoading(false);
@@ -162,7 +44,7 @@ const TruckPage = () => {
   const handleDelete = async (uuid) => {
     if (window.confirm("Are you sure you want to delete this truck?")) {
       try {
-        await fetch(`http://localhost:5000/api/truck/${uuid}`, { method: "DELETE" });
+        await fetch(`${URL}/api/truck/${uuid}`, { method: "DELETE" });
         fetchTrucks();
       } catch (error) {
         console.error("Error deleting truck:", error);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+const URL = import.meta.env.VITE_API_BACK_URL
 const PackagingForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     material_name: "",
@@ -50,8 +50,8 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
     try {
       const response = await fetch(
         editData
-          ? `http://localhost:5000/api/packaging/${editData.uuid}`
-          : "http://localhost:5000/api/packaging",
+          ? `${URL}/api/packaging/${editData.uuid}`
+          : `${URL}/api/packaging`,
         {
           method: editData ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },

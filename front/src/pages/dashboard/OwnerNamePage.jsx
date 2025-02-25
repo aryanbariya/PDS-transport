@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import OwnerNameForm from "./OwnerNameForm";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const OwnerNamePage = () => {
   const [owners, setOwners] = useState([]);
@@ -12,7 +13,7 @@ const OwnerNamePage = () => {
   // ✅ Fetch owners from backend
   const fetchOwners = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/owners");
+      const response = await fetch(`${URL}/api/owners`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setOwners(data || []);
@@ -31,7 +32,7 @@ const OwnerNamePage = () => {
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this owner?")) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/owners/${uuid}`, {
+      const response = await fetch(`${URL}/api/owners/${uuid}`, {
         method: "DELETE",
       });
       if (response.ok) {

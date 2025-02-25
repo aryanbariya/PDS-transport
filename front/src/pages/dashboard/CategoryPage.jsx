@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CategoryForm from "./CategoryForm";
+const URL = import.meta.env.VITE_API_BACK_URL
 
 const CategoryPage = () => {
   const [categories, setCategories] = useState([]);
@@ -12,7 +13,7 @@ const CategoryPage = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/categories");
+      const response = await fetch(`${URL}/api/categories`);
       if (!response.ok) throw new Error("Failed to fetch categories");
 
       const data = await response.json();
@@ -32,7 +33,7 @@ const CategoryPage = () => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${id}`, { method: "DELETE" });
+      const response = await fetch(`${URL}/api/categories/${id}`, { method: "DELETE" });
       if (response.ok) {
         alert("Category deleted successfully!");
         fetchCategories();
