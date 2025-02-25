@@ -52,10 +52,10 @@ const HomePage = () => {
       <div className="w-full bg-white p-4 shadow-md flex justify-between items-center">
         <h1 className="text-2xl font-bold">PDS</h1>
         <div>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-md mr-2" onClick={() => navigate("/signin")}>
+          <button className="px-4 py-2 bg-blue-500 text-white rounded-md mr-2" onClick={() => navigate("/auth/sign-in")}>
             Sign In
           </button>
-          <button className="px-4 py-2 bg-green-500 text-white rounded-md" onClick={() => navigate("/signup")}>
+          <button className="px-4 py-2 bg-green-500 text-white rounded-md" onClick={() => navigate("/auth/sign-up")}>
             Sign Up
           </button>
         </div>

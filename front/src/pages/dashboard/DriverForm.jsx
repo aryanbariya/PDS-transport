@@ -4,18 +4,18 @@ const URL = import.meta.env.VITE_API_BACK_URL;
 const DriverForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     driver_name: "",
-    aadhar_no: "",
+    aadhar_card_no: "",
     contact: "",
-    license_no: "",
+    driving_license_no: "",
   });
 
   useEffect(() => {
     if (editData) {
       setFormData({
         driver_name: editData.driver_name || "",
-        aadhar_no: editData.aadhar_no || "",
+        aadhar_no: editData.aadhar_card_no || "",
         contact: editData.contact || "",
-        license_no: editData.license_no || "",
+        license_no: editData.driving_license_no || "",
       });
     }
   }, [editData]);
@@ -34,7 +34,7 @@ const DriverForm = ({ onClose, onSave, editData }) => {
       : `${URL}/api/drivers`;
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch (url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -61,7 +61,7 @@ const DriverForm = ({ onClose, onSave, editData }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {["driver_name", "aadhar_no", "contact", "license_no"].map((field) => (
+            {["driver_name", "aadhar_card_no", "contact", "driving_license_no"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">
                   {field.replace("_", " ").toUpperCase()}

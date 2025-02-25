@@ -102,11 +102,11 @@ const DriverPage = () => {
           {filteredDrivers.length > 0 ? (
             filteredDrivers.map((driver) => (
               <tr key={driver.uuid} className="text-center hover:bg-gray-100">
-                <td className="border p-2">{driver.id}</td>
+                <td className="border p-2">{driver.order_number}</td>
                 <td className="border p-2">{driver.driver_name}</td>
-                <td className="border p-2">{driver.aadhar_no}</td>
+                <td className="border p-2">{driver.aadhar_card_no}</td>
                 <td className="border p-2">{driver.contact}</td>
-                <td className="border p-2">{driver.license_no}</td>
+                <td className="border p-2">{driver.driving_license_no}</td>
                 <td className="border p-2">
                   <div className="flex justify-center space-x-2">
                     <button

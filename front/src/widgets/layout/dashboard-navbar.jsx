@@ -142,10 +142,8 @@ export function DashboardNavbar({ setOpenSidenav }) {
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove auth state
-    setIsLoggedIn(false);
-    setShowLogout(false);
-    navigate("/dashboard"); // Redirect to login
+    localStorage.removeItem("token");
+    window.location.href = "/"; // Redirect to HomePage
   };
 
   return (

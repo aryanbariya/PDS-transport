@@ -179,7 +179,7 @@ const StatisticsCardsData = () => {
       link: "/driver",
       footer: {
         color: "text-green-500",
-        value: statistics.lastModifiedDriver||"NIL",
+        value: statistics.lastModifieddriver||"NIL",
         label: "Last updated",
       },
     },

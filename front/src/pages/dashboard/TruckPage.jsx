@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import TruckForm from "./TruckForm";
 import { formatDate } from "@/util/libs/formatDate";

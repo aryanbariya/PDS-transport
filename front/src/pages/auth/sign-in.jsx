@@ -8,12 +8,9 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-
+const URL = import.meta.env.VITE_API_BACK_URL
 
 export function SignIn() {
-  // const URL = "https://pds-transport.onrender.com"
-  const URL = import.meta.env.VITE_API_BACK_URL
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // Redirect after login
@@ -45,10 +42,6 @@ export function SignIn() {
 
 
   };
-
-
-
-
   return (
     <section className="m-8 flex gap-4">
       <div className="w-full lg:w-3/5 mt-24">
