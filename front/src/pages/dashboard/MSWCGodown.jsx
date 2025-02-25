@@ -12,8 +12,8 @@ const MSWCGodownPage = () => {
 
   const fetchGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/mswcgodown`);
-      // const response = await fetch("http://localhost:5000/api/mswcgodown");
+      // const response = await fetch(`${URL}/api/mswcgodown`);
+      const response = await fetch("http://localhost:5000/api/mswcgodown");
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
@@ -31,9 +31,9 @@ const MSWCGodownPage = () => {
 
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this godown?")) return;
-///////////`http://localhost:5000/api/mswcgodown/${uuid}`
+
     try {
-      const response = await fetch(`${URL}/api/mswcgodown/${uuid}`, {
+      const response = await fetch(`http://localhost:5000/api/mswcgodown/${uuid}`, {
         method: "DELETE",
       });
 
