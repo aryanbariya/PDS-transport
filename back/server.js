@@ -19,7 +19,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "",
   database: process.env.DB_NAME || "pdsmanagement",
-  // port: process.env.DB_PORT
+  port: process.env.DB_PORT || 3306, 
 });
 
 db.connect((err) => {
