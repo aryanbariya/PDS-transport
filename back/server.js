@@ -730,6 +730,119 @@ app.delete("/api/grains/:uuid", (req, res) => {
 ///end of grain
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////start of driver page
+
+app.get("/api/drivers", (req, res) => {
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number FROM drivers ORDER BY order_number";
+  
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+app.get("/api/drivers/:uuid", (req, res) => {
+  const sql = "SELECT * FROM drivers WHERE uuid = ?";
+  
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Driver not found" });
+    
+    res.json(results[0]);
+  });
+});
+
+
+
+app.post("/api/drivers", (req, res) => {
+  const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
+  const uuid = uuidv4(); // Generate UUID
+
+  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+
+    const nextOrder = result[0].next_order;
+    const insertSql = "INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, nextOrder], (insertErr) => {
+      if (insertErr) {
+        console.error("Error inserting:", insertErr);
+        return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+      }
+      
+      console.log(`✅ New driver added with order_number: ${nextOrder}`);
+      res.json({ message: "Driver added successfully", uuid, order_number: nextOrder });
+    });
+  });
+});
+
+app.put("/api/drivers/:uuid", (req, res) => {
+  const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
+  const sql = "UPDATE drivers SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ? WHERE uuid = ?";
+  
+  db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, req.params.uuid], (err, result) => {
+    if (err) {
+      console.error("Error updating:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+    res.json({ message: "Driver updated successfully" });
+  });
+});
+
+app.delete("/api/drivers/:uuid", (req, res) => {
+  const { uuid } = req.params;
+
+  // Step 1: Delete the specific record
+  const deleteSql = "DELETE FROM drivers WHERE uuid = ?";
+  db.query(deleteSql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error deleting:", err);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    console.log(`✅ Deleted driver with UUID: ${uuid}`);
+
+    // Step 2: Reset order numbers sequentially
+    const resetSql1 = "SET @new_order = 0";
+    const resetSql2 = "UPDATE drivers SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+    db.query(resetSql1, (resetErr1) => {
+      if (resetErr1) {
+        console.error("Error resetting variable:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset order numbering variable" });
+      }
+
+      db.query(resetSql2, (resetErr2) => {
+        if (resetErr2) {
+          console.error("Error resetting order numbers:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset order numbers" });
+        }
+
+        console.log("✅ Order numbers reset successfully!");
+        res.json({ message: "Driver deleted and order numbers reset successfully!" });
+      });
+    });
+  });
+});
+
+
+
+
+//////////end of driver page
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// start of truck page
 

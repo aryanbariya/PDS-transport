@@ -8,6 +8,7 @@ import SubGodownPage from "./pages/dashboard/SubGodownPage";
 import PackagingPage from "./pages/dashboard/PackagingPage";
 import SchemePage from "./pages/dashboard/SchemePage";
 import TruckPage from "./pages/dashboard/TruckPage";
+import DriverPage from "./pages/dashboard/DriverPage";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
       <Route path="/employee" element={<EmployeePage />} />
       <Route path="/mswc" element={<MSWCGodownPage />} />
       <Route path="/godown" element={<SubGodownPage />} />
-      <Route path="/driver" element={<Dashboard />} />
+      <Route path="/driver" element={<DriverPage />} />
       <Route path="/truck" element={<TruckPage />} />
       <Route path="/scheme" element={<SchemePage />} />
       <Route path="/packaging" element={<PackagingPage />} />
