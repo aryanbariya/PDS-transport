@@ -4,11 +4,14 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
+const multer = require("multer");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use("/uploads", express.static("uploads"));
 
 // JWT Secret Key
 const secretKey = process.env.JWT_SECRET || "be5c701d7b261e7cec659a9e361dcded66544da8c1c0930ac57a600d8fbba17f9895fd3f173c1f11608ef295c7ddce94c27338d94e39365ccb35069c18587a1933da8d3c608aa2d2f22a4bee67c55ce14cae2f82a735f4b406a576ec23088cdd0b2682fda5da3f1a4aaddf5f57e804f59773f625c2684dc830b5f42dbc60df496c03994665b46b73fb6a0829e4ac3d7e017fcdaed512288e9ce72eb88726a473bab260d1729e874b988d8c6217e3c8003cf9701b97cc3b2d0299c8fbbace8846e74fcc472536bc04866b2d6ff081c4752e221cf84303cf7da1f4ce0905fced8d";
@@ -66,6 +69,19 @@ db.connect((err) => {
 // });
 
 // **Signup API**
+
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Save files in the "uploads" folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+  },
+});
+
+const upload = multer({ storage });
+
 app.post("/signup", async (req, res) => {
   try {
     const { name, surname, phone_number, email, password } = req.body;
@@ -184,6 +200,8 @@ app.post("/api/employees", async (req, res) => {
     res.status(500).json({ error: "Server error: " + error.message });
   }
 });
+// **Insert Employee API**
+
 
 // **Update Employee API**
 app.put("/api/employees/:uuid", (req, res) => {
@@ -247,6 +265,11 @@ app.delete("/api/employees/:uuid", (req, res) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start of mswc godown
+
+
+
+
+
 app.get("/api/mswcgodown", (req, res) => {
   const sql = "SELECT uuid, godownName, godownUnder, order_number FROM mswc_godowns ORDER BY order_number";
   db.query(sql, (err, results) => {
@@ -287,9 +310,14 @@ app.post("/api/mswcgodown", (req, res) => {
       }
       console.log(`✅ New Godown added with order_number: ${nextOrder}, status: ${status}`);
       res.json({ message: "Godown added successfully", uuid, order_number: nextOrder, status });
+
+   
     });
   });
 });
+
+
+
 
 // Update an existing MSWC Godown
 app.put("/api/mswcgodown/:uuid", (req, res) => {
@@ -1275,6 +1303,7 @@ app.get("/api/getRowCounts", (req, res) => {
       (SELECT COUNT(*) FROM truck) AS table6_count,
       (SELECT COUNT(*) FROM scheme) AS table7_count,
       (SELECT COUNT(*) FROM packaging) AS table8_count,
+      (SELECT COUNT(*) FROM drivers) AS table9_count,
       
       (SELECT MAX(last_modified) FROM owners) AS last_modified_owners,
       (SELECT MAX(last_modified) FROM employee) AS last_modified_employee,
@@ -1282,7 +1311,8 @@ app.get("/api/getRowCounts", (req, res) => {
       (SELECT MAX(last_modified) FROM sub_godown) AS last_modified_sub_godown,
       (SELECT MAX(last_modified) FROM truck) AS last_modified_truck,
       (SELECT MAX(last_modified) FROM scheme) AS last_modified_scheme,
-      (SELECT MAX(last_modified) FROM packaging) AS last_modified_packaging
+      (SELECT MAX(last_modified) FROM packaging) AS last_modified_packaging,
+      (SELECT MAX(last_modified) FROM drivers) AS last_modified_drivers
   `;
 
   db.query(query, (err, results) => {
@@ -1316,6 +1346,7 @@ app.get("/api/getRowCounts", (req, res) => {
       truckcount: counts.table6_count,
       schemecount: counts.table7_count,
       packagingcount: counts.table8_count,
+      drivercount: counts.table9_count,
 
       lastModifiedOwners: formatDateTime(counts.last_modified_owners),
       lastModifiedEmployee: formatDateTime(counts.last_modified_employee),
@@ -1324,6 +1355,7 @@ app.get("/api/getRowCounts", (req, res) => {
       lastModifiedTruck: formatDateTime(counts.last_modified_truck),
       lastModifiedScheme: formatDateTime(counts.last_modified_scheme),
       lastModifiedPackaging: formatDateTime(counts.last_modified_packaging),
+      lastModifieddriver: formatDateTime(counts.last_modified_drivers),
     });
   });
 });

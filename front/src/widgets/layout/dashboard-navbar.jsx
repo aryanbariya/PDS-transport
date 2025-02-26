@@ -165,9 +165,9 @@ export function DashboardNavbar({ setOpenSidenav }) {
 
           {/* Conditional Sign In / Admin Button */}
           {isLoggedIn ? (
-           
+
             <div className="relative">
-               
+
               <Button
                 variant="text"
                 color="blue-gray"
@@ -189,7 +189,7 @@ export function DashboardNavbar({ setOpenSidenav }) {
                   </Button>
                 </div>
               )}
-          
+
             </div>
           ) : (
             <Link to="/auth/sign-in">
@@ -201,7 +201,7 @@ export function DashboardNavbar({ setOpenSidenav }) {
           )}
 
           {/* Other Icons */}
-          <Menu>
+          {/* <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
                 <BellIcon className="h-5 w-5 text-blue-gray-500" />
@@ -217,7 +217,10 @@ export function DashboardNavbar({ setOpenSidenav }) {
                 </div>
               </MenuItem>
             </MenuList>
-          </Menu>
+          </Menu> */}
+          <IconButton variant="text" color="blue-gray" onClick={() => navigate("/notifications")}>
+            <BellIcon className="h-5 w-5 text-blue-gray-500" />
+          </IconButton>
           <IconButton variant="text" color="blue-gray">
             <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
           </IconButton>

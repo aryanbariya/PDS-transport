@@ -7,7 +7,16 @@ import {
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import { MdMiscellaneousServices, MdEditNote  } from "react-icons/md"
+import { TbReport } from "react-icons/tb";
+import { FaClipboardCheck } from "react-icons/fa6";
 import { SignIn, SignUp } from "@/pages/auth";
+import Manage from "./pages/dashboard/Manage";
+import FirstTapa from "./pages/dashboard/FirstTapa";
+import FirstTapaReport from "./pages/dashboard/FirstTapaReport";
+import SecondDispatchReport from "./pages/dashboard/SecondDispatchReport";
+import SecondDispatch from "./pages/dashboard/SecondDispatch";
+import SecondTapa from "./pages/dashboard/SecondTapa";
 // import EmployeePage from "./pages/dashboard/EmployeePage";
 // import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 // import SubGodownPage from "./pages/dashboard/SubGodownPage";
@@ -30,6 +39,42 @@ export const routes = [
         name: "dashboard",
         path: "/home",
         element: <Home />,
+      },
+      {
+        icon: <MdMiscellaneousServices {...icon} />,
+        name: "manage",
+        path: "/manage",
+        element: <Manage />,
+      },
+      {
+        icon: <MdEditNote {...icon} />,
+        name: "1stTapa",
+        path: "/firsttapa",
+        element: <FirstTapa />,
+      },
+      {
+        icon: <TbReport {...icon} />,
+        name: "1stTapaReports",
+        path: "/firsttapareport",
+        element: <FirstTapaReport />,
+      },
+      {
+        icon: <MdEditNote {...icon} />,
+        name: "2ndTapa",
+        path: "/secondtapa",
+        element: <SecondTapa />,
+      },
+      {
+        icon: <FaClipboardCheck {...icon} />,
+        name: "2ndDispatch",
+        path: "/seconddispatch",
+        element: <SecondDispatch />,
+      },
+      {
+        icon: <FaClipboardCheck {...icon} />,
+        name: "2ndDispatchReports",
+        path: "/seconddispatchreport",
+        element: <SecondDispatchReport />,
       },
       // {
       //   icon: <UserCircleIcon {...icon} />,
