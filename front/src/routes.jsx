@@ -49,31 +49,31 @@ export const routes = [
       {
         icon: <MdEditNote {...icon} />,
         name: "1stTapa",
-        path: "/firsttapa",
+        path: "/firstTapa",
         element: <FirstTapa />,
       },
       {
         icon: <TbReport {...icon} />,
         name: "1stTapaReports",
-        path: "/firsttapareport",
+        path: "/firstTapareport",
         element: <FirstTapaReport />,
       },
       {
         icon: <MdEditNote {...icon} />,
         name: "2ndTapa",
-        path: "/secondtapa",
+        path: "/secondTapa",
         element: <SecondTapa />,
       },
       {
         icon: <FaClipboardCheck {...icon} />,
         name: "2ndDispatch",
-        path: "/seconddispatch",
+        path: "/secondDispatch",
         element: <SecondDispatch />,
       },
       {
         icon: <FaClipboardCheck {...icon} />,
         name: "2ndDispatchReports",
-        path: "/seconddispatchreport",
+        path: "/secondDispatchreport",
         element: <SecondDispatchReport />,
       },
       // {

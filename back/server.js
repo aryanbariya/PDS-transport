@@ -33,54 +33,8 @@ db.connect((err) => {
   console.log("Connected to MySQL database.");
 });
 
-// // Create Employee Table (if not exists)
-// db.query(`
-//   CREATE TABLE IF NOT EXISTS employees (
-//     id INT AUTO_INCREMENT PRIMARY KEY,
-//     category VARCHAR(50),
-//     fullName VARCHAR(100),
-//     username VARCHAR(50),
-//     password VARCHAR(255),
-//     address TEXT,
-//     aadharNo VARCHAR(20),
-//     panNo VARCHAR(20),
-//     bankName VARCHAR(100),
-//     accountNumber VARCHAR(50),
-//     ifscCode VARCHAR(20),
-//     branchName VARCHAR(100),
-//     subGodown VARCHAR(100)
-//   )
-// `, (err) => {
-//   if (err) console.error("Error creating employees table:", err);
-// });
-
-// // Create Users Table (for Authentication)
-// db.query(`
-//   CREATE TABLE IF NOT EXISTS signup (
-//     id INT AUTO_INCREMENT PRIMARY KEY,
-//     name VARCHAR(100),
-//     surname VARCHAR(100),
-//     phone_number VARCHAR(20),
-//     email VARCHAR(100) UNIQUE,
-//     password VARCHAR(255)
-//   )
-// `, (err) => {
-//   if (err) console.error("Error creating users table:", err);
-// });
-
-// **Signup API**
 
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Save files in the "uploads" folder
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
-  },
-});
-
-const upload = multer({ storage });
 
 app.post("/signup", async (req, res) => {
   try {
