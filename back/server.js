@@ -18,11 +18,11 @@ const secretKey = process.env.JWT_SECRET || "be5c701d7b261e7cec659a9e361dcded665
 
 // MySQL Connection
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME || "pdsmanagement",
-  port: process.env.DB_PORT || 3306, 
+  host: process.env.DB_HOST ,///////|| "localhost"
+  user: process.env.DB_USER ,//////|| "root"
+  password: process.env.DB_PASS ,//////|| ""
+  database: process.env.DB_NAME ,/////|| "pdsmanagement"
+  port: process.env.DB_PORT , /////|| 3306
 });
 
 db.connect((err) => {
@@ -90,6 +90,68 @@ app.post("/signin", async (req, res) => {
     }
   });
 });
+///////////////////////////////////////////////////////////////////
+
+app.post("/google-signin", async (req, res) => {
+  try {
+    const { email, name, sub } = req.body; // sub = Google user ID
+
+    if (!email || !name || !sub) {
+      return res.status(400).json({ error: "Missing required Google data" });
+    }
+
+    // Check if the user already exists in the database
+    const sqlCheck = "SELECT * FROM users WHERE email = ?";
+    db.query(sqlCheck, [email], (err, results) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Database error" });
+      }
+
+      if (results.length > 0) {
+        // User exists, generate token
+        const user = results[0];
+        const token = jwt.sign(
+          { id: user.id, email: user.email, name: user.name },
+          "your_secret_key",
+          { expiresIn: "1h" }
+        );
+        return res.json({ message: "Login successful", token, user });
+      } else {
+        // New user, insert into database
+        const sqlInsert =
+          "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)";
+        db.query(sqlInsert, [name, email, sub], (err, result) => {
+          if (err) {
+            console.error("Database insert error:", err);
+            return res.status(500).json({ error: "Database insert error" });
+          }
+
+          const newUser = {
+            id: result.insertId,
+            name,
+            email,
+          };
+
+          const token = jwt.sign(
+            { id: newUser.id, email: newUser.email, name: newUser.name },
+            "your_secret_key",
+            { expiresIn: "1h" }
+          );
+
+          return res.status(201).json({
+            message: "User registered successfully",
+            token,
+            user: newUser,
+          });
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Google authentication failed" });
+  }
+});
+
 
 
 

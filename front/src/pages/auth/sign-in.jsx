@@ -9,13 +9,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+
+
 const URL = import.meta.env.VITE_API_BACK_URL
 
 export function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); // Redirect after login
-  const [errors, setErrors] = useState({}); 
+  const [errors, setErrors] = useState({});
 
 
   const handleSignIn = async (e) => {
@@ -51,7 +53,7 @@ export function SignIn() {
           <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
         </div>
         <form onSubmit={handleSignIn} className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-        {errors.allFields && (<Typography variant="small" color="red" className="text-center">{errors.allFields}</Typography>)}
+          {errors.allFields && (<Typography variant="small" color="red" className="text-center">{errors.allFields}</Typography>)}
           <div className="mb-1 flex flex-col gap-6">
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
               Your email
