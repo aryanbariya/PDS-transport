@@ -36,6 +36,7 @@ db.connect((err) => {
 
 
 
+
 app.post("/signup", async (req, res) => {
   try {
     const { name, surname, phone_number, email, password } = req.body;
