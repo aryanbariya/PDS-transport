@@ -148,8 +148,12 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PackagingForm from "./PackagingForm";
+import $ from "jquery";
+import "datatables.net-dt/css/dataTables.dataTables.min.css";
+import "datatables.net-dt";
+
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const PackagingPage = () => {
@@ -158,16 +162,26 @@ const PackagingPage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 14;
+ const tableRef = useRef(null);
+
+
+  useEffect(() => {
+    fetchPackaging();
+  }, []);
+
+  useEffect(() => {
+    if (packagingList.length > 0 && tableRef.current) {
+      $(tableRef.current).DataTable();
+    }
+  }, [packagingList]);
 
   const fetchPackaging = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${URL}/api/packaging`);
       if (!response.ok) throw new Error("Failed to fetch packaging records");
       const data = await response.json();
-      setPackagingList(data || []);
+      setPackagingList(data );
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -175,9 +189,7 @@ const PackagingPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPackaging();
-  }, []);
+
 
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this packaging record?")) return;
@@ -208,13 +220,6 @@ const PackagingPage = () => {
     fetchPackaging();
   };
 
-  const filteredPackaging = packagingList.filter((p) =>
-    p.material_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPackaging.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -223,13 +228,7 @@ const PackagingPage = () => {
       </div>
 
       <div className="flex justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
-        <input
-          type="text"
-          placeholder="Search Packaging Material..."
-          className="border p-2 rounded-md w-full max-w-lg"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -250,7 +249,7 @@ const PackagingPage = () => {
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      <table className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
+      <table  ref={tableRef} className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
         <thead>
           <tr className="bg-gray-200">
             <th className="border p-2">ID</th>
@@ -261,8 +260,8 @@ const PackagingPage = () => {
           </tr>
         </thead>
         <tbody>
-          {currentItems.length > 0 ? (
-            currentItems.map((p) => (
+          {packagingList.length > 0 ? (
+            packagingList.map((p) => (
               <tr key={p.uuid} className="text-center hover:bg-gray-100">
                 <td className="border p-2">{p.order_number}</td>
                 <td className="border p-2">{p.material_name}</td>
@@ -296,23 +295,7 @@ const PackagingPage = () => {
         </tbody>
       </table>
 
-      <div className="flex justify-center space-x-4 mt-4">
-        <button
-          className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span className="py-2">Page {currentPage}</span>
-        <button
-          className="bg-gray-300 px-4 py-2 rounded-md hover:bg-gray-400"
-          onClick={() => setCurrentPage((prev) => (indexOfLastItem < filteredPackaging.length ? prev + 1 : prev))}
-          disabled={indexOfLastItem >= filteredPackaging.length}
-        >
-          Next
-        </button>
-      </div>
+
     </div>
   );
 };

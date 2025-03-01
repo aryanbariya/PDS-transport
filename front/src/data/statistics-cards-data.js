@@ -103,8 +103,7 @@
 
 // Adjust path based on location
 import {
-  // BanknotesIcon,
-  // UserPlusIcon,
+
   UsersIcon,
   TruckIcon,
   BuildingOffice2Icon,

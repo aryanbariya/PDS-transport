@@ -1,11 +1,18 @@
 import {
   HomeIcon,
   UserCircleIcon,
+  UsersIcon,
+  BuildingOffice2Icon,
+  TruckIcon,
+  ClipboardDocumentListIcon,
+  ArchiveBoxIcon,
   TableCellsIcon,
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
+import { MdWarehouse } from "react-icons/md";
+import { GiSteeringWheel } from "react-icons/gi";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { MdMiscellaneousServices, MdEditNote  } from "react-icons/md"
 import { TbReport } from "react-icons/tb";
@@ -17,10 +24,16 @@ import FirstTapaReport from "./pages/dashboard/FirstTapaReport";
 import SecondDispatchReport from "./pages/dashboard/SecondDispatchReport";
 import SecondDispatch from "./pages/dashboard/SecondDispatch";
 import SecondTapa from "./pages/dashboard/SecondTapa";
+import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 // import EmployeePage from "./pages/dashboard/EmployeePage";
 // import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
-// import SubGodownPage from "./pages/dashboard/SubGodownPage";
-// import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
+import SubGodownPage from "./pages/dashboard/SubGodownPage";
+import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
+import EmployeePage from "./pages/dashboard/EmployeePage";
+import DriverPage from "./pages/dashboard/DriverPage";
+import TruckPage from "./pages/dashboard/TruckPage";
+import PackagingPage from "./pages/dashboard/PackagingPage";
+import SchemePage from "./pages/dashboard/SchemePage";
 // import GrainPage from "./pages/dashboard/GrainPage";
 // import TruckPage from "./pages/dashboard/TruckPage";
 // import PackagingPage from "./pages/dashboard/PackagingPage";
@@ -45,7 +58,64 @@ export const routes = [
         name: "manage",
         path: "/manage",
         element: <Manage />,
+        subPages: [
+          {
+            icon: UserCircleIcon,
+            name: "Owner Name",
+            path: "/owners",
+            element: <OwnerNamePage />,
+          },
+          {
+            icon: UsersIcon,
+            name: "Employees",
+            path: "/employee",
+            element: <EmployeePage />,
+          },
+          {
+            icon: BuildingOffice2Icon,
+            name: "MSWC Godown",
+            path: "/mswc-godown",
+            element: <MSWCGodownPage />,
+          },
+          {
+            icon: MdWarehouse,
+            name: "Sub Godown",
+            path: "/sub-godown",
+            element: <SubGodownPage />,
+          },
+          {
+            icon: GiSteeringWheel,
+            name: "Drivers",
+            path: "/driver",
+            element: <DriverPage />,
+          },
+          {
+            icon: TruckIcon,
+            name: "Trucks",
+            path: "/truck",
+            element: <TruckPage />,
+          },
+          {
+            icon: ClipboardDocumentListIcon,
+            name: "Schemes",
+            path: "/scheme",
+            element: <SchemePage />,
+          },
+          {
+            icon: ArchiveBoxIcon,
+            name: "Packaging",
+            path: "/packaging",
+            element: <PackagingPage />,
+          },
+        ],
       },
+      
+      // {
+      //   icon: <MdMiscellaneousServices {...icon} />,
+      //   name: "manage",
+      //   path: "/manage",
+      //   element: <Manage />,
+      // },
       {
         icon: <MdEditNote {...icon} />,
         name: "1stTapa",
@@ -76,78 +146,6 @@ export const routes = [
         path: "/secondDispatchreport",
         element: <SecondDispatchReport />,
       },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "profile",
-      //   path: "/profile",
-      //   element: <Profile />,
-      // },
-      // {
-      //   icon: <TableCellsIcon {...icon} />,
-      //   name: "tables",
-      //   path: "/tables",
-      //   element: <Tables />,
-      // },
-      // {
-      //   icon: <InformationCircleIcon {...icon} />,
-      //   name: "notifications",
-      //   path: "/notifications",
-      //   element: <Notifications />,
-      // },
-      // {
-      //   icon: <HomeIcon {...icon} />,
-      //   name: "MSWCGodownPage",
-      //   path: "/MSWCGodownPage",
-      //   element: <MSWCGodownPage />,
-      // },
-      // {
-      //   icon: <HomeIcon {...icon} />,
-      //   name: "SubGodownPage",
-      //   path: "/SubGodownPage",
-      //   element: <SubGodownPage />,
-      // },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "EmploeePage",
-      //   path: "/EmployeePage",
-      //   element: <EmployeePage />,
-      // },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "OwnerNamePage",
-      //   path: "/OwnerNamePage",
-      //   element: <OwnerNamePage />,
-      // },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "GrainPage",
-      //   path: "/GrainPage",
-      //   element: <GrainPage />,
-      // },
-      // {
-      //   icon: <UserCircleIcon {...icon} />,
-      //   name: "TruckPage",
-      //   path: "/TruckPage",
-      //   element: <TruckPage />,
-      // },
-      // {
-      //   icon: <InformationCircleIcon {...icon} />,
-      //   name: "PackagingPage",
-      //   path: "/PackagingPage",
-      //   element: <PackagingPage />,
-      // },
-      // {
-      //   icon: <InformationCircleIcon {...icon} />,
-      //   name: "CategoryPage",
-      //   path: "/CategoryPage",
-      //   element: <CategoryPage />,
-      // },
-      // {
-      //   icon: <InformationCircleIcon {...icon} />,
-      //   name: "SchemePage",
-      //   path: "/SchemePage",
-      //   element: <SchemePage />,
-      // },
     ],
   },
   {
@@ -171,3 +169,5 @@ export const routes = [
 ];
 
 export default routes;
+
+

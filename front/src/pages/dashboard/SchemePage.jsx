@@ -162,8 +162,12 @@
 // export default SchemePage;
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import SchemeForm from "./SchemeForm";
+import $ from "jquery";
+import "datatables.net-dt/css/dataTables.dataTables.min.css";
+import "datatables.net-dt";
+
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const SchemePage = () => {
@@ -172,9 +176,18 @@ const SchemePage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 16;
+ const tableRef = useRef(null);
+
+
+ useEffect(() => {
+  fetchSchemes();
+}, []);
+
+useEffect(() => {
+  if (schemes.length > 0 && tableRef.current) {
+    $(tableRef.current).DataTable();
+  }
+}, [schemes]);
 
   const fetchSchemes = async () => {
     setLoading(true);
@@ -182,16 +195,15 @@ const SchemePage = () => {
       const response = await fetch(`${URL}/api/scheme`);
       if (!response.ok) throw new Error("Failed to fetch scheme");
       const data = await response.json();
-      setSchemes(data || []);
+      setSchemes(data);
+      setLoading(false);
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
-    setLoading(false);
+   
   };
 
-  useEffect(() => {
-    fetchSchemes();
-  }, []);
 
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this scheme?")) return;
@@ -222,16 +234,7 @@ const SchemePage = () => {
     fetchSchemes();
   };
 
-  const filteredSchemes = schemes.filter((scheme) =>
-    scheme.scheme_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredSchemes.length / itemsPerPage);
-  const displayedSchemes = filteredSchemes.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+ 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
       <div className="bg-blue-600 text-white p-4 rounded-md shadow-md">
@@ -239,13 +242,6 @@ const SchemePage = () => {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Search Schemes..."
-          className="border p-2 rounded-md w-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           onClick={() => {
@@ -267,7 +263,7 @@ const SchemePage = () => {
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="bg-white p-4 mt-4 rounded-md shadow-md overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 bg-white shadow-md rounded-md">
+        <table ref={tableRef}  className="w-full border-collapse border border-gray-300 bg-white shadow-md rounded-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">ID</th>
@@ -277,8 +273,8 @@ const SchemePage = () => {
             </tr>
           </thead>
           <tbody>
-            {displayedSchemes.length > 0 ? (
-              displayedSchemes.map((scheme) => (
+            {schemes.length > 0 ? (
+              schemes.map((scheme) => (
                 <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
                   <td className="border p-2">{scheme.order_number}</td>
                   <td className="border p-2">{scheme.scheme_name}</td>
@@ -310,26 +306,6 @@ const SchemePage = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-4 space-x-2">
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className="px-3 py-1 bg-gray-300 rounded-md disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="px-4 py-1 bg-gray-200 rounded-md">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-          className="px-3 py-1 bg-gray-300 rounded-md disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };

@@ -10,6 +10,8 @@ import SchemePage from "./pages/dashboard/SchemePage";
 import TruckPage from "./pages/dashboard/TruckPage";
 import DriverPage from "./pages/dashboard/DriverPage";
 import { Notifications } from "./pages/dashboard";
+import GrainPage from "./pages/dashboard/GrainPage";
+import CategoryPage from "./pages/dashboard/CategoryPage";
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
       <Route path="/packaging" element={<PackagingPage />} />
       <Route path="/notifications" element={<Notifications />} />
       <Route path="/HomePage/*" element={<HomePage />} />
+      <Route path="/grain/*" element={<GrainPage />} />
+      <Route path="/category/*" element={<CategoryPage />} />
       
     </Routes>
   );

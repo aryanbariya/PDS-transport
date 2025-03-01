@@ -30,30 +30,29 @@ import StatisticsCardsData from "@/data/statistics-cards-data";
 
 export function Home() {
   const data = StatisticsCardsData(); // Get updated data
-  
+
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {data.map(({ icon, title, link, footer, ...rest }) => (
-                    <Link to={link} key={title}> {/* Wrap Card inside Link */}
-                    <StatisticsCard
-                      {...rest}
-                      title={title}
-                      icon={React.createElement(icon, {
-                        className: "w-6 h-6 text-white",
-                      })}
-                      footer={
-                        <Typography className="font-normal text-blue-gray-600">
-                           &nbsp;{footer.label} <br />
-                          <strong className={footer.color}>{footer.value}</strong>
-                        </Typography>
-                      }
-                    />
-                  </Link>
+          <Link to={link} key={title}> {/* Wrap Card inside Link */}
+            <StatisticsCard
+              {...rest}
+              title={title}
+              icon={React.createElement(icon, {
+                className: "w-6 h-6 text-white",
+              })}
+              footer={
+                <Typography className="font-normal text-blue-gray-600">
+                  &nbsp;{footer.label} <br />
+                  <strong className={footer.color}>{footer.value}</strong>
+                </Typography>
+              }
+            />
+          </Link>
         ))}
       </div>
-      {/* <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-      </div> */}
+ 
       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
           <CardHeader
@@ -115,11 +114,10 @@ export function Home() {
               <tbody>
                 {projectsTableData.map(
                   ({ img, name, members, budget, completion }, key) => {
-                    const className = `py-3 px-5 ${
-                      key === projectsTableData.length - 1
+                    const className = `py-3 px-5 ${key === projectsTableData.length - 1
                         ? ""
                         : "border-b border-blue-gray-50"
-                    }`;
+                      }`;
 
                     return (
                       <tr key={name}>
@@ -189,10 +187,10 @@ export function Home() {
             color="transparent"
             className="m-0 p-6"
           > */}
-            {/* <Typography variant="h6" color="blue-gray" className="mb-2">
+          {/* <Typography variant="h6" color="blue-gray" className="mb-2">
               Orders Overview
             </Typography> */}
-            {/* <Typography
+          {/* <Typography
               variant="small"
               className="flex items-center gap-1 font-normal text-blue-gray-600"
             >
