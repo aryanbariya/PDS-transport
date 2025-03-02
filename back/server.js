@@ -1207,12 +1207,13 @@ app.get("/api/scheme/:uuid", (req, res) => {
 
 
 app.post("/api/scheme", (req, res) => {
+  const uuid = uuidv4(); // Generate a unique UUID
   const { scheme_name, scheme_status } = req.body;
   if (!scheme_name || !scheme_status) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  const uuid = uuidv4(); // Generate a unique UUID
+  
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
 
   db.query(getMaxOrderSql, (err, result) => {

@@ -70,10 +70,8 @@ useEffect(() => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-md w-full">
+      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
         Sub Godown List
-      </div>
-      <div className="flex justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -94,8 +92,8 @@ useEffect(() => {
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      <div className="overflow-x-auto mt-4">
-      <table ref={tableRef} className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
+      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+      <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
         <thead>
           <tr className="bg-gray-200">
             <th className="border p-2">ID</th>

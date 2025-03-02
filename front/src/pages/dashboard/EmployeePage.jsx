@@ -74,11 +74,8 @@ useEffect(() => {
   
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-md w-full">
+      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
         Employees Details
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
         <button
           className="mt-2 md:mt-0 md:ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -100,9 +97,9 @@ useEffect(() => {
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table ref={tableRef} className="w-full border-collapse text-xs md:text-sm">
+        <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
           <thead>
-            <tr className="bg-gray-200 text-gray-700">
+            <tr className="bg-gray-200 ">
               <th className="border p-2">Sr. No</th>
               <th className="border p-2">Category</th>
               <th className="border p-2">Employee</th>
@@ -115,7 +112,7 @@ useEffect(() => {
           <tbody>
             {employees.length > 0 ? (
               employees.map((emp) => (
-                <tr key={emp.uuid} className="text-gray-600 text-center hover:bg-gray-100">
+                <tr key={emp.uuid} className="text-center hover:bg-gray-100">
                   <td className="border p-2">{emp.order_number}</td>
                   <td className="border p-2 font-semibold">{emp.category}</td>
                   <td className="border p-2">

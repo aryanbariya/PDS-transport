@@ -236,14 +236,11 @@ useEffect(() => {
 
  
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-      <div className="bg-blue-600 text-white p-4 rounded-md shadow-md">
-        <h2 className="text-lg font-semibold">Scheme Management</h2>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+    <div className="flex flex-col h-full w-full p-4 bg-gray-100">
+      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
+       Scheme List
+       <button
+          className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
             setEditData(null);
             setShowForm(!showForm);
@@ -251,7 +248,10 @@ useEffect(() => {
         >
           {showForm ? "Close" : "Add"}
         </button>
+
       </div>
+
+
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
@@ -262,8 +262,8 @@ useEffect(() => {
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      <div className="bg-white p-4 mt-4 rounded-md shadow-md overflow-x-auto">
-        <table ref={tableRef}  className="w-full border-collapse border border-gray-300 bg-white shadow-md rounded-md">
+      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+        <table ref={tableRef}  className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">ID</th>
@@ -278,7 +278,7 @@ useEffect(() => {
                 <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
                   <td className="border p-2">{scheme.order_number}</td>
                   <td className="border p-2">{scheme.scheme_name}</td>
-                  <td className="border p-2">{scheme.status}</td>
+                  <td className="border p-2">{scheme.scheme_status}</td>
                   <td className="border p-2">
                     <div className="flex justify-center space-x-2">
                       <button

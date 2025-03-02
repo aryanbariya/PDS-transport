@@ -70,11 +70,6 @@ export function Dashboard() {
             )
           )}
         </Routes>
- 
-
-
-
-
         {/* Footer */}
         <div className="text-blue-gray-600">
           <Footer />
