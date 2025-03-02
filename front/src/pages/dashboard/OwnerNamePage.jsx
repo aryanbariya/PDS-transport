@@ -26,7 +26,6 @@ const OwnerNamePage = () => {
   }, [owners]);
   
 
-
   const fetchOwners = async () => {
     try {
       const response = await fetch(`${URL}/api/owners`);

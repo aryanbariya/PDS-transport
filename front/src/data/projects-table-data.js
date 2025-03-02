@@ -52,7 +52,7 @@ export const projectsTableData = [
   },
   {
     img: "/img/logo-invision.svg",
-    name: "Redesign New Online Shop",
+    // name: "Redesign New Online Shop",
     members: [
       { img: "/img/team-1.jpeg", name: "Romina Hadid" },
       { img: "/img/team-4.jpeg", name: "Alexander Smith" },
