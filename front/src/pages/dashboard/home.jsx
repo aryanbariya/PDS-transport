@@ -34,8 +34,9 @@ export function Home() {
   const data = StatisticsCardsData(); // Get updated data
 
   return (
+    
     <div className="mt-8">
-      {data === null ? (
+      {!data || data.length === 0 ?  (
         // 🚚 Truck Loader Animation While Fetching Data
         <div className="flex justify-center items-center h-64">
         <Player
@@ -48,13 +49,16 @@ export function Home() {
 
       ) : (
         <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+          
           {data.map(({ icon, title, link, footer, ...rest }) => (
 
             // <Link to={link} key={title}> {/* Wrap Card inside Link */}</Link>
             <StatisticsCard
+            
               key={title}
               {...rest}
               title={title}
+              value={rest.value ?? "NIL"}
               icon={React.createElement(icon, {
                 className: "w-6 h-6 text-white",
               })}

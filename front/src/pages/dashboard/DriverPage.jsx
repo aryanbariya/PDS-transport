@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
+import { Player } from "@lottiefiles/react-lottie-player";
+import truckLoader from "@/util/Animation.json";
 import DriverForm from "./DriverForm";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -85,8 +87,11 @@ const DriverPage = () => {
         </div>
       )}
 
-      {loading && <p>Loading...</p>}
+      {loading && <div className="flex justify-center items-center h-64">
+        <Player autoplay loop src={truckLoader} className="w-48 h-48" />
+      </div>}
       {error && <p className="text-red-500">{error}</p>}
+      {!loading && (
       <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
         <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
           <thead>
@@ -133,7 +138,7 @@ const DriverPage = () => {
             )}
           </tbody>
         </table>
-      </div>
+      </div>)}
 
     </div>
   );

@@ -2,26 +2,28 @@ import React, { useState, useEffect, useRef } from "react";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
+import { Player } from "@lottiefiles/react-lottie-player";
+import truckLoader from "@/util/Animation.json";
 import EmployeeForm from "./EmployeeForem";
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const EmployeePage = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-const tableRef = useRef(null);
+  const tableRef = useRef(null);
 
-useEffect(() => {
-  fetchEmployees();
-}, []);
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
-useEffect(() => {
-  if (employees.length > 0 && tableRef.current) {
-    $(tableRef.current).DataTable();
-  }
-}, [employees]);
+  useEffect(() => {
+    if (employees.length > 0 && tableRef.current) {
+      $(tableRef.current).DataTable();
+    }
+  }, [employees]);
 
 
 
@@ -71,7 +73,7 @@ useEffect(() => {
   };
 
 
-  
+
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
@@ -93,67 +95,74 @@ useEffect(() => {
         </div>
       )}
 
-      {loading && <p className="text-center text-gray-500">Loading...</p>}
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <Player autoplay loop src={truckLoader} className="w-48 h-48" />
+        </div>
+      )}
       {error && <p className="text-red-500">{error}</p>}
-
-      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-          <thead>
-            <tr className="bg-gray-200 ">
-              <th className="border p-2">Sr. No</th>
-              <th className="border p-2">Category</th>
-              <th className="border p-2">Employee</th>
-              <th className="border p-2">Login Info</th>
-              <th className="border p-2">Bank Info</th>
-              <th className="border p-2">Action</th>
-              <th className="border p-2">Docs</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.length > 0 ? (
-              employees.map((emp) => (
-                <tr key={emp.uuid} className="text-center hover:bg-gray-100">
-                  <td className="border p-2">{emp.order_number}</td>
-                  <td className="border p-2 font-semibold">{emp.category}</td>
-                  <td className="border p-2">
-                    <div className="font-semibold">{emp.fullName}</div>
-                    <div className="text-xs md:text-sm">{emp.address}</div>
-                  </td>
-                  <td className="border p-2">
-                    <div className="font-semibold">{emp.username}</div>
-                    <div className="text-xs md:text-sm">{emp.password}</div>
-                  </td>
-                  <td className="border p-2">
-                    <div>{emp.bankName || "N/A"}</div>
-                    <div>{emp.accountNumber || "N/A"}</div>
-                    <div>{emp.ifscCode || "N/A"}</div>
-                    <div>{emp.branchName || "N/A"}</div>
-                  </td>
-                  <td className="border p-2 flex justify-center gap-2 text-xs md:text-base">
-                  <button
-                      onClick={() => handleEdit(emp)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => handleDelete(emp.uuid)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                  <td className="border p-2 text-blue-500 cursor-pointer">📄</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-3 text-center text-gray-500">No Employees Found</td>
+      {!loading && (
+        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+            <thead>
+              <tr className="bg-gray-200 ">
+                <th className="border p-2">Sr. No</th>
+                <th className="border p-2">Category</th>
+                <th className="border p-2">Employee</th>
+                <th className="border p-2">Login Info</th>
+                <th className="border p-2">Bank Info</th>
+                <th className="border p-2">Action</th>
+                <th className="border p-2">Docs</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {employees.length > 0 ? (
+                employees.map((emp) => (
+                  <tr key={emp.uuid} className="text-center hover:bg-gray-100">
+                    <td className="border p-2">{emp.order_number}</td>
+                    <td className="border p-2 font-semibold">{emp.category}</td>
+                    <td className="border p-2">
+                      <div className="font-semibold">{emp.fullName}</div>
+                      <div className="text-xs md:text-sm">{emp.address}</div>
+                    </td>
+                    <td className="border p-2">
+                      <div className="font-semibold">{emp.username}</div>
+                      <div className="text-xs md:text-sm">{emp.password}</div>
+                    </td>
+                    <td className="border p-2">
+                      <div>{emp.bankName || "N/A"}</div>
+                      <div>{emp.accountNumber || "N/A"}</div>
+                      <div>{emp.ifscCode || "N/A"}</div>
+                      <div>{emp.branchName || "N/A"}</div>
+                    </td>
+                    <td className="border p-2 flex justify-center gap-2 text-xs md:text-base">
+                      <button
+                        onClick={() => handleEdit(emp)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDelete(emp.uuid)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                    <td className="border p-2 text-blue-500 cursor-pointer">📄</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="p-3 text-center text-gray-500">No Employees Found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+      )}
+
 
     </div>
   );

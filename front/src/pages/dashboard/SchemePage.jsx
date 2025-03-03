@@ -162,11 +162,13 @@
 // export default SchemePage;
 
 
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SchemeForm from "./SchemeForm";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
+import { Player } from "@lottiefiles/react-lottie-player";
+import truckLoader from "@/util/Animation.json";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -176,18 +178,18 @@ const SchemePage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
- const tableRef = useRef(null);
+  const tableRef = useRef(null);
 
 
- useEffect(() => {
-  fetchSchemes();
-}, []);
+  useEffect(() => {
+    fetchSchemes();
+  }, []);
 
-useEffect(() => {
-  if (schemes.length > 0 && tableRef.current) {
-    $(tableRef.current).DataTable();
-  }
-}, [schemes]);
+  useEffect(() => {
+    if (schemes.length > 0 && tableRef.current) {
+      $(tableRef.current).DataTable();
+    }
+  }, [schemes]);
 
   const fetchSchemes = async () => {
     setLoading(true);
@@ -201,7 +203,7 @@ useEffect(() => {
       setError(err.message);
       setLoading(false);
     }
-   
+
   };
 
 
@@ -234,12 +236,12 @@ useEffect(() => {
     fetchSchemes();
   };
 
- 
+
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
-       Scheme List
-       <button
+        Scheme List
+        <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
             setEditData(null);
@@ -259,11 +261,13 @@ useEffect(() => {
         </div>
       )}
 
-      {loading && <p>Loading...</p>}
+      {loading && <div className="flex justify-center items-center h-64">
+        <Player autoplay loop src={truckLoader} className="w-48 h-48" />
+      </div>}
       {error && <p className="text-red-500">{error}</p>}
-
+      {!loading && (
       <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table ref={tableRef}  className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+        <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">ID</th>
@@ -304,7 +308,7 @@ useEffect(() => {
             )}
           </tbody>
         </table>
-      </div>
+      </div>)}
 
     </div>
   );

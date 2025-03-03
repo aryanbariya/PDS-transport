@@ -121,6 +121,7 @@ import { useMaterialTailwindController } from "@/context";
 
 const StatisticsCardsData = () => {
   const { statistics } = useMaterialTailwindController();
+
   if (!statistics) return null;
   // const [delayedData, setDelayedData] = useState(null);
 
@@ -140,7 +141,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: UserCircleIcon,
       title: "OWNERS",
-      value: statistics.ownercount || "NIL",
+      value: statistics.ownercount ,
       link: "/owners",
       footer: {
       color: "text-green-500",
@@ -152,7 +153,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: UsersIcon,
       title: "EMPLOYEES",
-      value: statistics.employeecount || "NIL",
+      value: statistics.employeecount ,
       link: "/employee",
       footer: {
         color: "text-green-500",
@@ -164,7 +165,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: BuildingOffice2Icon,
       title: "MSWC",
-      value: statistics.mswccount || "NIL",
+      value: statistics.mswccount ,
       link: "/mswc",
       footer: {
         color: "text-green-500",
@@ -176,7 +177,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: MdWarehouse,
       title: "GODOWN",
-      value: statistics.godowncount || "NIL",
+      value: statistics.godowncount ,
       link: "/godown",
       footer: {
         color: "text-green-500",
@@ -188,7 +189,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: GiSteeringWheel,
       title:"DRIVERS",
-      value:  statistics. drivercount || "NIL",
+      value:  statistics. drivercount ,
       link: "/driver",
       footer: {
         color: "text-green-500",
@@ -200,7 +201,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: TruckIcon,
       title: "TRUCKS",
-      value:  statistics.truckcount ||"NIL",
+      value:  statistics.truckcount ,
       link: "/truck",
       footer: {
         color: "text-green-500",
@@ -212,7 +213,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: ClipboardDocumentListIcon,
       title: "SCHEMES",
-      value: statistics.schemecount || "NIL",
+      value: statistics.schemecount  ,
       link: "/scheme",
       footer: {
         color: "text-green-500",
@@ -224,7 +225,7 @@ const StatisticsCardsData = () => {
       color: "gray",
       icon: ArchiveBoxIcon,
       title:  "PACKAGING",
-      value: statistics.packagingcount ||"NIL",
+      value: statistics.packagingcount ,
       link: "/packaging",
       footer: {
         color: "text-green-500",
