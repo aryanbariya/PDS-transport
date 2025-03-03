@@ -116,10 +116,24 @@ import {
 
 import { GiSteeringWheel } from "react-icons/gi";
 import { MdWarehouse } from "react-icons/md";
+import { useEffect, useState } from "react"; // ✅ Import useEffect & useState
 import { useMaterialTailwindController } from "@/context";
 
 const StatisticsCardsData = () => {
   const { statistics } = useMaterialTailwindController();
+  if (!statistics) return null;
+  // const [delayedData, setDelayedData] = useState(null);
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setDelayedData(statistics);
+  //   }, 3000); // ✅ 3-second delay to simulate data loading
+
+  //   return () => clearTimeout(timer); // Cleanup timeout when unmounting
+  // }, [statistics]);
+
+  // if (!delayedData) return null; // ✅ Return null to show loader in Home.jsx
+
 
   const statisticsCardsData = [
     {

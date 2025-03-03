@@ -26,6 +26,8 @@ import {
   ordersOverviewData,
 } from "@/data";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { Player } from "@lottiefiles/react-lottie-player";
+import truckAnimation from "@/util/Animation.json"; // ✅ Import JSON animation
 import StatisticsCardsData from "@/data/statistics-cards-data";
 
 export function Home() {
@@ -33,27 +35,41 @@ export function Home() {
 
   return (
     <div className="mt-8">
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {data.map(({ icon, title, link, footer, ...rest }) => (
-          // <Link to={link} key={title}> {/* Wrap Card inside Link */}</Link>
+      {data === null ? (
+        // 🚚 Truck Loader Animation While Fetching Data
+        <div className="flex justify-center items-center h-64">
+        <Player
+          autoplay
+          loop
+          src={truckAnimation} // ✅ Path to JSON animation
+          style={{ height: "150px", width: "150px" }} // Adjust size
+        />
+      </div>
+
+      ) : (
+        <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+          {data.map(({ icon, title, link, footer, ...rest }) => (
+
+            // <Link to={link} key={title}> {/* Wrap Card inside Link */}</Link>
             <StatisticsCard
+              key={title}
               {...rest}
               title={title}
               icon={React.createElement(icon, {
                 className: "w-6 h-6 text-white",
               })}
-              // footer={
-              //   <Typography className="font-normal text-blue-gray-600">
-              //     &nbsp;{footer.label} <br />
-              //     <strong className={footer.color}>{footer.value}</strong>
-              //   </Typography>
-              // }
+            // footer={
+            //   <Typography className="font-normal text-blue-gray-600">
+            //     &nbsp;{footer.label} <br />
+            //     <strong className={footer.color}>{footer.value}</strong>
+            //   </Typography>
+            // }
             />
-          
-        ))}
-      </div>
+
+          ))}
+        </div>
+         )}
     </div>
-    
   );
 };
 
