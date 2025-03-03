@@ -36,7 +36,7 @@ export function Home() {
   return (
     
     <div className="mt-8">
-      {!data || data.length === 0 ?  (
+      {data.length === 0 ?  (
         // 🚚 Truck Loader Animation While Fetching Data
         <div className="flex justify-center items-center h-64">
         <Player
@@ -58,7 +58,7 @@ export function Home() {
               key={title}
               {...rest}
               title={title}
-              value={rest.value ?? "NIL"}
+              value={rest.value ?? "Loading"}
               icon={React.createElement(icon, {
                 className: "w-6 h-6 text-white",
               })}

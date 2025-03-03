@@ -122,7 +122,7 @@ import { useMaterialTailwindController } from "@/context";
 const StatisticsCardsData = () => {
   const { statistics } = useMaterialTailwindController();
 
-  if (!statistics) return null;
+  if (!statistics) return [];
   // const [delayedData, setDelayedData] = useState(null);
 
   // useEffect(() => {

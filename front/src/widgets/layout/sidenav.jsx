@@ -215,6 +215,7 @@ import PropTypes from "prop-types";
 import { Link, NavLink } from "react-router-dom";
 import { XMarkIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { Button, IconButton, Typography } from "@material-tailwind/react";
+import { FaPlay } from "react-icons/fa";
 
 export function Sidenav({ open, setOpen, routes }) {
   const [manageOpen, setManageOpen] = useState(false);
@@ -259,9 +260,8 @@ export function Sidenav({ open, setOpen, routes }) {
     //     </IconButton>
     //   </div>
     <aside
-      className={`${sidenavTypes[sidenavType]} ${
-        open ? "translate-x-0" : "-translate-x-80"
-      } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
+      className={`${sidenavTypes[sidenavType]} ${open ? "translate-x-0" : "-translate-x-80"
+        } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
       {/* Logo */}
       <div className="relative p-4" >
@@ -309,7 +309,7 @@ export function Sidenav({ open, setOpen, routes }) {
                             <NavLink to={`/${layout}${path}`} className="block p-2">
                               {({ isActive }) => (
                                 <Button variant={isActive ? "gradient" : "text"} className="flex items-center gap-4 px-4 capitalize" fullWidth>
-                               
+                                 <FaPlay className="w-3 h-3 text-gray-500" /> {/* Triangle Icon */}
                                   <Typography className="font-medium capitalize">{name}</Typography>
                                 </Button>
                               )}
