@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@lottiefiles/react-lottie-player": "^3.6.0",
     "axios": "^1.7.9",
     "datatables.net": "^2.2.2",
     "datatables.net-dt": "^2.2.2",
