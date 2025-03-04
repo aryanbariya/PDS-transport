@@ -76,10 +76,10 @@ const EmployeePage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
-        Employees Details
+      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+        <span>Employees Details</span>
         <button
-          className="mt-2 md:mt-0 md:ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
             setEditData(null);
             setShowForm(!showForm);
@@ -88,7 +88,6 @@ const EmployeePage = () => {
           {showForm ? "Close" : "Add"}
         </button>
       </div>
-
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
           <EmployeeForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
@@ -169,3 +168,5 @@ const EmployeePage = () => {
 };
 
 export default EmployeePage;
+
+

@@ -225,8 +225,8 @@ const PackagingPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
-        Packaging List
+      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+        <span>Packaging List</span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -234,7 +234,7 @@ const PackagingPage = () => {
             setShowForm(!showForm);
           }}
         >
-          {showForm ? "Close" : "Add Packaging"}
+          {showForm ? "Close" : "Add"}
         </button>
       </div>
 
@@ -249,53 +249,53 @@ const PackagingPage = () => {
       </div>}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
-      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Material Name</th>
-              <th className="border p-2">Weight</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {packagingList.length > 0 ? (
-              packagingList.map((p) => (
-                <tr key={p.uuid} className="text-center hover:bg-gray-100">
-                  <td className="border p-2">{p.order_number}</td>
-                  <td className="border p-2">{p.material_name}</td>
-                  <td className="border p-2">{p.weight}</td>
-                  <td className="border p-2">{p.status}</td>
-                  <td className="border p-2">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(p)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.uuid)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border p-2">ID</th>
+                <th className="border p-2">Material Name</th>
+                <th className="border p-2">Weight</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packagingList.length > 0 ? (
+                packagingList.map((p) => (
+                  <tr key={p.uuid} className="text-center hover:bg-gray-100">
+                    <td className="border p-2">{p.order_number}</td>
+                    <td className="border p-2">{p.material_name}</td>
+                    <td className="border p-2">{p.weight}</td>
+                    <td className="border p-2">{p.status}</td>
+                    <td className="border p-2">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleEdit(p)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.uuid)}
+                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center p-4">
+                    No records found
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center p-4">
-                  No records found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>)}
+              )}
+            </tbody>
+          </table>
+        </div>)}
 
 
 
