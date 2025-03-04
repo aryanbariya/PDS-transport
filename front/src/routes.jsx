@@ -45,14 +45,9 @@ const icon = {
 
 export const routes = [
   {
+    title: "Navigation",
     layout: "dashboard",
     pages: [
-      {
-        icon: <HomeIcon {...icon} />,
-        name: "dashboard",
-        path: "/home",
-        element: <Home />,
-      },
       {
         icon: <MdMiscellaneousServices {...icon} />,
         name: "manage",
@@ -109,13 +104,12 @@ export const routes = [
           },
         ],
       },
-      
-      // {
-      //   icon: <MdMiscellaneousServices {...icon} />,
-      //   name: "manage",
-      //   path: "/manage",
-      //   element: <Manage />,
-      // },
+      {
+        icon: <HomeIcon {...icon} />,
+        name: "dashboard",
+        path: "/home",
+        element: <Home />,
+      },
       {
         icon: <MdEditNote {...icon} />,
         name: "1stTapa",
