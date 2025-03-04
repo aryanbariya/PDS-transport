@@ -237,16 +237,18 @@ import { XMarkIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/o
 import { Button, IconButton, Typography } from "@material-tailwind/react";
 import { FaPlay, FaCog } from "react-icons/fa";
 import { XCircleIcon } from "@heroicons/react/24/solid";
+import {  DashboardNavbar, Footer } from "@/widgets/layout";
 
 
-export function Sidenav({ open, setOpen, collapsed, setCollapsed, routes }) {
+export function Sidenav({ open, setOpen,  routes }) {
   const [manageOpen, setManageOpen] = useState(false);
 
   return (
+ 
     <aside
       className={`bg-[#2A3042] text-white fixed inset-y-0 left-0 z-50 h-screen w-[260px] 
         transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} 
-        xl:translate-x-0 shadow-lg ${collapsed ? "w-[80px]" : "w-[260px]"} `}
+        xl:translate-x-0 shadow-lg  `}
     >
       {/* Logo */}
       <div className="relative p-4" >
