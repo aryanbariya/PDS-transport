@@ -46,17 +46,17 @@
 
 // export function Dashboard() {
 //   const [openSidenav, setOpenSidenav] = useState(false);
-  
+
 
 //   return (
 //     <div className="min-h-screen bg-blue-gray-50/50">
 //       {/* Sidenav */}
-      
+
 //       <Sidenav open={openSidenav} setOpen={setOpenSidenav} routes={routes} />
 
 //       {/* Main Content */}
 //       <div className=" xl:ml-[260px] ">
-        
+
 //         <DashboardNavbar setOpenSidenav={setOpenSidenav} />
 
 //         {/* Routes */}
@@ -105,7 +105,7 @@
 
 //       {/* Main Content Wrapper */}
 //       <div className="flex flex-col w-full xl:ml-[260px] min-h-screen">
-        
+
 //         {/* Fixed Navbar */}
 //         <div className="fixed top-0 left-0 xl:left-[260px] md:z-0 w-full xl:w-[calc(100%-260px)] bg-white   shadow-md ">
 //           <DashboardNavbar setOpenSidenav={setOpenSidenav} />
@@ -152,7 +152,7 @@
 
 //       {/* Main Content Wrapper */}
 //       <div className="flex flex-col w-full xl:ml-[260px] min-h-screen">
-        
+
 //         {/* Fixed Navbar */}
 //         <div className="fixed top-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white shadow-md h-16 z-40">
 //           <DashboardNavbar setOpenSidenav={setOpenSidenav} />
@@ -189,26 +189,37 @@ import { useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Sidenav, DashboardNavbar, Footer } from "@/widgets/layout";
 import routes from "@/routes";
+import {
+  Navbar,
+  Typography,
+  Button,
+  Input,
+  IconButton,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Avatar,
+} from "@material-tailwind/react"
 
 export function Dashboard() {
   const [openSidenav, setOpenSidenav] = useState(false);
   const location = useLocation(); // Get the current route
-  
-console.log("Current Path:", location.pathname);
 
-  // Debugging: Log routes array to check its structure
-  console.log("Routes:", routes);
+  const { pathname } = useLocation();
+
 
   // Check if the current route corresponds to "dashboard"
   const isDashboard = routes.some(({ pages }) => {
     return pages.some(({ name, path }) => {
       console.log(`Checking: name=${name}, path=${path}, currentPath=${location.pathname}`);
-      return name === "dashboard" && location.pathname === "/dashboard/Dashboard";
+      return name === "dashboard" && location.pathname === "/dashboard/home";
     });
   });
+  const path = location.pathname.startsWith("/")
+  ? location.pathname.substring(1)
+  : location.pathname;
 
-  // Debugging: Log the final result
-  console.log("Is Dashboard Page:", isDashboard);
 
   return (
     <div className="min-h-screen bg-blue-gray-50/50 flex">
@@ -217,7 +228,7 @@ console.log("Current Path:", location.pathname);
 
       {/* Main Content Wrapper */}
       <div className="flex flex-col w-full xl:ml-[260px] min-h-screen">
-        
+
         {/* Fixed Navbar */}
         <div className="fixed top-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white shadow-md h-16 z-40">
           <DashboardNavbar setOpenSidenav={setOpenSidenav} />
@@ -225,10 +236,17 @@ console.log("Current Path:", location.pathname);
 
         {/* Routes Container - Fixed if Dashboard, Scrollable otherwise */}
         <div
-          className={`pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${
-            isDashboard ? "" : "overflow-y-auto"
-          }`}
+          className={`pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${isDashboard ? "" : "overflow-y-auto"
+            }`}
         >
+          <div className=" mt-20 sm:mt-7   text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+            <div className="capitalize">
+              <Typography variant="h6" color="[#2A3042]">
+              {path}
+                {/* {pathname.split("/").filter((el) => el !== "").pop()} */}
+              </Typography>
+            </div>
+          </div>
           <Routes>
             {routes.map(({ layout, pages }) =>
               pages.map(({ path, element, name }) => (

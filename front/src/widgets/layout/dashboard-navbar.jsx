@@ -538,6 +538,7 @@ export function DashboardNavbar({ setOpenSidenav }) {
     localStorage.removeItem("token");
     window.location.href = "/";
   };
+  
 
   return (
     <Navbar className="  transition-all  py-3 shadow-md shadow-blue-gray-500/5" fullWidth blurred >

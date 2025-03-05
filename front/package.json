@@ -20,6 +20,8 @@
     "apexcharts": "3.44.0",
     "axios": "^1.7.9",
     "datatables.net": "^2.2.2",
+    "datatables.net-buttons": "^3.2.2",
+    "datatables.net-buttons-dt": "^3.2.2",
     "datatables.net-dt": "^2.2.2",
     "dotenv": "^16.4.7",
     "jquery": "^3.7.1",
