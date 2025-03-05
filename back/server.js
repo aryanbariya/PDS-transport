@@ -287,14 +287,123 @@ app.delete("/api/employees/:uuid", (req, res) => {
 
 
 
+// app.get("/api/mswcgodown", (req, res) => {
+//   const sql = "SELECT uuid, godownName, godownUnder, order_number FROM mswc_godowns ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// app.get("/api/mswcgodown/:uuid", (req, res) => {
+//   const sql = "SELECT * FROM mswc_godowns WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // Add a new MSWC Godown
+// app.post("/api/mswcgodown", (req, res) => {
+//   const { godownName, godownUnder, status = "Active" } = req.body;
+//   const uuid = uuidv4();
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM mswc_godowns";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting:", insertErr.sqlMessage || insertErr);
+//         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//       }
+//       console.log(`✅ New Godown added with order_number: ${nextOrder}, status: ${status}`);
+//       res.json({ message: "Godown added successfully", uuid, order_number: nextOrder, status });
+
+   
+//     });
+//   });
+// });
+
+
+
+
+// // Update an existing MSWC Godown
+// app.put("/api/mswcgodown/:uuid", (req, res) => {
+//   const { godownName, godownUnder, status } = req.body;
+//   const sql = "UPDATE mswc_godowns SET godownName = ?, godownUnder = ?, status = ? WHERE uuid = ?";
+  
+//   db.query(sql, [godownName, godownUnder, status, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+//     res.json({ message: "Godown updated successfully" });
+//   });
+// });
+
+
+
+// app.delete("/api/mswcgodown/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   // Step 1: Delete the specific record
+//   const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+
+//     console.log(`✅ Deleted Godown with UUID: ${uuid}`);
+
+//     // Step 2: Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE mswc_godowns SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting variable:", resetErr1.sqlMessage || resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering variable", details: resetErr1.sqlMessage });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2.sqlMessage || resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers", details: resetErr2.sqlMessage });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Godown deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
+
+// Get all active godowns
 app.get("/api/mswcgodown", (req, res) => {
-  const sql = "SELECT uuid, godownName, godownUnder, order_number FROM mswc_godowns ORDER BY order_number";
+  const sql = "SELECT uuid, godownName, godownUnder, order_number FROM mswc_godowns WHERE status = 'Active' ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
+// Get a specific godown by UUID
 app.get("/api/mswcgodown/:uuid", (req, res) => {
   const sql = "SELECT * FROM mswc_godowns WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
@@ -312,29 +421,17 @@ app.post("/api/mswcgodown", (req, res) => {
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM mswc_godowns";
 
   db.query(getMaxOrderSql, (err, result) => {
-    if (err) {
-      console.error("Error getting next order number:", err.sqlMessage || err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-    }
+    if (err) return res.status(500).json({ error: err.message });
 
     const nextOrder = result[0].next_order;
     const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
 
     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
-      if (insertErr) {
-        console.error("Error inserting:", insertErr.sqlMessage || insertErr);
-        return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
-      }
-      console.log(`✅ New Godown added with order_number: ${nextOrder}, status: ${status}`);
+      if (insertErr) return res.status(500).json({ error: insertErr.message });
       res.json({ message: "Godown added successfully", uuid, order_number: nextOrder, status });
-
-   
     });
   });
 });
-
-
-
 
 // Update an existing MSWC Godown
 app.put("/api/mswcgodown/:uuid", (req, res) => {
@@ -342,55 +439,29 @@ app.put("/api/mswcgodown/:uuid", (req, res) => {
   const sql = "UPDATE mswc_godowns SET godownName = ?, godownUnder = ?, status = ? WHERE uuid = ?";
   
   db.query(sql, [godownName, godownUnder, status, req.params.uuid], (err, result) => {
-    if (err) {
-      console.error("Error updating:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Godown not found" });
-    }
+    if (err) return res.status(500).json({ error: "Database error" });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Godown not found" });
     res.json({ message: "Godown updated successfully" });
   });
 });
 
-
-
+// Deactivate a Godown (instead of deleting)
 app.delete("/api/mswcgodown/:uuid", (req, res) => {
-  const { uuid } = req.params;
+  const sql = "UPDATE mswc_godowns SET status = 'Deactivated' WHERE uuid = ?";
+  
+  db.query(sql, [req.params.uuid], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Godown not found" });
+    res.json({ message: "Godown deactivated successfully" });
+  });
+});
 
-  // Step 1: Delete the specific record
-  const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
-  db.query(deleteSql, [uuid], (err, result) => {
-    if (err) {
-      console.error("Error deleting:", err.sqlMessage || err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Godown not found" });
-    }
-
-    console.log(`✅ Deleted Godown with UUID: ${uuid}`);
-
-    // Step 2: Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE mswc_godowns SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-    db.query(resetSql1, (resetErr1) => {
-      if (resetErr1) {
-        console.error("Error resetting variable:", resetErr1.sqlMessage || resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering variable", details: resetErr1.sqlMessage });
-      }
-
-      db.query(resetSql2, (resetErr2) => {
-        if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2.sqlMessage || resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers", details: resetErr2.sqlMessage });
-        }
-
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Godown deleted and order numbers reset successfully!" });
-      });
-    });
+// Get all godowns, including deactivated ones
+app.get("/api/mswcgodown/all", (req, res) => {
+  const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
   });
 });
 //end of mswc godown
@@ -403,41 +474,126 @@ app.delete("/api/mswcgodown/:uuid", (req, res) => {
 
 
 //////////////////////////////////////////////////////////////////////////////
-//part of subgodwon
-app.get("/api/godowns", (req, res) => {
-  const query = "SELECT godownName FROM mswc_godowns"; // Fetch only godownname
+// //part of subgodwon
+// app.get("/api/godowns", (req, res) => {
+//   const query = "SELECT godownName FROM mswc_godowns"; // Fetch only godownname
 
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching godown names:", err);
-      return res.status(500).json({ error: "Database query error" });
-    }
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching godown names:", err);
+//       return res.status(500).json({ error: "Database query error" });
+//     }
 
-    res.json(results);
-  });
-});
+//     res.json(results);
+//   });
+// });
 
 
-app.get("/api/subgodown", (req, res) => {
-  const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown ORDER BY order_number";
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
-});
+// app.get("/api/subgodown", (req, res) => {
+//   const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
 
-app.get("/api/subgodown/:uuid", (req, res) => {
-  const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown WHERE uuid = ?";
-  db.query(sql, [req.params.uuid], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
-    res.json(results[0]);
-  });
-});
+// app.get("/api/subgodown/:uuid", (req, res) => {
+//   const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
+//     res.json(results[0]);
+//   });
+// });
 
+// app.post("/api/subgodown", (req, res) => {
+//   const { parentGodown, subGodown, status = "Active" } = req.body;
+//   const uuid = uuidv4();
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM sub_godown";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO sub_godown (uuid, parentGodown, subGodown, status, order_number) VALUES (?, ?, ?, ?, ?)";
+    
+//     db.query(insertSql, [uuid, parentGodown, subGodown, status, nextOrder], (err, result) => {
+//       if (err) return res.status(500).json({ error: err.message });
+//       res.status(201).json({ message: "Sub-Godown added successfully", uuid });
+//     });
+//   });
+// });
+
+
+
+
+
+
+// // Update an existing MSWC Godown
+// app.put("/api/subgodown/:uuid", (req, res) => {
+//   const { parentGodown, subGodown, status } = req.body;
+//   const sql = "UPDATE sub_godown SET parentGodown = ?, subGodown = ?, status = ? WHERE uuid = ?";
+  
+//   db.query(sql, [parentGodown, subGodown, status, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+//     res.json({ message: "Godown updated successfully" });
+//   });
+// });
+
+// app.delete("/api/subgodown/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   // Step 1: Delete the specific record
+//   const deleteSql = "DELETE FROM sub_godown WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting:", err.sqlMessage || err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+
+//     console.log(`✅ Deleted Godown with UUID: ${uuid}`);
+
+//     // Step 2: Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE sub_godown SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting variable:", resetErr1.sqlMessage || resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering variable", details: resetErr1.sqlMessage });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2.sqlMessage || resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers", details: resetErr2.sqlMessage });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Godown deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
+
+// Create a new Sub-Godown (Status defaults to 'Active')
 app.post("/api/subgodown", (req, res) => {
-  const { parentGodown, subGodown, status = "Active" } = req.body;
+  const { parentGodown, subGodown } = req.body; // No need to take status from user
   const uuid = uuidv4();
+  const status = "Active"; // Default status
 
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM sub_godown";
 
@@ -448,25 +604,39 @@ app.post("/api/subgodown", (req, res) => {
     }
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO sub_godown (uuid, parentGodown, subGodown, status, order_number) VALUES (?, ?, ?, ?, ?)";
-    
-    db.query(insertSql, [uuid, parentGodown, subGodown, status, nextOrder], (err, result) => {
+    const insertSql = "INSERT INTO sub_godown (uuid, MSWCgodown, subGodown, status, order_number) VALUES (?, ?, ?, ?, ?)";
+
+    db.query(insertSql, [uuid, MSWCdodown, subGodown, status, nextOrder], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.status(201).json({ message: "Sub-Godown added successfully", uuid });
     });
   });
 });
 
+// Fetch only active sub-godowns
+app.get("/api/subgodown", (req, res) => {
+  const sql = "SELECT uuid, MSWCgodown, subGodown, status, order_number FROM sub_godown WHERE status = 'Active' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
+// Fetch sub-godown by UUID (active & deactive both)
+app.get("/api/subgodown/:uuid", (req, res) => {
+  const sql = "SELECT uuid, MSWCgodown, subGodown, status, order_number FROM sub_godown WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
+    res.json(results[0]);
+  });
+});
 
-
-
-
-// Update an existing MSWC Godown
+// Update Sub-Godown (Status remains Active by default)
 app.put("/api/subgodown/:uuid", (req, res) => {
-  const { parentGodown, subGodown, status } = req.body;
-  const sql = "UPDATE sub_godown SET parentGodown = ?, subGodown = ?, status = ? WHERE uuid = ?";
-  
+  const { parentGodown, subGodown, status = "Active" } = req.body;
+  const sql = "UPDATE sub_godown SET MSWCgodown = ?, subGodown = ?, status = ? WHERE uuid = ?";
+
   db.query(sql, [parentGodown, subGodown, status, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating:", err);
@@ -479,45 +649,24 @@ app.put("/api/subgodown/:uuid", (req, res) => {
   });
 });
 
+// Soft Delete: Set Status to 'Deactive' instead of deleting
 app.delete("/api/subgodown/:uuid", (req, res) => {
   const { uuid } = req.params;
+  const sql = "UPDATE sub_godown SET status = 'Deactive' WHERE uuid = ?";
 
-  // Step 1: Delete the specific record
-  const deleteSql = "DELETE FROM sub_godown WHERE uuid = ?";
-  db.query(deleteSql, [uuid], (err, result) => {
+  db.query(sql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting:", err.sqlMessage || err);
+      console.error("Error setting status to Deactive:", err.sqlMessage || err);
       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
     }
 
-    console.log(`✅ Deleted Godown with UUID: ${uuid}`);
-
-    // Step 2: Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE sub_godown SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-    db.query(resetSql1, (resetErr1) => {
-      if (resetErr1) {
-        console.error("Error resetting variable:", resetErr1.sqlMessage || resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering variable", details: resetErr1.sqlMessage });
-      }
-
-      db.query(resetSql2, (resetErr2) => {
-        if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2.sqlMessage || resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers", details: resetErr2.sqlMessage });
-        }
-
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Godown deleted and order numbers reset successfully!" });
-      });
-    });
+    console.log(`✅ Godown ${uuid} marked as Deactive`);
+    res.json({ message: "Godown deactivated successfully!" });
   });
 });
-
 
 //////////////////////////////////////////
 //start of ownerpage
@@ -776,7 +925,7 @@ app.delete("/api/grains/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////start of driver page
+//start of driver page
 
 app.get("/api/drivers", (req, res) => {
   const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number FROM drivers ORDER BY order_number";

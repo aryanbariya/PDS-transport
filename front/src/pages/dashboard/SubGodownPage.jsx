@@ -101,7 +101,7 @@ const SubGodownPage = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="border p-2">ID</th>
-                <th className="border p-2">Parent Godown</th>
+                <th className="border p-2">MSWC Godown</th>
                 <th className="border p-2">Sub Godown Name</th>
                 <th className="border p-2">Status</th>
                 <th className="border p-2">Actions</th>
@@ -112,16 +112,16 @@ const SubGodownPage = () => {
                 godowns.map((g) => (
                   <tr key={g.uuid} className="text-center hover:bg-gray-100">
                     <td className="border p-2">{g.order_number}</td>
-                    <td className="border p-2">{g.parentGodown}</td>
+                    <td className="border p-2">{g.mswcGodown}</td>
                     <td className="border p-2">{g.subGodown || "N/A"}</td>
                     <td className="border p-2">{g.status || "N/A"}</td>
                     <td className="border p-2">
                       <div className="flex justify-center space-x-2">
                         <button onClick={() => handleEdit(g)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
-                          ✏️
+                          ✏️ 
                         </button>
                         <button onClick={() => handleDelete(g.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
-                          🗑️
+                          🗑️ 
                         </button>
                       </div>
                     </td>

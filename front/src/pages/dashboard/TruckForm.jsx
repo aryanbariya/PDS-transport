@@ -77,8 +77,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-        <h2 className="bg-blue-600 text-white text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
-          {editData ? "Edit Truck" : "Add Truck"}
+        <h2 className="bg--600 text-Black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+          {editData ? "Edit Truck" : "Truck"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -109,7 +109,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
               </select>
             </div>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-end  gap-2">
             <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
               {editData ? "Update" : "Submit"}
             </button>

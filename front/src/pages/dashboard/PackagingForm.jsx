@@ -76,8 +76,8 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-        <h2 className="bg-blue-600 text-white text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
-          {editData ? "Edit Packaging" : "Add New Packaging"}
+        <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+          {editData ? "Edit Packaging" : "New Packaging"}
         </h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 p-4">
           <div className="col-span-2">
@@ -108,7 +108,7 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
             {errors.weight && <p className="text-red-500 text-sm">{errors.weight}</p>}
           </div>
 
-          <div className="col-span-2 flex justify-between">
+          <div className="col-span-2 flex justify-end gap-2">
             <button
               type="submit"
               className={`px-4 py-2 rounded-lg ${

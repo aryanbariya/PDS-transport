@@ -292,13 +292,13 @@ const OwnerNamePage = () => {
                         onClick={() => handleEdit(o)}
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                       >
-                        ✏️ Edit
+                        ✏️ 
                       </button>
                       <button
                         onClick={() => handleDelete(o.uuid)}
                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                       >
-                        🗑️ Delete
+                        🗑️ 
                       </button>
                     </td>
                   )}
@@ -326,13 +326,13 @@ const OwnerNamePage = () => {
                 onClick={() => handleEdit(selectedOwner)}
                 className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
               >
-                ✏️ Edit
+                
               </button>
               <button
                 onClick={() => handleDelete(selectedOwner.uuid)}
                 className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
               >
-                🗑️ Delete
+                🗑️ 
               </button>
               <button
                 onClick={() => setSelectedOwner(null)}

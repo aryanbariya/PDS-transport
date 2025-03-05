@@ -39,6 +39,8 @@ import SchemePage from "./pages/dashboard/SchemePage";
 // import PackagingPage from "./pages/dashboard/PackagingPage";
 // import CategoryPage from "./pages/dashboard/CategoryPage";
 // import SchemePage from "./pages/dashboard/SchemePage";
+
+
 const icon = {
   className: "w-5 h-5 text-inherit",
 };
@@ -48,6 +50,12 @@ export const routes = [
     title: "Navigation",
     layout: "dashboard",
     pages: [
+      {
+        icon: <HomeIcon {...icon} />,
+        name: "dashboard",
+        path: "/home",
+        element: <Home />,
+      },
       {
         icon: <MdMiscellaneousServices {...icon} />,
         name: "manage",
@@ -105,12 +113,6 @@ export const routes = [
         ],
       },
       {
-        icon: <HomeIcon {...icon} />,
-        name: "dashboard",
-        path: "/home",
-        element: <Home />,
-      },
-      {
         icon: <MdEditNote {...icon} />,
         name: "1stTapa",
         path: "/firstTapa",
@@ -163,5 +165,3 @@ export const routes = [
 ];
 
 export default routes;
-
-
