@@ -166,7 +166,6 @@ const PackagingPage = () => {
   const [showForm, setShowForm] = useState(false);
   const tableRef = useRef(null);
 
-
   useEffect(() => {
     fetchPackaging();
   }, []);
@@ -190,8 +189,6 @@ const PackagingPage = () => {
       setLoading(false);
     }
   };
-
-
 
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this packaging record?")) return;
@@ -221,7 +218,6 @@ const PackagingPage = () => {
     setEditData(null);
     fetchPackaging();
   };
-
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -296,8 +292,6 @@ const PackagingPage = () => {
           </tbody>
         </table>
       </div>)}
-
-
 
     </div>
   );
