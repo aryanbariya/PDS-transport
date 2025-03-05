@@ -239,8 +239,8 @@ const SchemePage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
-        Scheme List
+      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+        <span>Scheme List</span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -250,9 +250,7 @@ const SchemePage = () => {
         >
           {showForm ? "Close" : "Add"}
         </button>
-
       </div>
-
 
 
       {showForm && (
@@ -266,49 +264,49 @@ const SchemePage = () => {
       </div>}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
-      <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-        <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Scheme Name</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {schemes.length > 0 ? (
-              schemes.map((scheme) => (
-                <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
-                  <td className="border p-2">{scheme.order_number}</td>
-                  <td className="border p-2">{scheme.scheme_name}</td>
-                  <td className="border p-2">{scheme.scheme_status}</td>
-                  <td className="border p-2">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(scheme)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => handleDelete(scheme.uuid)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center p-4">No records found</td>
+        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border p-2">ID</th>
+                <th className="border p-2">Scheme Name</th>
+                <th className="border p-2">Status</th>
+                <th className="border p-2">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>)}
+            </thead>
+            <tbody>
+              {schemes.length > 0 ? (
+                schemes.map((scheme) => (
+                  <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
+                    <td className="border p-2">{scheme.order_number}</td>
+                    <td className="border p-2">{scheme.scheme_name}</td>
+                    <td className="border p-2">{scheme.scheme_status}</td>
+                    <td className="border p-2">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleEdit(scheme)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(scheme.uuid)}
+                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center p-4">No records found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>)}
 
     </div>
   );
