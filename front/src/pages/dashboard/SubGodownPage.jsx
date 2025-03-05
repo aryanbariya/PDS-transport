@@ -112,7 +112,7 @@ const SubGodownPage = () => {
                 godowns.map((g) => (
                   <tr key={g.uuid} className="text-center hover:bg-gray-100">
                     <td className="border p-2">{g.order_number}</td>
-                    <td className="border p-2">{g.mswcGodown}</td>
+                    <td className="border p-2">{g.parentGodown}</td>
                     <td className="border p-2">{g.subGodown || "N/A"}</td>
                     <td className="border p-2">{g.status || "N/A"}</td>
                     <td className="border p-2">
