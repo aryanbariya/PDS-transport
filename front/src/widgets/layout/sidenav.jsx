@@ -268,6 +268,7 @@ export function Sidenav({ open, setOpen,  routes }) {
     rounded-md p-2 transition-all duration-500 ease-in-out 
     ${open ? "translate-x-0" : "translate-x-full opacity-0"}`}
           onClick={() => setOpen(false)}
+          
         >
           <XCircleIcon strokeWidth={2.5} className="h-6 w-6 text-white" />
         </IconButton>

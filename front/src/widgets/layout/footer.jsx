@@ -144,7 +144,7 @@ export function Footer({ isSidebarOpen }) {
         </div>
 
         {/* Quick Links */}
-        <div>
+        {/* <div>
           <Typography variant="h6" className="text-lg font-semibold mb-2">
             Quick Links
           </Typography>
@@ -157,7 +157,7 @@ export function Footer({ isSidebarOpen }) {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         {/* Contact Info */}
         <div>
