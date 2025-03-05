@@ -244,6 +244,7 @@ export function Sidenav({ open, setOpen,  routes }) {
   const [manageOpen, setManageOpen] = useState(false);
 
   return (
+   
  
     <aside
       className={`bg-[#2A3042] text-white fixed inset-y-0 left-0 z-50 h-screen w-[260px] 
@@ -268,7 +269,6 @@ export function Sidenav({ open, setOpen,  routes }) {
     rounded-md p-2 transition-all duration-500 ease-in-out 
     ${open ? "translate-x-0" : "translate-x-full opacity-0"}`}
           onClick={() => setOpen(false)}
-          
         >
           <XCircleIcon strokeWidth={2.5} className="h-6 w-6 text-white" />
         </IconButton>
@@ -298,9 +298,6 @@ export function Sidenav({ open, setOpen,  routes }) {
                           >
                             <FaCog className="w-5 h-5" />
                           </div>
-
-
-
                           <span className="text-sm font-medium text-white">Manage</span>
                         </div>
 

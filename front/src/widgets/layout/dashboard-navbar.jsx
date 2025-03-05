@@ -540,7 +540,8 @@ export function DashboardNavbar({ setOpenSidenav }) {
   };
 
   return (
-    <Navbar className="rounded-xl transition-all sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5" fullWidth blurred>
+    <Navbar className="  transition-all  py-3 shadow-md shadow-blue-gray-500/5" fullWidth blurred >
+    {/* // <Navbar className="rounded-xl transition-all fixed top-0 z-40 py-3 left-0 xl:left-[260px] shadow-md shadow-blue-gray-500/5" fullWidth blurred> */}
       <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
           <Typography variant="h6" color="blue-gray">
@@ -624,5 +625,9 @@ export function DashboardNavbar({ setOpenSidenav }) {
 }
 
 export default DashboardNavbar;
+
+
+
+
 
 
