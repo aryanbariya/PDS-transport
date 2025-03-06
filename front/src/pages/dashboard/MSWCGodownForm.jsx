@@ -176,11 +176,11 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
       newErrors.godownName = "Must be at least 3 characters";
     }
 
-    if (!formData.godownUnder.trim()) {
-      newErrors.godownUnder = "Godown Under is required";
-    } else if (formData.godownUnder.length < 3) {
-      newErrors.godownUnder = "Must be at least 3 characters";
-    }
+    // if (!formData.godownUnder.trim()) {
+    //   newErrors.godownUnder = "Godown Under is required";
+    // } else if (formData.godownUnder.length < 3) {
+    //   newErrors.godownUnder = "Must be at least 3 characters";
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

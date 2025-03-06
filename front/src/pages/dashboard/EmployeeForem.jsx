@@ -289,7 +289,8 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
         alert(editData ? "Employee updated successfully!" : "Employee added successfully!");
         onSave();
         onClose();
-      } else {
+      }
+      else {
         alert("Error submitting form");
       }
     } catch (error) {

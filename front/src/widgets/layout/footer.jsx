@@ -131,7 +131,9 @@ export function Footer({ isSidebarOpen }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className={`bg-gray-900 text-white  transition-all duration-300 `}>
+    <footer className={`bg-gray-900 text-white  transition-all duration-300 left-0 w-full`}>
+    {/* // <footer className={`bg-gray-900 text-white transition-all duration-300 fixed bottom-0 left-0 w-full`}> */}
+
       {/* Copyright */}
       <div className="">
         {/* <Typography variant="small" className="text-gray-400 flex justify-center items-center">
