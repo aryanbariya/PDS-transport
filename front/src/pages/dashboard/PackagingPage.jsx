@@ -221,7 +221,7 @@ const PackagingPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+      {/* <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
         <span>Packaging List</span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
@@ -232,7 +232,7 @@ const PackagingPage = () => {
         >
           {showForm ? "Close" : "Add"}
         </button>
-      </div>
+      </div> */}
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
@@ -246,6 +246,17 @@ const PackagingPage = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          <div className="flex justify-end mb-2">
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              onClick={() => {
+                setEditData(null);
+                setShowForm(!showForm);
+              }}
+            >
+              {showForm ? "Close" : "Add Package"}
+            </button>
+          </div>
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200">
@@ -270,13 +281,13 @@ const PackagingPage = () => {
                           onClick={() => handleEdit(p)}
                           className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                         >
-                          ✏️
+                          Edit
                         </button>
                         <button
                           onClick={() => handleDelete(p.uuid)}
                           className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                         >
-                          🗑️
+                          delete
                         </button>
                       </div>
                     </td>

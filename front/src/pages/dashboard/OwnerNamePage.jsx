@@ -2,8 +2,10 @@
 // import $ from "jquery";
 // import "datatables.net-dt/css/dataTables.dataTables.min.css";
 // import "datatables.net-dt";
+// import "datatables.net-buttons-dt/css/buttons.dataTables.min.css";
+// import "datatables.net-buttons-dt";
 // import { Player } from "@lottiefiles/react-lottie-player";
-// import truckLoader from "@/util/Animation.json"; // ✅ Import JSON animation
+// import truckLoader from "@/util/Animation.json";
 // import OwnerNameForm from "./OwnerNameForm";
 
 // const URL = import.meta.env.VITE_API_BACK_URL;
@@ -14,8 +16,9 @@
 //   const [error, setError] = useState(null);
 //   const [editData, setEditData] = useState(null);
 //   const [showForm, setShowForm] = useState(false);
+//   const [selectedOwner, setSelectedOwner] = useState(null);
+//   const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Track mobile screen size
 //   const tableRef = useRef(null);
-
 
 //   useEffect(() => {
 //     fetchOwners();
@@ -27,6 +30,18 @@
 //     }
 //   }, [owners]);
 
+
+
+
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setIsMobile(window.innerWidth < 768);
+//     };
+
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
 
 //   const fetchOwners = async () => {
 //     try {
@@ -50,6 +65,7 @@
 //       if (response.ok) {
 //         alert("Owner deleted successfully!");
 //         fetchOwners();
+
 //       } else {
 //         alert("Failed to delete owner.");
 //       }
@@ -70,10 +86,13 @@
 //     fetchOwners();
 //   };
 
+
+
+
 //   return (
 //     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-//       <div className="bg-blue-600 text-white text-lg font-semibold py-2 px-6 rounded-md w-full">
-//         Owner List
+//       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+//         <span>Owner List</span>
 //         <button
 //           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
 //           onClick={() => {
@@ -84,9 +103,10 @@
 //           {showForm ? "Close" : "Add"}
 //         </button>
 //       </div>
+
 //       {showForm && (
 //         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
-//           <OwnerNameForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+//           <OwnerNameForm onClose={() => setShowForm(false)} onSave={fetchOwners} editData={editData} />
 //         </div>
 //       )}
 
@@ -96,19 +116,19 @@
 //         </div>
 //       )}
 
-//       {/* {loading && <p>Loading...</p>} */}
 //       {error && <p className="text-red-500">{error}</p>}
+
 //       {!loading && (
-//         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+//         <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
 //           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
 //             <thead>
 //               <tr className="bg-gray-200 text-center">
 //                 <th className="border p-2">ID</th>
 //                 <th className="border p-2">Owner Name</th>
-//                 <th className="border p-2">Contact</th>
-//                 <th className="border p-2">Address</th>
-//                 <th className="border p-2">Email ID</th>
-//                 <th className="border p-2">Actions</th>
+//                 {!isMobile && <th className="border p-2">Contact</th>}
+//                 {!isMobile && <th className="border p-2">Address</th>}
+//                 {!isMobile && <th className="border p-2">Email</th>}
+//                 {isMobile ? <th className="border p-2">More Info</th> : <th className="border p-2">Actions</th>}
 //               </tr>
 //             </thead>
 //             <tbody>
@@ -116,24 +136,76 @@
 //                 <tr key={o.uuid} className="text-center hover:bg-gray-100">
 //                   <td className="border p-2">{o.order_number}</td>
 //                   <td className="border p-2">{o.ownerName}</td>
-//                   <td className="border p-2">{o.contact}</td>
-//                   <td className="border p-2">{o.address}</td>
-//                   <td className="border p-2">{o.emailID}</td>
-//                   <td className="border p-2">
-//                     <div className="flex justify-center space-x-2">
-//                       <button onClick={() => handleEdit(o)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
-//                         ✏️
+//                   {!isMobile && <td className="border p-2">{o.contact}</td>}
+//                   {!isMobile && <td className="border p-2">{o.address}</td>}
+//                   {!isMobile && <td className="border p-2">{o.emailID}</td>}
+//                   {isMobile ? (
+//                     <td className="border p-2">
+//                       <button
+//                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+//                         onClick={() => setSelectedOwner(o)}
+//                       >
+//                         More Info
 //                       </button>
-//                       <button onClick={() => handleDelete(o.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
-//                         🗑️
+//                     </td>
+//                   ) : (
+//                     <td className="border p-2 flex justify-center space-x-2">
+//                       <button
+//                         onClick={() => handleEdit(o)}
+//                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+//                       >
+//                         ✏️ 
 //                       </button>
-//                     </div>
-//                   </td>
+//                       <button
+//                         onClick={() => handleDelete(o.uuid)}
+//                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+//                       >
+//                         🗑️ 
+//                       </button>
+//                     </td>
+//                   )}
+
 //                 </tr>
 //               ))}
 //             </tbody>
 //           </table>
-//         </div>)}
+//         </div>
+//       )}
+
+//       {/* Mobile Pop-up Modal */}
+//       {isMobile && selectedOwner && (
+//         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+//           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+//             <h2 className="text-xl font-semibold mb-3">Owner Details</h2>
+//             <p><strong>ID:</strong> {selectedOwner.order_number}</p>
+//             <p><strong>Name:</strong> {selectedOwner.ownerName}</p>
+//             <p><strong>Contact:</strong> {selectedOwner.contact}</p>
+//             <p><strong>Address:</strong> {selectedOwner.address}</p>
+//             <p><strong>Email:</strong> {selectedOwner.emailID}</p>
+
+//             <div className="mt-4 flex justify-between">
+//               <button
+//                 onClick={() => handleEdit(selectedOwner)}
+//                 className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+//               >
+
+//               </button>
+//               <button
+//                 onClick={() => handleDelete(selectedOwner.uuid)}
+//                 className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+//               >
+//                 🗑️ 
+//               </button>
+//               <button
+//                 onClick={() => setSelectedOwner(null)}
+//                 className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-700 w-full"
+//               >
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
 //     </div>
 //   );
 // };
@@ -143,6 +215,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
+import { Button } from "@material-tailwind/react";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
@@ -174,7 +247,7 @@ const OwnerNamePage = () => {
     }
   }, [owners]);
 
-  
+
 
 
 
@@ -235,7 +308,7 @@ const OwnerNamePage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+      {/* <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
         <span>Owner List</span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
@@ -246,7 +319,7 @@ const OwnerNamePage = () => {
         >
           {showForm ? "Close" : "Add"}
         </button>
-      </div>
+      </div> */}
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
@@ -264,6 +337,17 @@ const OwnerNamePage = () => {
 
       {!loading && (
         <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
+          <div className="flex justify-end mb-2">
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              onClick={() => {
+                setEditData(null);
+                setShowForm(!showForm);
+              }}
+            >
+              {showForm ? "Close" : "Add Owner"}
+            </button>
+          </div>
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200 text-center">
@@ -294,17 +378,17 @@ const OwnerNamePage = () => {
                     </td>
                   ) : (
                     <td className="border p-2 flex justify-center space-x-2">
-                      <button
+                      <Button
                         onClick={() => handleEdit(o)}
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                       >
-                        ✏️ 
-                      </button>
+                        Edit
+                      </Button>
                       <button
                         onClick={() => handleDelete(o.uuid)}
                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                       >
-                        🗑️ 
+                        Delete
                       </button>
                     </td>
                   )}
@@ -329,16 +413,17 @@ const OwnerNamePage = () => {
 
             <div className="mt-4 flex justify-between">
               <button
+              
                 onClick={() => handleEdit(selectedOwner)}
                 className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
               >
-                
+                Edit
               </button>
               <button
                 onClick={() => handleDelete(selectedOwner.uuid)}
                 className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
               >
-                🗑️ 
+                🗑️
               </button>
               <button
                 onClick={() => setSelectedOwner(null)}

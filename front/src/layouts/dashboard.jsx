@@ -212,7 +212,6 @@ export function Dashboard() {
   // Check if the current route corresponds to "dashboard"
   const isDashboard = routes.some(({ pages }) => {
     return pages.some(({ name, path }) => {
-      console.log(`Checking: name=${name}, path=${path}, currentPath=${location.pathname}`);
       return name === "dashboard" && location.pathname === "/dashboard/home";
     });
   });
@@ -241,7 +240,7 @@ export function Dashboard() {
         >
           <div className=" mt-20 sm:mt-7   text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
             <div className="capitalize">
-              <Typography variant="h6" color="[#2A3042]">
+              <Typography variant="h6" color="blue-gray">
               {path}
                 {/* {pathname.split("/").filter((el) => el !== "").pop()} */}
               </Typography>
