@@ -613,10 +613,59 @@ app.get("/api/owners/:uuid", (req, res) => {
 });
 
 
+// app.post("/api/owners", (req, res) => {
+//   const { ownerName, contact, address, emailID } = req.body;
+//   if (!ownerName || !contact || !address || !emailID) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM owners";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, ownerName, contact, address, emailID, nextOrder], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting owner:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+
+// app.put("/api/owners/:uuid", (req, res) => {
+//   const { ownerName, contact, address, emailID } = req.body;
+//   if (!ownerName || !contact || !address || !emailID) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
+
+//   db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating owner:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+//     res.json({ message: "Owner updated successfully" });
+//   });
+// });
+
 app.post("/api/owners", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
-  if (!ownerName || !contact || !address || !emailID) {
-    return res.status(400).json({ error: "All fields are required" });
+  if (!ownerName) {
+    return res.status(400).json({ error: "Owner Name is required" });
   }
 
   const uuid = uuidv4();
@@ -631,7 +680,7 @@ app.post("/api/owners", (req, res) => {
     const nextOrder = result[0].next_order;
     const insertSql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) VALUES (?, ?, ?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, ownerName, contact, address, emailID, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr) => {
       if (insertErr) {
         console.error("Error inserting owner:", insertErr);
         return res.status(500).json({ error: "Database insertion failed" });
@@ -641,16 +690,15 @@ app.post("/api/owners", (req, res) => {
   });
 });
 
-
 app.put("/api/owners/:uuid", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
-  if (!ownerName || !contact || !address || !emailID) {
-    return res.status(400).json({ error: "All fields are required" });
+  if (!ownerName) {
+    return res.status(400).json({ error: "Owner Name is required" });
   }
 
-  const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
+  const sql = "UPDATE owners SET ownerName = ?, contact = COALESCE(?, contact), address = COALESCE(?, address), emailID = COALESCE(?, emailID) WHERE uuid = ?";
 
-  db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
+  db.query(sql, [ownerName, contact || null, address || null, emailID || null, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating owner:", err);
       return res.status(500).json({ error: "Database update error" });
