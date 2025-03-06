@@ -3,8 +3,10 @@ import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
 import { Player } from "@lottiefiles/react-lottie-player";
+import Navigation from "@/util/libs/navigation";
 import truckLoader from "@/util/Animation.json";
 import DriverForm from "./DriverForm";
+
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -68,8 +70,8 @@ const DriverPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      {/* <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span>Driver Management</span>
+      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+        <span><Navigation/></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -79,7 +81,7 @@ const DriverPage = () => {
         >
           {showForm ? "Close" : "Add"}
         </button>
-      </div> */}
+      </div>
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
@@ -93,17 +95,6 @@ const DriverPage = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-          <div className="flex justify-end mb-2">
-            <button
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-              onClick={() => {
-                setEditData(null);
-                setShowForm(!showForm);
-              }}
-            >
-              {showForm ? "Close" : "Add Driver"}
-            </button>
-          </div>
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200">

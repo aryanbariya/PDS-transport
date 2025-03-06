@@ -206,7 +206,7 @@ export function Dashboard() {
   const [openSidenav, setOpenSidenav] = useState(false);
   const location = useLocation(); // Get the current route
 
-  const { pathname } = useLocation();
+  // const { pathname } = useLocation();
 
 
   // Check if the current route corresponds to "dashboard"
@@ -215,9 +215,9 @@ export function Dashboard() {
       return name === "dashboard" && location.pathname === "/dashboard/home";
     });
   });
-  const path = location.pathname.startsWith("/")
-  ? location.pathname.substring(1)
-  : location.pathname;
+  // const path = location.pathname.startsWith("/")
+  // ? location.pathname.substring(1)
+  // : location.pathname;
 
 
   return (
@@ -235,17 +235,9 @@ export function Dashboard() {
 
         {/* Routes Container - Fixed if Dashboard, Scrollable otherwise */}
         <div
-          className={`pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${isDashboard ? "" : "overflow-hidden"
+          className={`mt-20 md:mt-5 pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${isDashboard ? "" : "overflow-hidden"
             }`}
         >
-          <div className=" mt-20 sm:mt-7   text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-            <div className="capitalize">
-              <Typography variant="h6" color="blue-gray">
-              {path}
-                {/* {pathname.split("/").filter((el) => el !== "").pop()} */}
-              </Typography>
-            </div>
-          </div>
           <Routes>
             {routes.map(({ layout, pages }) =>
               pages.map(({ path, element, name }) => (
