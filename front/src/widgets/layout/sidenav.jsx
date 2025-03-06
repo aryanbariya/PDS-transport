@@ -230,7 +230,7 @@
 
 
 
-import { useState } from "react";
+import { useState,useEffect,useRef } from "react";
 import PropTypes from "prop-types";
 import { Link, NavLink } from "react-router-dom";
 import { XMarkIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
@@ -243,10 +243,30 @@ import {  DashboardNavbar, Footer } from "@/widgets/layout";
 export function Sidenav({ open, setOpen,  routes }) {
   const [manageOpen, setManageOpen] = useState(false);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (window.innerWidth < 1280) { // Apply only for mobile screens
+        const sidenav = document.getElementById("sidenav");
+        if (sidenav && !sidenav.contains(event.target)) {
+          setOpen(false);
+        }
+      }
+    };
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open, setOpen]);
+
+
   return (
    
  
-    <aside
+    <aside id="sidenav"
       className={`bg-[#2A3042] text-white fixed inset-y-0 left-0 z-50 h-screen w-[260px] 
         transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} 
         xl:translate-x-0 shadow-lg  `}
@@ -287,7 +307,7 @@ export function Sidenav({ open, setOpen,  routes }) {
                   {name === "manage" ? (
                     <>
                       <button
-                        className="flex items-center justify-between w-full px-4 py-2 rounded-md hover:bg-gray-700"
+                        className="flex items-center justify-between w-full px-4 py-2 rounded-md hover:bg-gray-700 "
                         onClick={() => setManageOpen(!manageOpen)}
                       >
                         <div className="flex items-center gap-3">
@@ -318,6 +338,7 @@ export function Sidenav({ open, setOpen,  routes }) {
                                   `flex items-center gap-3 w-full text-left px-4 py-2 rounded-md transition-all duration-300 
              ${isActive ? "text-blue-500 border border-blue-500 bg-transparent" : "text-white hover:text-blue-500 hover:bg-blue-50"}`
                                 }
+                                onClick={() => setOpen(false)}
                               >
                                 <FaPlay className={({ isActive }) => `w-3 h-3 ${isActive ? "text-blue-500" : "text-white"}`} />
                                 <Typography variant="small" className={({ isActive }) => `text-sm ${isActive ? "text-blue-500" : "text-white"}`}>
@@ -336,6 +357,7 @@ export function Sidenav({ open, setOpen,  routes }) {
                         `flex items-center gap-3 px-4 py-2 rounded-md transition-all duration-300 
      ${isActive ? "border-l-2 border-blue-500 text-blue-500 bg-transparent" : "text-white hover:text-blue-500 hover:bg-blue-50"}`
                       }
+                      onClick={() => setOpen(false)}
                     >
                       {icon}
                       <Typography className="text-sm">{name || "Unnamed"}</Typography>

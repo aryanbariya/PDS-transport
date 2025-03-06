@@ -411,7 +411,7 @@ const OwnerNamePage = () => {
             <p><strong>Address:</strong> {selectedOwner.address}</p>
             <p><strong>Email:</strong> {selectedOwner.emailID}</p>
 
-            <div className="mt-4 flex justify-between">
+            <div className="mt-4 flex justify-end space-x-2">
               <button
               
                 onClick={() => handleEdit(selectedOwner)}
@@ -423,11 +423,11 @@ const OwnerNamePage = () => {
                 onClick={() => handleDelete(selectedOwner.uuid)}
                 className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
               >
-                🗑️
+                Delete
               </button>
               <button
                 onClick={() => setSelectedOwner(null)}
-                className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-700 w-full"
+                className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-700 "
               >
                 Close
               </button>

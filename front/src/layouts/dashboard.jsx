@@ -221,12 +221,12 @@ export function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-blue-gray-50/50 flex">
+    <div className="min-h-screen bg-blue-gray-50/50 flex ">
       {/* Sidebar - Sidenav */}
       <Sidenav open={openSidenav} setOpen={setOpenSidenav} routes={routes} />
 
       {/* Main Content Wrapper */}
-      <div className="flex flex-col w-full xl:ml-[260px] min-h-screen">
+      <div className="flex flex-col w-full xl:ml-[260px] min-h-screen ">
 
         {/* Fixed Navbar */}
         <div className="fixed top-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white shadow-md h-16 z-40">
@@ -235,7 +235,7 @@ export function Dashboard() {
 
         {/* Routes Container - Fixed if Dashboard, Scrollable otherwise */}
         <div
-          className={`pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${isDashboard ? "" : "overflow-y-auto"
+          className={`pt-16 p-4 flex-1  h-[calc(100vh-64px)] ${isDashboard ? "" : "overflow-hidden"
             }`}
         >
           <div className=" mt-20 sm:mt-7   text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
