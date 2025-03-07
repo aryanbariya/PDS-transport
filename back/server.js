@@ -414,41 +414,58 @@ app.put("/api/mswcgodown/:uuid", (req, res) => {
 });
 
 // Delete a godown and reset order numbers
+// Soft Delete a godown (Change status from Active to Inactive)
 app.delete("/api/mswcgodown/:uuid", (req, res) => {
   const { uuid } = req.params;
-  const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
+  const updateSql = "UPDATE mswc_godowns SET status = 'Inactive' WHERE uuid = ?";
 
-  db.query(deleteSql, [uuid], (err, result) => {
+  db.query(updateSql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting godown:", err);
-      return res.status(500).json({ error: "Database deletion failed" });
+      console.error("Error updating godown status:", err);
+      return res.status(500).json({ error: "Failed to update godown status" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
     }
-
-    console.log(`✅ Deleted Godown with UUID: ${uuid}`);
-
-    // Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE mswc_godowns SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-    db.query(resetSql1, (resetErr1) => {
-      if (resetErr1) {
-        console.error("Error resetting order numbers:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering" });
-      }
-      db.query(resetSql2, (resetErr2) => {
-        if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
-        }
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Godown deleted and order numbers reset successfully!" });
-      });
-    });
+    res.json({ message: "Godown status updated to Inactive successfully!" });
   });
 });
+
+// app.delete("/api/mswcgodown/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+//   const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
+
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting godown:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+
+//     console.log(`✅ Deleted Godown with UUID: ${uuid}`);
+
+//     // Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE mswc_godowns SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting order numbers:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering" });
+//       }
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Godown deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
 
 
 
