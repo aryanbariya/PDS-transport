@@ -431,6 +431,7 @@ app.delete("/api/mswcgodown/:uuid", (req, res) => {
   });
 });
 
+////future delete button
 // app.delete("/api/mswcgodown/:uuid", (req, res) => {
 //   const { uuid } = req.params;
 //   const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
