@@ -367,7 +367,7 @@ app.get("/api/mswcgodown/:uuid", (req, res) => {
 // Add a new godown with auto-incremented order_number and default status "Active"
 app.post("/api/mswcgodown", (req, res) => {
   const { godownName, godownUnder } = req.body;
-  if (!godownName || !godownUnder) {
+  if (!godownName ) {
     return res.status(400).json({ error: "Godown Name and Godown Under are required" });
   }
   const uuid = uuidv4();
