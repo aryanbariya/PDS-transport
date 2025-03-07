@@ -646,7 +646,7 @@ app.get("/api/owners/:uuid", (req, res) => {
 app.post("/api/owners", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
   
-  console.log("🔹 Received Data:", req.body); // Log request body for debugging
+   // Log request body for debugging
 
   if (!ownerName) {
     return res.status(400).json({ error: "Owner Name is required" });
@@ -673,8 +673,6 @@ app.post("/api/owners", (req, res) => {
         console.error("❌ Database Insertion Error:", insertErr);
         return res.status(500).json({ error: "Database insertion failed", details: insertErr.message });
       }
-
-      console.log("✅ Owner inserted successfully:", result);
       res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
     });
   });
