@@ -1,5 +1,7 @@
+
 // import React, { useState, useEffect } from "react";
-// const URL = import.meta.env.VITE_API_BACK_URL
+// import Swal from "sweetalert2"; // Import SweetAlert2
+// const URL = import.meta.env.VITE_API_BACK_URL;
 
 // const TruckForm = ({ onClose, onSave, editData }) => {
 //   const [formData, setFormData] = useState({
@@ -12,10 +14,10 @@
 //     reg_date: "",
 //     truck_owner_name: "",
 //     owner_id: "",
-//     tax_validity: "",
-//     insurance_validity: "",
-//     fitness_validity: "",
-//     permit_validity: "",
+//     tax_validity_date: "",
+//     insurance_validity_date: "",
+//     fitness_validity_date: "",
+//     permit_validity_date: "",
 //     direct_sale: "",
 //   });
 
@@ -34,7 +36,7 @@
 //         owner_id: editData.owner_id || "",
 //         tax_validity_date: editData.tax_validity_date || "",
 //         insurance_validity_date: editData.insurance_validity_date || "",
-//         fitness_validity_date: editData.fitness_validity || "",
+//         fitness_validity_date: editData.fitness_validity_date || "", // Corrected field name
 //         permit_validity_date: editData.permit_validity_date || "",
 //         direct_sale: editData.direct_sale || "",
 //       });
@@ -48,7 +50,6 @@
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-    
 //     const method = editData ? "PUT" : "POST";
 //     const url = editData
 //       ? `${URL}/api/truck/${editData.uuid}`
@@ -62,22 +63,36 @@
 //       });
 
 //       if (response.ok) {
-//         alert(editData ? "Truck updated successfully!" : "Truck added successfully!");
-//         onSave();
-//         onClose();
+//         Swal.fire({
+//           icon: "success",
+//           title: editData ? "Truck updated successfully!" : "Truck added successfully!",
+//           showConfirmButton: false,
+//           timer: 1500,
+//         }).then(() => {
+//           onSave();
+//           onClose();
+//         });
 //       } else {
-//         alert("Error submitting form");
+//         Swal.fire({
+//           icon: "error",
+//           title: "Error",
+//           text: "Error submitting form",
+//         });
 //       }
 //     } catch (error) {
 //       console.error("Error submitting data:", error);
-//       alert("Error submitting form");
+//       Swal.fire({
+//         icon: "error",
+//         title: "Error",
+//         text: "Error submitting form",
+//       });
 //     }
 //   };
 
 //   return (
 //     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
 //       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-//         <h2 className="bg--600 text-Black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+//         <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
 //           {editData ? "Edit Truck" : "Truck"}
 //         </h2>
 //         <form onSubmit={handleSubmit} className="space-y-4">
@@ -92,6 +107,7 @@
 //                   name={field}
 //                   value={formData[field]}
 //                   onChange={handleChange}
+//                   autoComplete="off" // Prevent autocomplete
 //                   className="p-2 border rounded-lg w-full"
 //                 />
 //               </div>
@@ -124,6 +140,8 @@
 // };
 
 // export default TruckForm;
+
+
 
 
 import React, { useState, useEffect } from "react";
@@ -172,11 +190,22 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "truck_name") {
+      setFormData({ ...formData, [name]: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.truck_name.trim()) {
+      setErrors({ truck_name: "Truck name is required" });
+      return;
+    }
+
+    console.log(formData); // Log formData for inspection
+
     const method = editData ? "PUT" : "POST";
     const url = editData
       ? `${URL}/api/truck/${editData.uuid}`
@@ -200,10 +229,12 @@ const TruckForm = ({ onClose, onSave, editData }) => {
           onClose();
         });
       } else {
+        const errorData = await response.json();
+        console.error("Error submitting data:", errorData);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Error submitting form",
+          text: errorData.message || "Error submitting form",
         });
       }
     } catch (error) {
@@ -235,8 +266,11 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                   value={formData[field]}
                   onChange={handleChange}
                   autoComplete="off" // Prevent autocomplete
-                  className="p-2 border rounded-lg w-full"
+                  className={`p-2 border rounded-lg w-full ${field === "truck_name" && errors.truck_name ? "border-red-500" : ""}`}
                 />
+                {field === "truck_name" && errors.truck_name && (
+                  <p className="text-red-500 text-sm">{errors.truck_name}</p>
+                )}
               </div>
             ))}
             <div>
