@@ -396,7 +396,7 @@ app.post("/api/mswcgodown", (req, res) => {
 // Update an existing godown
 app.put("/api/mswcgodown/:uuid", (req, res) => {
   const { godownName, godownUnder, status } = req.body;
-  if (!godownName || !godownUnder || !status) {
+  if (!godownName ) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
