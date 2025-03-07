@@ -217,31 +217,6 @@ app.get("/api/employees/:uuid", (req, res) => {
 //     res.status(500).json({ error: "Server error: " + error.message });
 //   }
 // });
-// **Insert Employee API**
-
-
-// **Update Employee API**
-// app.put("/api/employees/:uuid", (req, res) => {
-//   const { category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown } = req.body;
-//   if (!category || !fullName || !username || !address || !aadharNo || !panNo || !bankName || !accountNumber || !ifscCode || !branchName || !subGodown) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, subGodown = ? WHERE uuid = ?";
-
-//   db.query(sql, [category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating employee:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Employee not found" });
-//     }
-//     res.json({ message: "Employee updated successfully" });
-//   });
-// });
-
-// **Insert Employee API**
 app.post("/api/employees", async (req, res) => {
   const { category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
   
@@ -260,10 +235,10 @@ app.post("/api/employees", async (req, res) => {
         return res.status(500).json({ error: "Database error" });
       }
       
-      const nextOrder = result[0].next_order;
+      const nextOrder = result[0]?.next_order || 1;
       const insertSql = "INSERT INTO employee (uuid, category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.query(insertSql, [uuid, category, fullName, username, hashedPassword, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, nextOrder], (insertErr) => {
+      db.query(insertSql, [uuid, category, fullName, username, hashedPassword, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, nextOrder], (insertErr) => {
         if (insertErr) {
           console.error("Error inserting employee:", insertErr);
           return res.status(500).json({ error: "Database insertion failed" });
@@ -280,15 +255,14 @@ app.post("/api/employees", async (req, res) => {
 
 // **Update Employee API**
 app.put("/api/employees/:uuid", (req, res) => {
-  const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
-  
-  if (!category || !fullName || !username || !subGodown) {
-    return res.status(400).json({ error: "Required fields: category, fullName, username, subGodown" });
+  const { category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown } = req.body;
+  if (!category || !fullName || !username || !address || !aadharNo || !panNo || !bankName || !accountNumber || !ifscCode || !branchName || !subGodown) {
+    return res.status(400).json({ error: "All fields are required" });
   }
 
-  const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
+  const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, subGodown = ? WHERE uuid = ?";
 
-  db.query(sql, [category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, req.params.uuid], (err, result) => {
+  db.query(sql, [category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating employee:", err);
       return res.status(500).json({ error: "Database update error" });
@@ -299,6 +273,8 @@ app.put("/api/employees/:uuid", (req, res) => {
     res.json({ message: "Employee updated successfully" });
   });
 });
+
+
 
 
 // **Delete Employee API**

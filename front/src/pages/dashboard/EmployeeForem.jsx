@@ -581,20 +581,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     return Object.keys(newErrors).length === 0;
   };
   
-  // const validateForm = () => {
-  //   let newErrors = {};
-  //   if (!formData.category) newErrors.category = "Category is required";
-  //   if (!formData.fullName) newErrors.fullName = "Full Name is required";
-  //   if (!formData.username) newErrors.username = "Username is required";
-  //   if (!formData.password) newErrors.password = "Password is required";
-  //   if (!formData.aadharNo.match(/^\d{12}$/)) newErrors.aadharNo = "Aadhar No must be 12 digits";
-  //   if (!formData.panNo.match(/^[A-Z]{5}\d{4}[A-Z]{1}$/)) newErrors.panNo = "Invalid PAN No format";
-  //   if (!formData.accountNumber.match(/^\d{9,18}$/)) newErrors.accountNumber = "Account Number must be 9-18 digits";
-  //   if (!formData.ifscCode.match(/^[A-Z]{4}0[A-Z0-9]{6}$/)) newErrors.ifscCode = "Invalid IFSC Code format";
 
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -674,6 +661,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
                 <option value="Warehouse 1">Warehouse 1</option>
                 <option value="Warehouse 2">Warehouse 2</option>
               </select>
+              {errors.subGodown && <p className="text-red-500 text-sm">{errors.subGodown}</p>}
             </div>
           </div>
           <div className="flex justify-end space-x-4">
