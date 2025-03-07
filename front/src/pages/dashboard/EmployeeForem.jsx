@@ -510,7 +510,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     username: "",
     password: "",
     address: "",
-    aadharNo: "",
+    adharNo: "",
     panNo: "",
     bankName: "",
     accountNumber: "",

@@ -94,7 +94,7 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
         <h2 className="text-xl font-semibold text-center py-3">
-          {editData ? "Edit Owner" : "Add Owner"}
+          {editData ? "Edit Owner" : "Owner"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {Object.keys(formData).map((field) => (
