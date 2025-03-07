@@ -260,13 +260,13 @@ const PackagingPage = () => {
             <tbody>
               {packagingList.length > 0 ? (
                 packagingList.map((p) => (
-                  <tr key={p.uuid} className="text-center hover:bg-gray-100">
+                  <tr key={p.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{p.order_number}</td>
                     <td className="border p-2">{p.material_name}</td>
                     <td className="border p-2">{p.weight}</td>
                     <td className="border p-2">{p.status}</td>
                     <td className="border p-2">
-                      <div className="flex justify-center space-x-2">
+                      <div className="flex justify-start space-x-2">
                         <button
                           onClick={() => handleEdit(p)}
                           className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"

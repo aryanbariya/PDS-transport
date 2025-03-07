@@ -118,7 +118,7 @@ const EmployeePage = () => {
             <tbody>
               {employees.length > 0 ? (
                 employees.map((emp) => (
-                  <tr key={emp.uuid} className="text-center hover:bg-gray-100">
+                  <tr key={emp.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{emp.order_number}</td>
                     <td className="border p-2 font-semibold">{emp.category}</td>
                     <td className="border p-2">
@@ -135,7 +135,7 @@ const EmployeePage = () => {
                       <div>{emp.ifscCode || "N/A"}</div>
                       <div>{emp.branchName || "N/A"}</div>
                     </td>
-                    <td className="border p-2 flex justify-center gap-2 text-xs md:text-base">
+                    <td className="border p-2 flex justify-start gap-2 text-xs md:text-base">
                       <button
                         onClick={() => handleEdit(emp)}
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
@@ -154,7 +154,7 @@ const EmployeePage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className="p-3 text-center text-gray-500">No Employees Found</td>
+                  <td colSpan="7" className="p-3 text-start text-gray-500">No Employees Found</td>
                 </tr>
               )}
             </tbody>

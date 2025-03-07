@@ -337,7 +337,7 @@ const OwnerNamePage = () => {
         <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
-              <tr className="bg-gray-200 text-center">
+              <tr className="bg-gray-200 text-start">
                 <th className="border p-2">ID</th>
                 <th className="border p-2">Owner Name</th>
                 {!isMobile && <th className="border p-2">Contact</th>}
@@ -348,7 +348,7 @@ const OwnerNamePage = () => {
             </thead>
             <tbody>
               {owners.map((o) => (
-                <tr key={o.uuid} className="text-center hover:bg-gray-100">
+                <tr key={o.uuid} className="text-start hover:bg-gray-100">
                   <td className="border p-2">{o.order_number}</td>
                   <td className="border p-2">{o.ownerName}</td>
                   {!isMobile && <td className="border p-2">{o.contact}</td>}
@@ -398,7 +398,7 @@ const OwnerNamePage = () => {
             <p><strong>Address:</strong> {selectedOwner.address}</p>
             <p><strong>Email:</strong> {selectedOwner.emailID}</p>
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="mt-4 flex justify-start space-x-2">
               <button
               
                 onClick={() => handleEdit(selectedOwner)}
