@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const OwnerNameForm = ({ onClose, onSave, editData }) => {
@@ -12,7 +12,6 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
 
   const [ownerNameError, setOwnerNameError] = useState(""); // Track error
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     if (editData) {
@@ -27,7 +26,6 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
@@ -36,7 +34,7 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
       updatedValue = value
         .toLowerCase()
         .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
       setOwnerNameError(""); // Clear error when user types
     }
@@ -48,7 +46,6 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
 
     setFormData({ ...formData, [name]: updatedValue });
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,16 +72,30 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
       const data = await response.json();
 
       if (response.ok) {
-        alert(editData ? "Owner updated successfully!" : "Owner added successfully!");
-        onSave();
-        onClose();
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Owner updated successfully!" : "Owner added successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          onSave();
+          onClose();
+        });
       } else {
         console.error("Server error:", data);
-        alert("Error: " + (data.error || "Error submitting form"));
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.error || "Error submitting form",
+        });
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      alert("Error submitting form");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error submitting form",
+      });
     } finally {
       setLoading(false); // Stop loading after request is completed
     }
@@ -120,21 +131,30 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
             </div>
           ))}
           <div className="flex justify-end space-x-2">
-            <button
-              type="submit"
-              className="py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : editData ? "Update" : "Submit"}
-            </button>
-            <button
-              type="button"
-              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-              onClick={onClose}
-            >
-              Close
-            </button>
-          </div>
+  <button
+    type="submit"
+    className="py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+    disabled={loading}
+  >
+    {loading ? "Submitting..." : editData ? "Update" : "Submit"}
+  </button>
+  {editData && (
+    <button
+      type="button"
+      className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
+      onClick={() => handleDelete(editData.uuid)}
+    >
+      Delete
+    </button>
+  )}
+  <button
+    type="button"
+    className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700"
+    onClick={onClose}
+  >
+    Close
+  </button>
+</div>
         </form>
       </div>
     </div>

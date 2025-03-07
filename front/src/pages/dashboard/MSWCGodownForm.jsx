@@ -132,7 +132,7 @@
 //               type="submit"
 //               disabled={loading}
 //               className={`py-2 px-5 rounded-lg text-white transition duration-300 ${
-//                 !loading ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+//                 loading "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
 //               }`}
 //             >
 //               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
@@ -148,6 +148,8 @@
 
 
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2"; // Import SweetAlert2
+const URL = import.meta.env.VITE_API_BACK_URL;
 
 const MSWCGodownForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
@@ -236,15 +238,29 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
       console.log("Response:", data);
 
       if (response.ok) {
-        alert(editData ? "Godown updated successfully!" : "MSWC Godown added successfully!");
-        onSave();
-        onClose();
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Godown updated successfully!" : "MSWC Godown added successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          onSave();
+          onClose();
+        });
       } else {
-        alert(data.message || "Failed to submit form");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message || "Failed to submit form",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error submitting data");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error submitting data",
+      });
     } finally {
       setLoading(false);
     }
