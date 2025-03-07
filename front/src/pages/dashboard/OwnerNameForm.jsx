@@ -42,37 +42,72 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
   // Only ownerName is required
   const isFormValid = formData.ownerName.trim() !== "";
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!isFormValid) {
+  //     alert("Owner Name is required.");
+  //     return;
+  //   }
+
+  //   const method = editData ? "PUT" : "POST";
+  //   const url = editData
+  //     ? `${URL}/api/owners/${editData.uuid}`
+  //     : `${URL}/api/owners`;
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method,
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     if (response.ok) {
+  //       alert(editData ? "Owner updated successfully!" : "Owner added successfully!");
+  //       onSave();
+  //       onClose();
+  //     } else {
+  //       alert("Error submitting form");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //     alert("Error submitting form");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) {
       alert("Owner Name is required.");
       return;
     }
-
+  
     const method = editData ? "PUT" : "POST";
     const url = editData
       ? `${URL}/api/owners/${editData.uuid}`
       : `${URL}/api/owners`;
-
+  
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
+      const data = await response.json(); // Parse response
+  
       if (response.ok) {
         alert(editData ? "Owner updated successfully!" : "Owner added successfully!");
         onSave();
         onClose();
       } else {
-        alert("Error submitting form");
+        console.error("Server error:", data);
+        alert("Error: " + (data.error || "Error submitting form"));
       }
     } catch (error) {
       console.error("Error submitting data:", error);
       alert("Error submitting form");
     }
   };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

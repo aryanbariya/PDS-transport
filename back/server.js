@@ -641,10 +641,15 @@ app.get("/api/owners/:uuid", (req, res) => {
 //   });
 // });
 
+
+
 app.post("/api/owners", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
-  if (!ownerName ) {
-    return res.status(400).json({ error: "OwnerName are required" });
+  
+  console.log("🔹 Received Data:", req.body); // Log request body for debugging
+
+  if (!ownerName) {
+    return res.status(400).json({ error: "Owner Name is required" });
   }
 
   const uuid = uuidv4();
@@ -652,22 +657,29 @@ app.post("/api/owners", (req, res) => {
 
   db.query(getMaxOrderSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
-      return res.status(500).json({ error: "Database error" });
+      console.error("❌ Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error", details: err.message });
     }
 
-    const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+    const nextOrder = result[0]?.next_order || 1;
+    console.log("✅ Next order number:", nextOrder);
 
-    db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr) => {
+    const insertSql = `
+      INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) 
+      VALUES (?, ?, ?, ?, ?, ?)`;
+
+    db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr, result) => {
       if (insertErr) {
-        console.error("Error inserting owner:", insertErr);
-        return res.status(500).json({ error: "Database insertion failed" });
+        console.error("❌ Database Insertion Error:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed", details: insertErr.message });
       }
+
+      console.log("✅ Owner inserted successfully:", result);
       res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
     });
   });
 });
+
 
 
 app.put("/api/owners/:uuid", (req, res) => {
