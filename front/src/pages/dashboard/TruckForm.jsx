@@ -127,6 +127,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const TruckForm = ({ onClose, onSave, editData }) => {
@@ -176,7 +177,6 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const method = editData ? "PUT" : "POST";
     const url = editData
       ? `${URL}/api/truck/${editData.uuid}`
@@ -190,15 +190,29 @@ const TruckForm = ({ onClose, onSave, editData }) => {
       });
 
       if (response.ok) {
-        alert(editData ? "Truck updated successfully!" : "Truck added successfully!");
-        onSave();
-        onClose();
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Truck updated successfully!" : "Truck added successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          onSave();
+          onClose();
+        });
       } else {
-        alert("Error submitting form");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error submitting form",
+        });
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      alert("Error submitting form");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error submitting form",
+      });
     }
   };
 

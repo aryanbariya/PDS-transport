@@ -7,6 +7,7 @@ import { Player } from "@lottiefiles/react-lottie-player";
 import truckLoader from "@/util/Animation.json";
 import { formatDate } from "@/util/libs/formatDate";
 import Navigation from "@/util/libs/navigation";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -52,26 +53,34 @@ const TruckPage = () => {
     setShowForm(true);
   };
 
-
   const handleDelete = async (uuid) => {
-    if (!window.confirm("Are you sure you want to delete this truck?")) return;
-    try {
-      const response = await fetch(`${URL}/api/truck/${uuid}`, {
-        method: "DELETE"
-      });
-      if (response.ok) {
-        alert("Truck deleted successfully!");
-        fetchTrucks();
-      } else {
-        alert("Failed to delete Truck.");
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`${URL}/api/truck/${uuid}`, {
+            method: "DELETE"
+          });
+          if (response.ok) {
+            Swal.fire("Deleted!", "Truck deleted successfully!", "success");
+            fetchTrucks();
+          } else {
+            Swal.fire("Error", "Failed to delete Truck.", "error");
+          }
+        } catch (err) {
+          console.error("Error deleting truck:", err);
+          Swal.fire("Error", "Error deleting data.", "error");
+        }
       }
-    } catch (err) {
-      console.error("Error deleting truck:", err);
-      alert("Error deleting data.");
-    }
+    });
   };
-
-
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -156,10 +165,6 @@ const TruckPage = () => {
           </tbody>
         </table>
       </div>)}
-
-
-
-
     </div>
   );
 };
