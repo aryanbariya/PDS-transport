@@ -338,6 +338,30 @@ app.delete("/api/employees/:uuid", (req, res) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start of mswc godown
+// Get only "Active" godowns
+app.get("/api/mswcgodown/active", (req, res) => {
+  const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns WHERE status = 'Active' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching active godowns:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// Get only "Inactive" godowns
+app.get("/api/mswcgodown/inactive", (req, res) => {
+  const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns WHERE status = 'Inactive' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching inactive godowns:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
 app.get("/api/mswcgodown", (req, res) => {
   const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns ORDER BY order_number";
   db.query(sql, (err, results) => {
@@ -431,6 +455,7 @@ app.delete("/api/mswcgodown/:uuid", (req, res) => {
   });
 });
 
+////future delete button
 // app.delete("/api/mswcgodown/:uuid", (req, res) => {
 //   const { uuid } = req.params;
 //   const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
