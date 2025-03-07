@@ -15,6 +15,7 @@ const MSWCGodownPage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("all");
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -28,18 +29,40 @@ const MSWCGodownPage = () => {
   }, [godowns]);
 
 
+  useEffect(() => {
+    fetchGodowns();
+  }, [filter]);
+
   const fetchGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/mswcgodown`);
+      let endpoint = `${URL}/api/mswcgodown`;
+      if (filter === "active") endpoint = `${URL}/api/mswcgodown/active`;
+      if (filter === "inactive") endpoint = `${URL}/api/mswcgodown/inactive`;
+
+      const response = await fetch(endpoint);
       if (!response.ok) throw new Error("Failed to fetch data");
+
       const data = await response.json();
+
+      if (tableRef.current) {
+        $(tableRef.current).DataTable().destroy();
+      }
+
       setGodowns(data || []);
+
+      setTimeout(() => {
+        if (tableRef.current) {
+          $(tableRef.current).DataTable();
+        }
+      }, 0);
+
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
   };
+
 
 
 
@@ -78,7 +101,7 @@ const MSWCGodownPage = () => {
 
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -95,6 +118,29 @@ const MSWCGodownPage = () => {
           <MSWCGodownForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
         </div>
       )}
+      {/* Filter Buttons */}
+      {/* <div className="flex space-x-3 my-4">
+      <button 
+        className={`px-4 py-2 rounded-md ${filter === "all" ? "bg-blue-600 text-white" : "bg-gray-300"}`}
+        onClick={() => setFilter("all")}
+      >
+        All
+      </button>
+      <button 
+        className={`px-4 py-2 rounded-md ${filter === "active" ? "bg-green-600 text-white" : "bg-gray-300"}`}
+        onClick={() => setFilter("active")}
+      >
+        Active
+      </button>
+      <button 
+        className={`px-4 py-2 rounded-md ${filter === "inactive" ? "bg-red-600 text-white" : "bg-gray-300"}`}
+        onClick={() => setFilter("inactive")}
+      >
+        Inactive
+      </button>
+    </div> */}
+
+
 
       {loading && <div className="flex justify-center items-center h-64">
         <Player autoplay loop src={truckLoader} className="w-48 h-48" />
@@ -102,6 +148,18 @@ const MSWCGodownPage = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          {/* Filter Dropdown */}
+          <div className="my-4">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-2 py-2 border border-gray-300 rounded-md bg-white shadow-md focus:outline-none"
+            >
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200">
@@ -119,7 +177,7 @@ const MSWCGodownPage = () => {
                     <td className="border p-2">{g.order_number}</td>
                     <td className="border p-2">{g.godownName}</td>
                     <td className="border p-2">{g.godownUnder || "N/A"}</td>
-                    <td className="border p-2">{g.status }</td>
+                    <td className="border p-2">{g.status}</td>
                     <td className="border p-2">
                       <div className="flex justify-center space-x-2">
                         <button onClick={() => handleEdit(g)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">Edit</button>
@@ -138,8 +196,6 @@ const MSWCGodownPage = () => {
 
         </div>
       )}
-
-
     </div>
   );
 };

@@ -41,7 +41,6 @@ const SubGodownPage = () => {
     }
   };
 
-
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this godown?")) return;
     try {
@@ -135,9 +134,7 @@ const SubGodownPage = () => {
               )}
             </tbody>
           </table>
-
         </div>
-
       )}
 
 
