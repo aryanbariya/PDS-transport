@@ -401,6 +401,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const SubGodownForm = ({ onClose, onSave, editData }) => {
@@ -414,7 +415,6 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch godown names from `mswcgodown`
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
@@ -432,7 +432,6 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
     fetchGodowns();
   }, []);
 
-  // ✅ Pre-fill form if editing
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -445,12 +444,10 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
-  // ✅ Auto-capitalize first letter
   const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  // ✅ Handle input changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -458,17 +455,14 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
     });
   };
 
-  // ✅ Handle selecting godown from dropdown
   const handleSelectGodown = (godownName) => {
     setFormData({ ...formData, parentGodown: capitalizeFirstLetter(godownName) });
     setSearch(godownName);
     setShowDropdown(false);
   };
 
-  // ✅ Validate form (Only parentGodown is required)
   const isFormValid = formData.parentGodown.trim() !== "";
 
-  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid || loading) return;
@@ -490,15 +484,29 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
       const data = await response.json();
 
       if (response.ok) {
-        alert(editData ? "Godown updated successfully!" : "Parent Godown added successfully!");
-        onSave();
-        onClose();
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Godown updated successfully!" : "Parent Godown added successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          onSave();
+          onClose();
+        });
       } else {
-        alert(data.message || "Failed to submit form");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message || "Failed to submit form",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error submitting data");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error submitting data",
+      });
     } finally {
       setLoading(false);
     }
@@ -512,7 +520,6 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {/* ✅ Parent Godown with Dropdown */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700">MSWCGodown </label>
               <input
@@ -547,7 +554,6 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
               )}
             </div>
 
-            {/* ✅ Sub-Godown Input (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Sub-Godown Name</label>
               <input
@@ -561,7 +567,6 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
             </div>
           </div>
 
-          {/* ✅ Buttons */}
           <div className="flex justify-end gap-2">
             <button
               type="submit"
