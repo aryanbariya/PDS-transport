@@ -15,6 +15,7 @@ const SubGodownPage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("all");
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -28,18 +29,54 @@ const SubGodownPage = () => {
     }
   }, [godowns]);
 
+  // const fetchGodowns = async () => {
+  //   try {
+  //     const response = await fetch(`${URL}/api/subgodown`);
+  //     if (!response.ok) throw new Error("Failed to fetch data");
+  //     const data = await response.json();
+  //     setGodowns(data || []);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     setError(err.message);
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  useEffect(() => {
+    fetchGodowns();
+  }, [filter]);
+
   const fetchGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/subgodown`);
+      let endpoint = `${URL}/api/subgodown`;
+      if (filter === "active") endpoint = `${URL}/api/subgodown/active`;
+      if (filter === "inactive") endpoint = `${URL}/api/subgodown/inactive`;
+
+      const response = await fetch(endpoint);
       if (!response.ok) throw new Error("Failed to fetch data");
+
       const data = await response.json();
+
+      if (tableRef.current) {
+        $(tableRef.current).DataTable().destroy();
+      }
+
       setGodowns(data || []);
+
+      setTimeout(() => {
+        if (tableRef.current) {
+          $(tableRef.current).DataTable();
+        }
+      }, 0);
+
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
   };
+
 
   const handleDelete = async (uuid) => {
     if (!window.confirm("Are you sure you want to delete this godown?")) return;
@@ -73,7 +110,7 @@ const SubGodownPage = () => {
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -97,6 +134,18 @@ const SubGodownPage = () => {
       {error && <p className="text-red-500">{error}</p>}
       {!loading && (
         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          {/* Filter Dropdown */}
+          <div className="my-4">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-2 py-2 border border-gray-300 rounded-md bg-white shadow-md focus:outline-none"
+            >
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200">
@@ -121,7 +170,7 @@ const SubGodownPage = () => {
                           Edit
                         </button>
                         <button onClick={() => handleDelete(g.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
-                          Delete
+                          Deactive
                         </button>
                       </div>
                     </td>
