@@ -52,38 +52,7 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!validate() || loading) return;
 
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       editData
-  //         ? `${URL}/api/mswcgodown/${editData.uuid}`
-  //         : `${URL}/api/mswcgodown`,
-  //       {
-  //         method: editData ? "PUT" : "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify(formData),
-  //       }
-  //     );
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       alert(editData ? "Godown updated successfully!" : "MSWC Godown added successfully!");
-  //       onSave();
-  //       onClose();
-  //     } else {
-  //       alert(data.message || "Failed to submit form");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     alert("Error submitting data");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate() || loading) return;
