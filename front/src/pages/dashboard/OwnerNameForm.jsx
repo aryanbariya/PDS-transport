@@ -10,6 +10,10 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     emailID: "",
   });
 
+  const [ownerNameError, setOwnerNameError] = useState(""); // Track error
+  const [loading, setLoading] = useState(false);
+
+
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -23,77 +27,53 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
 
     if (name === "ownerName") {
-      // Capitalize first letter of each word
       updatedValue = value
         .toLowerCase()
         .split(" ")
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
+      setOwnerNameError(""); // Clear error when user types
+    }
+
+    if (name === "contact") {
+      // Allow only digits and limit to 10 characters
+      updatedValue = value.replace(/\D/g, "").slice(0, 10);
     }
 
     setFormData({ ...formData, [name]: updatedValue });
   };
 
-  // Only ownerName is required
-  const isFormValid = formData.ownerName.trim() !== "";
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!isFormValid) {
-  //     alert("Owner Name is required.");
-  //     return;
-  //   }
-
-  //   const method = editData ? "PUT" : "POST";
-  //   const url = editData
-  //     ? `${URL}/api/owners/${editData.uuid}`
-  //     : `${URL}/api/owners`;
-
-  //   try {
-  //     const response = await fetch(url, {
-  //       method,
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(formData),
-  //     });
-
-  //     if (response.ok) {
-  //       alert(editData ? "Owner updated successfully!" : "Owner added successfully!");
-  //       onSave();
-  //       onClose();
-  //     } else {
-  //       alert("Error submitting form");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting data:", error);
-  //     alert("Error submitting form");
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid) {
-      alert("Owner Name is required.");
+
+    if (!formData.ownerName.trim()) {
+      setOwnerNameError("Owner Name is required."); // Show error message
       return;
     }
-  
+
+    setLoading(true); // Start loading
+
     const method = editData ? "PUT" : "POST";
     const url = editData
       ? `${URL}/api/owners/${editData.uuid}`
       : `${URL}/api/owners`;
-  
+
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
-      const data = await response.json(); // Parse response
-  
+
+      const data = await response.json();
+
       if (response.ok) {
         alert(editData ? "Owner updated successfully!" : "Owner added successfully!");
         onSave();
@@ -105,9 +85,10 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     } catch (error) {
       console.error("Error submitting data:", error);
       alert("Error submitting form");
+    } finally {
+      setLoading(false); // Stop loading after request is completed
     }
   };
-  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
@@ -119,7 +100,10 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
           {Object.keys(formData).map((field) => (
             <div key={field}>
               <label className="block text-sm font-medium text-gray-700">
-                {field.replace(/([A-Z])/g, " $1").trim()}
+                {field
+                  .replace(/([A-Z])/g, " $1")
+                  .replace(/\b\w/g, (char) => char.toUpperCase())
+                  .trim()}
               </label>
               <input
                 type={field === "emailID" ? "email" : "text"}
@@ -127,18 +111,21 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
                 placeholder={`Enter ${field}`}
                 value={formData[field]}
                 onChange={handleChange}
-                className="p-2 border rounded-lg w-full"
-                required={field === "ownerName"} // Only ownerName is required
+                className={`p-2 border rounded-lg w-full ${field === "ownerName" && ownerNameError ? "border-red-500" : ""
+                  }`}
               />
+              {field === "ownerName" && ownerNameError && (
+                <p className="text-red-500 text-sm mt-1">{ownerNameError}</p>
+              )}
             </div>
           ))}
           <div className="flex justify-end space-x-2">
             <button
               type="submit"
-              disabled={!isFormValid}
-              className={`py-2 px-4 rounded-lg ${isFormValid ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
+              className="py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              disabled={loading}
             >
-              {editData ? "Update" : "Submit"}
+              {loading ? "Submitting..." : editData ? "Update" : "Submit"}
             </button>
             <button
               type="button"

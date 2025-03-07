@@ -146,7 +146,7 @@ export function Footer({ isSidebarOpen }) {
           variant="small"
           className="text-gray-400 flex flex-col md:flex-row justify-center items-center text-xs sm:text-sm md:text-base lg:text-lg"
         >
-          <p className="text-center">
+          <span className="text-center">
             &copy; {year} PDS Transport. Made with{" "}
             <HeartIcon className="inline-block h-4 w-4 text-red-500" /> by{" "}
             <a
@@ -157,7 +157,7 @@ export function Footer({ isSidebarOpen }) {
             >
               Creative Aryan
             </a>
-          </p>
+          </span>
         </Typography>
 
       </div>
