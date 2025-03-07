@@ -109,14 +109,14 @@ const DriverPage = () => {
             <tbody>
               {drivers.length > 0 ? (
                 drivers.map((driver) => (
-                  <tr key={driver.uuid} className="text-center hover:bg-gray-100">
+                  <tr key={driver.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{driver.order_number}</td>
                     <td className="border p-2">{driver.driver_name}</td>
                     <td className="border p-2">{driver.aadhar_card_no}</td>
                     <td className="border p-2">{driver.contact}</td>
                     <td className="border p-2">{driver.driving_license_no}</td>
                     <td className="border p-2">
-                      <div className="flex justify-center space-x-2">
+                      <div className="flex justify-start space-x-2">
                         <button
                           onClick={() => handleEdit(driver)}
                           className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
