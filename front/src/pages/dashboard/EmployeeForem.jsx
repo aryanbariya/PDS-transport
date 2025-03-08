@@ -1111,7 +1111,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
                 className="p-2 border rounded-lg w-full"
               />
               {showDropdown && (
-                <div className="absolute z-10 bg-white border rounded-md w-full mt-1 max-h-40 overflow-auto shadow-lg">
+                <div className="absolute z-10 bg-white border rounded-md w-full bottom-full mt-1 max-h-40 overflow-auto shadow-lg">
                   {godownList
                     .filter((godown) =>
                       godown.subGodown.toLowerCase().includes(search.toLowerCase())
