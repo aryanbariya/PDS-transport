@@ -253,6 +253,7 @@ import {
 } from "@material-tailwind/react";
 import { UserCircleIcon, BellIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { Bars3Icon as OutlineBars3Icon } from "@heroicons/react/24/outline";
+import Swal from 'sweetalert2';
 
 export function DashboardNavbar({ setOpenSidenav }) {
   const { pathname } = useLocation();
@@ -268,8 +269,19 @@ export function DashboardNavbar({ setOpenSidenav }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will be logged out!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, log out!',
+      cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
+    });
   };
 
   return (

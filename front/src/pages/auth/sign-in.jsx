@@ -222,29 +222,29 @@ export function SignIn() {
     }
   };
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, log out!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.removeItem("token");
-        Swal.fire({
-          icon: "success",
-          title: "Logged out successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          navigate("/"); // Redirect to home page
-        });
-      }
-    });
-  };
+  // const handleLogout = () => {
+  //   Swal.fire({
+  //     title: "Are you sure?",
+  //     text: "You will be logged out!",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "Yes, log out!",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       localStorage.removeItem("token");
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "Logged out successfully!",
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //       }).then(() => {
+  //         navigate("/"); // Redirect to home page
+  //       });
+  //     }
+  //   });
+  // };
 
   return (
     <section className="m-8 flex gap-4">
@@ -355,11 +355,11 @@ export function SignIn() {
             <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
           </Typography>
         </form>
-        <Link to="#" onClick={handleLogout}>
+        {/* <Link to="#" onClick={handleLogout}>
           <Button className="mt-6" fullWidth>
             Log Out
           </Button>
-        </Link>
+        </Link> */}
       </div>
       <div className="w-2/5 h-full hidden lg:block">
         <img
