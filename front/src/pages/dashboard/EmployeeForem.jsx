@@ -921,7 +921,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch(`${URL}/api/dropsubgodowns`);
+        const response = await fetch(`${URL}/api/dropsubgodown`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
 
         const data = await response.json();
@@ -968,9 +968,9 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const handleSelectGodown = (godownName) => {
-    setFormData({ ...formData, parentGodown: capitalizeFirstLetter(godownName) });
-    setSearch(godownName);
+  const handleSelectGodown = (subGodown) => {
+    setFormData({ ...formData, parentGodown: capitalizeFirstLetter(subGodown) });
+    setSearch(subGodown);
     setShowDropdown(false);
   };
 
@@ -1114,15 +1114,15 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
                 <div className="absolute z-10 bg-white border rounded-md w-full mt-1 max-h-40 overflow-auto shadow-lg">
                   {godownList
                     .filter((godown) =>
-                      godown.godownName.toLowerCase().includes(search.toLowerCase())
+                      godown.subGodown.toLowerCase().includes(search.toLowerCase())
                     )
                     .map((godown, index) => (
                       <div
                         key={index}
-                        onClick={() => handleSelectGodown(godown.godownName)}
+                        onClick={() => handleSelectGodown(godown.subGodown)}
                         className="p-2 hover:bg-gray-200 cursor-pointer"
                       >
-                        {godown.godownName}
+                        {godown.subGodown}
                       </div>
                     ))}
                 </div>

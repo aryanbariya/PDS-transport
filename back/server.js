@@ -159,7 +159,7 @@ app.post("/google-signin", async (req, res) => {
 
 // **Get All Employees API**
 app.get("/api/dropsubgodown", (req, res) => {
-  const query = "SELECT subGodown FROM sub_godown"; // Fetch only godownname
+  const query = "SELECT subGodown FROM sub_godown WHERE status = 'Active'"; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
@@ -483,7 +483,7 @@ app.get("/api/subgodown/inactive", (req, res) => {
   });
 });
 app.get("/api/godowns", (req, res) => {
-  const query = "SELECT godownName FROM mswc_godowns"; // Fetch only godownname
+  const query = "SELECT godownName FROM mswc_godowns WHERE status = 'Active'"; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
