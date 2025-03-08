@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from "react";
 // import Swal from "sweetalert2"; // Import SweetAlert2
 // const URL = import.meta.env.VITE_API_BACK_URL;
@@ -45,11 +44,22 @@
 
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
+//     if (name === "truck_name") {
+//       setFormData({ ...formData, [name]: value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() });
+//     } else {
+//       setFormData({ ...formData, [name]: value });
+//     }
 //   };
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
+//     if (!formData.truck_name.trim()) {
+//       setErrors({ truck_name: "Truck name is required" });
+//       return;
+//     }
+
+//     console.log(formData); // Log formData for inspection
+
 //     const method = editData ? "PUT" : "POST";
 //     const url = editData
 //       ? `${URL}/api/truck/${editData.uuid}`
@@ -73,10 +83,12 @@
 //           onClose();
 //         });
 //       } else {
+//         const errorData = await response.json();
+//         console.error("Error submitting data:", errorData);
 //         Swal.fire({
 //           icon: "error",
 //           title: "Error",
-//           text: "Error submitting form",
+//           text: errorData.message || "Error submitting form",
 //         });
 //       }
 //     } catch (error) {
@@ -108,8 +120,11 @@
 //                   value={formData[field]}
 //                   onChange={handleChange}
 //                   autoComplete="off" // Prevent autocomplete
-//                   className="p-2 border rounded-lg w-full"
+//                   className={`p-2 border rounded-lg w-full ${field === "truck_name" && errors.truck_name ? "border-red-500" : ""}`}
 //                 />
+//                 {field === "truck_name" && errors.truck_name && (
+//                   <p className="text-red-500 text-sm">{errors.truck_name}</p>
+//                 )}
 //               </div>
 //             ))}
 //             <div>
@@ -143,7 +158,6 @@
 
 
 
-
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -151,7 +165,7 @@ const URL = import.meta.env.VITE_API_BACK_URL;
 const TruckForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     order_number: '',
-    truck_name: "",
+    truck_number: "",
     truck_status: "Active",
     empty_weight: "",
     company: "",
@@ -171,7 +185,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     if (editData) {
       setFormData({
-        truck_name: editData.truck_name || "",
+        truck_number: editData.truck_number || "",
         truck_status: editData.truck_status || "Active",
         empty_weight: editData.empty_weight || "",
         company: editData.company || "",
@@ -199,8 +213,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.truck_name.trim()) {
-      setErrors({ truck_name: "Truck name is required" });
+    if (!formData.truck_number.trim()) {
+      setErrors({ truck_number: "Truck name is required" });
       return;
     }
 
@@ -255,7 +269,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id", "tax_validity_date", "insurance_validity_date", "fitness_validity_date", "permit_validity_date", "direct_sale"].map((field) => (
+            {["truck_number", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id", "tax_validity_date", "insurance_validity_date", "fitness_validity_date", "permit_validity_date", "direct_sale"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">
                   {field.replace("_", " ").toUpperCase()}
@@ -266,10 +280,10 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                   value={formData[field]}
                   onChange={handleChange}
                   autoComplete="off" // Prevent autocomplete
-                  className={`p-2 border rounded-lg w-full ${field === "truck_name" && errors.truck_name ? "border-red-500" : ""}`}
+                  className={`p-2 border rounded-lg w-full ${field === "truck_number" && errors.truck_number ? "border-red-500" : ""}`}
                 />
-                {field === "truck_name" && errors.truck_name && (
-                  <p className="text-red-500 text-sm">{errors.truck_name}</p>
+                {field === "truck_number" && errors.truck_number && (
+                  <p className="text-red-500 text-sm">{errors.truck_number}</p>
                 )}
               </div>
             ))}

@@ -1012,8 +1012,8 @@ app.get("/api/truck/:uuid", (req, res) => {
 
 // Add a new truck
 app.post("/api/truck", (req, res) => {
-  const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
-  if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+  const { truck_number, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  if (!truck_number || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
     return res.status(400).json({ error: "All required fields must be filled" });
   }
 
@@ -1024,9 +1024,9 @@ app.post("/api/truck", (req, res) => {
     if (err) return res.status(500).json({ error: "Database error" });
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const insertSql = "INSERT INTO truck (uuid, truck_number, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, truck_number, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, nextOrder], (insertErr) => {
       if (insertErr) return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
       res.json({ message: "Truck added successfully", uuid, order_number: nextOrder });
     });
@@ -1035,14 +1035,14 @@ app.post("/api/truck", (req, res) => {
 
 // Update an existing truck
 app.put("/api/truck/:uuid", (req, res) => {
-  const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
-  if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+  const { truck_number, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  if (!truck_number || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
     return res.status(400).json({ error: "All required fields must be filled" });
   }
 
-  const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
+  const sql = "UPDATE truck SET truck_number = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
   
-  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, req.params.uuid], (err, result) => {
+  db.query(sql, [truck_number, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, req.params.uuid], (err, result) => {
     if (err) return res.status(500).json({ error: "Database error" });
     if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
     res.json({ message: "Truck updated successfully" });
