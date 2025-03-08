@@ -158,6 +158,18 @@ app.post("/google-signin", async (req, res) => {
 
 
 // **Get All Employees API**
+app.get("/api/dropsubgodown", (req, res) => {
+  const query = "SELECT subGodown FROM sub_godown"; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
 app.get("/api/employees", (req, res) => {
   const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number FROM employee ORDER BY order_number";
   db.query(sql, (err, results) => {
