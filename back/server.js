@@ -985,7 +985,7 @@ app.delete("/api/grains/:uuid", (req, res) => {
 //start of driver page
 
 app.get("/api/drivers", (req, res) => {
-  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status order_number FROM drivers ORDER BY order_number";
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number FROM drivers ORDER BY order_number";
   
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
