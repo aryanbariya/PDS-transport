@@ -1259,7 +1259,7 @@ app.post("/api/truck", (req, res) => {
     const nextOrder = result[0].next_order;
     const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null, permit_validity_date || null, direct_sale, nextOrder], (insertErr) => {
       if (insertErr) return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
       res.json({ message: "Truck added successfully", uuid, order_number: nextOrder });
     });
