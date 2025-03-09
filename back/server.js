@@ -414,12 +414,21 @@ app.post("/api/mswcgodown", (req, res) => {
 // Update an existing godown
 app.put("/api/mswcgodown/:uuid", (req, res) => {
   const { godownName, godownUnder, status } = req.body;
-  if (!godownName ) {
-    return res.status(400).json({ error: "All fields are required" });
+
+  if (!godownName) {
+    return res.status(400).json({ error: "Godown name is required" });
   }
 
-  const sql = "UPDATE mswc_godowns SET godownName = ?, godownUnder = ?, status = ? WHERE uuid = ?";
-  db.query(sql, [godownName, godownUnder, status, req.params.uuid], (err, result) => {
+  // If no status is provided, default to "Active"
+  const updatedStatus = status || "Active";
+
+  const sql = `
+    UPDATE mswc_godowns 
+    SET godownName = ?, godownUnder = ?, status = ? 
+    WHERE uuid = ?
+  `;
+
+  db.query(sql, [godownName, godownUnder, updatedStatus, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating godown:", err);
       return res.status(500).json({ error: "Database update error" });
@@ -430,6 +439,25 @@ app.put("/api/mswcgodown/:uuid", (req, res) => {
     res.json({ message: "Godown updated successfully" });
   });
 });
+
+// app.put("/api/mswcgodown/:uuid", (req, res) => {
+//   const { godownName, godownUnder, status } = req.body;
+//   if (!godownName ) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = "UPDATE mswc_godowns SET godownName = ?, godownUnder = ?, status = ? WHERE uuid = ?";
+//   db.query(sql, [godownName, godownUnder, status, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating godown:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Godown not found" });
+//     }
+//     res.json({ message: "Godown updated successfully" });
+//   });
+// });
 
 // Delete a godown and reset order numbers
 // Soft Delete a godown (Change status from Active to Inactive)

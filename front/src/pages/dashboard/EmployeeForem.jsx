@@ -1274,7 +1274,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
     if (!formData.username) newErrors.username = "Username is required";
-    if (!formData.password) newErrors.password = "Password is required";
+    if (!editData && !formData.password) newErrors.password = "Password is required";
     if (!formData.subGodown) newErrors.subGodown = "Sub Godown is required";
 
     if (formData.aadharNo && !formData.aadharNo.match(/^\d{12}$/)) {
