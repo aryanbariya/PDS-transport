@@ -1158,45 +1158,61 @@ app.put("/api/drivers/:uuid", (req, res) => {
 //     res.json({ message: "Driver updated successfully" });
 //   });
 // });
-
+// Soft Delete a driver (Change status from Active to Inactive)
 app.delete("/api/drivers/:uuid", (req, res) => {
   const { uuid } = req.params;
+  const updateSql = "UPDATE drivers SET status = 'Inactive' WHERE uuid = ?";
 
-  // Step 1: Delete the specific record
-  const deleteSql = "DELETE FROM drivers WHERE uuid = ?";
-  db.query(deleteSql, [uuid], (err, result) => {
+  db.query(updateSql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error deleting:", err);
-      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+      console.error("Error updating drivers status:", err);
+      return res.status(500).json({ error: "Failed to update driver status" });
     }
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Driver not found" });
+      return res.status(404).json({ message: "driver not found" });
     }
-
-    console.log(`✅ Deleted driver with UUID: ${uuid}`);
-
-    // Step 2: Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE drivers SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-    db.query(resetSql1, (resetErr1) => {
-      if (resetErr1) {
-        console.error("Error resetting variable:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering variable" });
-      }
-
-      db.query(resetSql2, (resetErr2) => {
-        if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
-        }
-
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Driver deleted and order numbers reset successfully!" });
-      });
-    });
+    res.json({ message: "driver status updated to Inactive successfully!" });
   });
 });
+
+// app.delete("/api/drivers/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   // Step 1: Delete the specific record
+//   const deleteSql = "DELETE FROM drivers WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting:", err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Driver not found" });
+//     }
+
+//     console.log(`✅ Deleted driver with UUID: ${uuid}`);
+
+//     // Step 2: Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE drivers SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting variable:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering variable" });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Driver deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
 
 
 
