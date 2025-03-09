@@ -516,7 +516,7 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
         <h2 className="bg-white-600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
-          {editData ? "Edit Parent Godown" : "Parent Godown"}
+          {editData ? "Edit Sub Godown" : "Sub Godown"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -570,9 +570,9 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
           <div className="flex justify-end gap-2">
             <button
               type="submit"
-              disabled={!isFormValid || loading}
+              disabled={ loading}
               className={`py-2 px-4 rounded-lg ${
-                isFormValid && !loading
+                 !loading
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
