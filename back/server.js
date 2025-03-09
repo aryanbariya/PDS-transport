@@ -984,6 +984,29 @@ app.delete("/api/grains/:uuid", (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start of driver page
 
+app.get("/api/drivers/active", (req, res) => {
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Active' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching active drivers:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// Get only "Inactive" drivers
+app.get("/api/drivers/inactive", (req, res) => {
+    const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Inactive' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching inactive drivers:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
 app.get("/api/drivers", (req, res) => {
   const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number FROM drivers ORDER BY order_number";
   
