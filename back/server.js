@@ -229,17 +229,31 @@ app.post("/api/employees", async (req, res) => {
   }
 });
 
-
-app.put("/api/employees/:uuid", (req, res) => {
-  const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
+app.put("/api/employees/:uuid", async (req, res) => {
+  const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, password } = req.body;
   
   if (!category || !fullName || !username || !subGodown) {
     return res.status(400).json({ error: "Required fields: category, fullName, username, subGodown" });
   }
 
-  const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
+  let sql;
+  let params;
 
-  db.query(sql, [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, req.params.uuid], (err, result) => {
+  if (password) {
+    // Hash new password before updating
+    const bcrypt = require("bcrypt");
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, password = ? WHERE uuid = ?";
+    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, hashedPassword, req.params.uuid];
+  } else {
+    // Don't update password if it's not provided
+    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
+    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, req.params.uuid];
+  }
+
+  db.query(sql, params, (err, result) => {
     if (err) {
       console.error("Error updating employee:", err);
       return res.status(500).json({ error: "Database update error" });
@@ -250,6 +264,29 @@ app.put("/api/employees/:uuid", (req, res) => {
     res.json({ message: "Employee updated successfully" });
   });
 });
+
+
+// app.put("/api/employees/:uuid", (req, res) => {
+//   const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
+  
+//   if (!category || !fullName || !username || !subGodown) {
+//     return res.status(400).json({ error: "Required fields: category, fullName, username, subGodown" });
+//   }
+
+//   const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
+
+//   db.query(sql, [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating employee:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Employee not found" });
+//     }
+//     res.json({ message: "Employee updated successfully" });
+//   });
+// });
+
 
 
 
