@@ -418,20 +418,20 @@ const DriverPage = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, deactive it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${URL}/api/driver/${uuid}`, { method: "DELETE" });
+          const response = await fetch(`${URL}/api/drivers/${uuid}`, { method: "DELETE" });
           if (response.ok) {
-            Swal.fire("Deleted!", "Driver deleted successfully!", "success");
+            Swal.fire("Deactivated!", "Driver deactivated successfully!", "success");
             fetchDrivers();
           } else {
-            Swal.fire("Error", "Failed to delete driver.", "error");
+            Swal.fire("Error", "Failed to deactivate driver.", "error");
           }
         } catch (error) {
-          console.error("Error deleting driver:", error);
-          Swal.fire("Error", "Error deleting data.", "error");
+          console.error("Error deactivating driver:", error);
+          Swal.fire("Error", "Error deactivating data.", "error");
         }
       }
     });
@@ -510,7 +510,7 @@ const DriverPage = () => {
                           onClick={() => handleDelete(driver.uuid)}
                           className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                         >
-                          Delete
+                          Dactivate
                         </button>
                       </div>
                     </td>
