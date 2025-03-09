@@ -1040,13 +1040,46 @@ app.post("/api/drivers", (req, res) => {
 app.put("/api/drivers/:uuid", (req, res) => {
   const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
 
-  const sql = `
-    UPDATE drivers 
-    SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ?, status = ? 
-    WHERE uuid = ?
-  `;
+  // Ensure driver_name is provided
+  if (!driver_name || driver_name.trim() === "") {
+    return res.status(400).json({ error: "Driver name is required" });
+  }
 
-  db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, status, req.params.uuid], (err, result) => {
+  // Prepare dynamic query based on provided fields
+  let updates = [];
+  let values = [];
+
+  if (driver_name) {
+    updates.push("driver_name = ?");
+    values.push(driver_name);
+  }
+  if (aadhar_card_no) {
+    updates.push("aadhar_card_no = ?");
+    values.push(aadhar_card_no);
+  }
+  if (contact) {
+    updates.push("contact = ?");
+    values.push(contact);
+  }
+  if (driving_license_no) {
+    updates.push("driving_license_no = ?");
+    values.push(driving_license_no);
+  }
+  if (status) {
+    updates.push("status = ?");
+    values.push(status);
+  }
+
+  // If no valid fields provided (besides driver_name), return an error
+  if (updates.length < 2) {
+    return res.status(400).json({ error: "At least one additional field must be updated along with driver_name" });
+  }
+
+  // Build the SQL query dynamically
+  const sql = `UPDATE drivers SET ${updates.join(", ")} WHERE uuid = ?`;
+  values.push(req.params.uuid);
+
+  db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error updating:", err);
       return res.status(500).json({ error: "Database error" });
@@ -1054,9 +1087,10 @@ app.put("/api/drivers/:uuid", (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Driver not found" });
     }
-    res.json({ message: "Driver updated successfully", status });
+    res.json({ message: "Driver updated successfully" });
   });
 });
+
 
 
 // app.post("/api/drivers", (req, res) => {
