@@ -1024,7 +1024,7 @@ app.post("/api/drivers", (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, driver_name, aadhar_card_no || null, contact || null, driving_license_no || null, status, nextOrder], (insertErr) => {
       if (insertErr) {
         console.error("Error inserting:", insertErr);
         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
