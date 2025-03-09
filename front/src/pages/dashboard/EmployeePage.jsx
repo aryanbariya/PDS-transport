@@ -342,10 +342,7 @@ const EmployeePage = () => {
             </tbody>
           </table>
         </div>
-
       )}
-
-
     </div>
   );
 };

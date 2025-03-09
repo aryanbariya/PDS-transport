@@ -603,9 +603,11 @@ app.post("/api/subgodown", (req, res) => {
 // Update an existing MSWC Godown
 app.put("/api/subgodown/:uuid", (req, res) => {
   const { parentGodown, subGodown, status } = req.body;
+
+  const updatedstatus = status || "Active";
   const sql = "UPDATE sub_godown SET parentGodown = ?, subGodown = ?, status = ? WHERE uuid = ?";
   
-  db.query(sql, [parentGodown, subGodown, status, req.params.uuid], (err, result) => {
+  db.query(sql, [parentGodown, subGodown, updatedstatus, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating:", err);
       return res.status(500).json({ error: "Database error" });
