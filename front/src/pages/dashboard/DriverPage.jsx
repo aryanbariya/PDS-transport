@@ -267,6 +267,7 @@ const DriverPage = () => {
                 <th className="border p-2">Aadhar Card No.</th>
                 <th className="border p-2">Contact</th>
                 <th className="border p-2">Driving License No.</th>
+                <th className="border p-2">Status</th>
                 <th className="border p-2">Actions</th>
               </tr>
             </thead>
@@ -279,6 +280,7 @@ const DriverPage = () => {
                     <td className="border p-2">{driver.aadhar_card_no}</td>
                     <td className="border p-2">{driver.contact}</td>
                     <td className="border p-2">{driver.driving_license_no}</td>
+                    <td className="border p-2">{driver.status}</td>
                     <td className="border p-2">
                       <div className="flex justify-start space-x-2">
                         <button

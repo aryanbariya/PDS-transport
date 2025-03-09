@@ -468,6 +468,10 @@ const DriverForm = ({ onClose, onSave, editData }) => {
     if (name === "driver_name") {
       newValue = value.charAt(0).toUpperCase() + value.slice(1);
     }
+    if (name === "contact") {
+      // Allow only digits and limit to 10 characters
+      newValue = value.replace(/\D/g, "").slice(0, 10);
+    }
 
     setFormData({ ...formData, [name]: newValue });
     setErrors({ ...errors, [name]: "" }); // Clear errors on change
