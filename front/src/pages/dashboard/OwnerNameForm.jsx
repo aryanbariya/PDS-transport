@@ -220,59 +220,130 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     setFormData({ ...formData, [name]: "" });
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   if (!formData.ownerName.trim()) {
+  //     setOwnerNameError("Owner Name is required."); // Show error message
+  //     return;
+  //   }
+
+  //   setLoading(true); // Start loading
+
+  //   const method = editData ? "PUT" : "POST";
+  //   const url = editData
+  //     ? `${URL}/api/owners/${editData.uuid}`
+  //     : `${URL}/api/owners`;
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method,
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (response.ok) {
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: editData ? "Owner updated successfully!" : "Owner added successfully!",
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //       }).then(() => {
+  //         onSave();
+  //         onClose();
+  //       });
+  //     } else {
+  //       console.error("Server error:", data);
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Error",
+  //         text: data.error || "Error submitting form",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Error",
+  //       text: "Error submitting form",
+  //     });
+  //   } finally {
+  //     setLoading(false); // Stop loading after request is completed
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation: Only `ownerName` is required in both Add and Edit
     if (!formData.ownerName.trim()) {
-      setOwnerNameError("Owner Name is required."); // Show error message
-      return;
+        Swal.fire({
+            icon: "error",
+            title: "Validation Error",
+            text: "Owner Name is required.",
+        });
+        return;
     }
 
     setLoading(true); // Start loading
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `${URL}/api/owners/${editData.uuid}`
-      : `${URL}/api/owners`;
+        ? `${URL}/api/owners/${editData.uuid}`
+        : `${URL}/api/owners`;
+
+    // Send only modified fields during update
+    const updatedData = editData
+        ? Object.fromEntries(
+              Object.entries(formData).filter(([key, value]) => value !== editData[key])
+          )
+        : formData;
+
+    // Ensure at least `ownerName` is sent in update
+    if (editData && !updatedData.ownerName) {
+        updatedData.ownerName = formData.ownerName;
+    }
 
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: editData ? "Owner updated successfully!" : "Owner added successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          onSave();
-          onClose();
+        const response = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedData),
         });
-      } else {
-        console.error("Server error:", data);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: data.error || "Error submitting form",
-        });
-      }
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: "success",
+                title: editData ? "Owner updated successfully!" : "Owner added successfully!",
+                showConfirmButton: false,
+                timer: 1500,
+            }).then(() => {
+                onSave();
+                onClose();
+            });
+        } else {
+            console.error("Server error:", data);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.error || "Error submitting form",
+            });
+        }
     } catch (error) {
-      console.error("Error submitting data:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Error submitting form",
-      });
+        console.error("Error submitting data:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Error submitting form",
+        });
     } finally {
-      setLoading(false); // Stop loading after request is completed
+        setLoading(false); // Stop loading after request is completed
     }
-  };
+};
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

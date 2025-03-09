@@ -676,15 +676,55 @@ app.post("/api/owners", (req, res) => {
 
 
 
+// app.put("/api/owners/:uuid", (req, res) => {
+//   const { ownerName, contact, address, emailID } = req.body;
+//   if (!ownerName || !contact || !address || !emailID) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
+
+//   db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating owner:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+//     res.json({ message: "Owner updated successfully" });
+//   });
+// });
 app.put("/api/owners/:uuid", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
-  if (!ownerName || !contact || !address || !emailID) {
-    return res.status(400).json({ error: "All fields are required" });
+
+  // `ownerName` is required, but other fields can be empty or missing
+  if (!ownerName) {
+    return res.status(400).json({ error: "Owner name is required" });
   }
 
-  const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
+  // Prepare fields for update (only update provided values)
+  let updateFields = ["ownerName = ?"];
+  let values = [ownerName];
 
-  db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
+  if (contact !== undefined) {
+    updateFields.push("contact = ?");
+    values.push(contact);
+  }
+  if (address !== undefined) {
+    updateFields.push("address = ?");
+    values.push(address);
+  }
+  if (emailID !== undefined) {
+    updateFields.push("emailID = ?");
+    values.push(emailID);
+  }
+
+  // Construct SQL query dynamically
+  const sql = `UPDATE owners SET ${updateFields.join(", ")} WHERE uuid = ?`;
+  values.push(req.params.uuid);
+
+  db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error updating owner:", err);
       return res.status(500).json({ error: "Database update error" });
