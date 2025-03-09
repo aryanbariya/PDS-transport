@@ -158,7 +158,7 @@
 
 
 
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -166,7 +166,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     order_number: '',
     truck_name: "",
-    truck_status: "Active",
+  
     empty_weight: "",
     company: "",
     gvw: "",
@@ -186,7 +186,6 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     if (editData) {
       setFormData({
         truck_name: editData.truck_name || "",
-        truck_status: editData.truck_status || "Active",
         empty_weight: editData.empty_weight || "",
         company: editData.company || "",
         gvw: editData.gvw || "",
@@ -209,28 +208,57 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  
+
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
       if (value.trim() === "") {
         newErrors[name] = `${name.replace("_", " ").toUpperCase()} is required`;
       } else {
-        delete newErrors[name]; // Remove error when valid input is entered
+        delete newErrors[name];
       }
       return newErrors;
     });
   };
-  
+
+
+
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   const requiredFields = [
+  //     "truck_name",
+  //     "empty_weight",
+  //     "company",
+  //     "gvw",
+  //     "reg_date",
+  //     "truck_owner_name",
+  //     "owner_id",
+  //     "direct_sale" // Ensure this field is validated
+  //   ];
+
+  //   requiredFields.forEach((field) => {
+  //     if (!formData[field] || formData[field].trim() === "") {
+  //       newErrors[field] = `${field.replace("_", " ").toUpperCase()} is required`;
+  //     }
+  //   });
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0; // Return true if no errors
+  // };
   const validateForm = () => {
     const newErrors = {};
+    
     ["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id"].forEach((field) => {
-      if (!formData[field].trim()) {
+      if (!String(formData[field] || "").trim()) { // ✅ Convert to string safely
         newErrors[field] = `${field.replace("_", " ").toUpperCase()} is required`;
       }
     });
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -240,14 +268,16 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     const url = editData
       ? `${URL}/api/truck/${editData.uuid}`
       : `${URL}/api/truck`;
-
+      console.log("Submitting Data:", formData);
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
+        
       });
-
+      const responseData = await response.json(); // Read JSON response
+      console.log("Response:", responseData); // Debug response
       if (response.ok) {
         Swal.fire({
           icon: "success",
@@ -307,6 +337,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                 onChange={handleChange}
                 className="p-2 border rounded-lg w-full"
               >
+                <option value="">Select an option</option>
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>

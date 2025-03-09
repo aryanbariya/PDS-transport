@@ -1275,7 +1275,7 @@ app.put("/api/truck/:uuid", (req, res) => {
 
   const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
   
-  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale, req.params.uuid], (err, result) => {
+  db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null, permit_validity_date || null, direct_sale, req.params.uuid], (err, result) => {
     if (err) return res.status(500).json({ error: "Database error" });
     if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
     res.json({ message: "Truck updated successfully" });
