@@ -1005,10 +1005,10 @@ app.get("/api/drivers/:uuid", (req, res) => {
 });
 
 
-
+// Add Driver (POST)
 app.post("/api/drivers", (req, res) => {
-  const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
-  const uuid = uuidv4(); // Generate UUID
+  const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
+  const uuid = uuidv4();
 
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
 
@@ -1019,25 +1019,34 @@ app.post("/api/drivers", (req, res) => {
     }
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+    const insertSql = `
+      INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, nextOrder], (insertErr) => {
       if (insertErr) {
         console.error("Error inserting:", insertErr);
         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
       }
-      
-      console.log(`✅ New driver added with order_number: ${nextOrder}`);
-      res.json({ message: "Driver added successfully", uuid, order_number: nextOrder });
+
+      console.log(`✅ New driver added with order_number: ${nextOrder}, Status: ${status}`);
+      res.json({ message: "Driver added successfully", uuid, order_number: nextOrder, status });
     });
   });
 });
 
+// Update Driver (PUT)
 app.put("/api/drivers/:uuid", (req, res) => {
-  const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
-  const sql = "UPDATE drivers SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ? WHERE uuid = ?";
-  
-  db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, req.params.uuid], (err, result) => {
+  const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
+
+  const sql = `
+    UPDATE drivers 
+    SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ?, status = ? 
+    WHERE uuid = ?
+  `;
+
+  db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, status, req.params.uuid], (err, result) => {
     if (err) {
       console.error("Error updating:", err);
       return res.status(500).json({ error: "Database error" });
@@ -1045,9 +1054,53 @@ app.put("/api/drivers/:uuid", (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Driver not found" });
     }
-    res.json({ message: "Driver updated successfully" });
+    res.json({ message: "Driver updated successfully", status });
   });
 });
+
+
+// app.post("/api/drivers", (req, res) => {
+//   const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
+//   const uuid = uuidv4(); // Generate UUID
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number) VALUES (?, ?, ?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, nextOrder], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting:", insertErr);
+//         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//       }
+      
+//       console.log(`✅ New driver added with order_number: ${nextOrder}`);
+//       res.json({ message: "Driver added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+// app.put("/api/drivers/:uuid", (req, res) => {
+//   const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
+//   const sql = "UPDATE drivers SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ? WHERE uuid = ?";
+  
+//   db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Driver not found" });
+//     }
+//     res.json({ message: "Driver updated successfully" });
+//   });
+// });
 
 app.delete("/api/drivers/:uuid", (req, res) => {
   const { uuid } = req.params;
