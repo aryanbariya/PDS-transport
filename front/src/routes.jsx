@@ -65,7 +65,7 @@ export const routes = [
           {
             icon: UserCircleIcon,
             name: "Owner Name",
-            path: "/owners",
+            path: "/owner",
             element: <OwnerNamePage />,
           },
           {
