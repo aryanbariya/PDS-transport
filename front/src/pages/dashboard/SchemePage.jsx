@@ -121,12 +121,12 @@ const SchemePage = () => {
             <tbody>
               {schemes.length > 0 ? (
                 schemes.map((scheme) => (
-                  <tr key={scheme.uuid} className="text-center hover:bg-gray-100">
+                  <tr key={scheme.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{scheme.order_number}</td>
                     <td className="border p-2">{scheme.scheme_name}</td>
                     <td className="border p-2">{scheme.scheme_status}</td>
                     <td className="border p-2">
-                      <div className="flex justify-center space-x-2">
+                      <div className="flex justify-start space-x-2">
                         <button
                           onClick={() => handleEdit(scheme)}
                           className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
