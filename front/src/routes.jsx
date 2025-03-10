@@ -64,14 +64,14 @@ export const routes = [
         subPages: [
           {
             icon: UserCircleIcon,
-            name: "Owner Name",
-            path: "/owner",
+            name: "Owners ",
+            path: "/owners",
             element: <OwnerNamePage />,
           },
           {
             icon: UsersIcon,
             name: "Employees",
-            path: "/employee",
+            path: "/employees",
             element: <EmployeePage />,
           },
           {
@@ -89,19 +89,19 @@ export const routes = [
           {
             icon: GiSteeringWheel,
             name: "Drivers",
-            path: "/driver",
+            path: "/drivers",
             element: <DriverPage />,
           },
           {
             icon: TruckIcon,
             name: "Trucks",
-            path: "/truck",
+            path: "/trucks",
             element: <TruckPage />,
           },
           {
             icon: ClipboardDocumentListIcon,
             name: "Schemes",
-            path: "/scheme",
+            path: "/schemes",
             element: <SchemePage />,
           },
           {
