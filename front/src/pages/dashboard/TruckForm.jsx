@@ -225,6 +225,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   //   const { name, value } = e.target;
   //   setFormData({ ...formData, [name]: value });
   // };
+
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -382,7 +384,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                   {field.replace("_", " ").toUpperCase()}
                 </label>
 
-                {field.includes("date") ? (
+                {field.includes("date" ) ? (
                   editData ? (
                     <input
                       type="date"
