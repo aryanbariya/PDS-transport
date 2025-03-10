@@ -64,7 +64,7 @@ const TruckPage = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, deactivate it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -154,7 +154,7 @@ const TruckPage = () => {
                         onClick={() => handleDelete(truck.uuid)}
                         className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
                       >
-                        Delete
+                        Deactivate
                       </button>
                     </div>
                   </td>
