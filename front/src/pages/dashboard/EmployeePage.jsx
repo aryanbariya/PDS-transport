@@ -308,19 +308,19 @@ const EmployeePage = () => {
                     </td>
                     <td className="border p-2">
                       <div className="font-semibold"><span className="font-normal">Name:</span>{emp.fullName}</div>
-                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Address:</span>{emp.address}</div>
-                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Contact:</span>{emp.contact}</div>
-                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Pan No:</span>{emp.panNo}</div>
+                      <div className="text-sm md:text-sm font-semibold"><span className="font-normal">Address:</span>{emp.address}</div>
+                      <div className="text-sm md:text-sm font-semibold"><span className="font-normal">Contact:</span>{emp.contact}</div>
+                      <div className="text-sm md:text-sm font-semibold"><span className="font-normal">Pan No:</span>{emp.panNo}</div>
                     </td>
                     <td className="border p-2">
-                      <div className="font-semibold">{emp.username}</div>
-                      <div className="text-xs md:text-sm">{emp.password}</div>
+                      <div className="font-semibold"><span className="font-normal">Username:</span>{emp.username}</div>
+                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Password:</span>{emp.password}</div>
                     </td>
                     <td className="border p-2">
-                      <div>{emp.bankName || "N/A"}</div>
-                      <div>{emp.accountNumber || "N/A"}</div>
-                      <div>{emp.ifscCode || "N/A"}</div>
-                      <div>{emp.branchName || "N/A"}</div>
+                      <div className="font-semibold "><span className="font-normal">Username:</span>{emp.bankName || "N/A"}</div>
+                      <div className="font-semibold "><span className="font-normal">A/C No:</span>{emp.accountNumber || "N/A"}</div>
+                      <div className="font-semibold "><span className="font-normal">IFSC:</span>{emp.ifscCode || "N/A"}</div>
+                      <div className="font-semibold "><span className="font-normal">Branch:</span>{emp.branchName || "N/A"}</div>
                     </td>
                     <td className="border p-2 flex justify-start gap-2 text-xs md:text-base">
                       <button

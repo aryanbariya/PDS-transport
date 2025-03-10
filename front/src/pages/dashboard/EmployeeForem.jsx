@@ -1176,7 +1176,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     subGodown: "",
     contact:"",
   });
-console.log(editData);
+
 
   const [godownList, setGodownList] = useState([]);
   const [errors, setErrors] = useState({});
@@ -1243,18 +1243,25 @@ console.log(editData);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedValue = ["fullName", "bankName"].includes(name)
-      ? value.charAt(0).toUpperCase() + value.slice(1)
-      : value;
-
+  
+    let updatedValue = value;
+    
+    if (name === "contact") {
+      updatedValue = value.replace(/\D/g, ""); // Remove non-numeric characters
+      if (updatedValue.length > 10) return; // Restrict to 10 digits
+    }
+  
+    updatedValue = ["fullName", "bankName"].includes(name)
+      ? updatedValue.charAt(0).toUpperCase() + updatedValue.slice(1)
+      : updatedValue;
+  
     setFormData({ ...formData, [name]: updatedValue });
-
-    // Remove error message when user starts typing
+  
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
   };
-
+  
   // const handleSelectGodown = (subGodown) => {
   //   setFormData({ ...formData, subGodown });
   //   setSearch(subGodown);
@@ -1273,13 +1280,13 @@ console.log(editData);
 
   const validateForm = () => {
     let newErrors = {};
-
+  
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.fullName) newErrors.fullName = "Full Name is required";
     if (!formData.username) newErrors.username = "Username is required";
     if (!editData && !formData.password) newErrors.password = "Password is required";
     if (!formData.subGodown) newErrors.subGodown = "Sub Godown is required";
-
+  
     if (formData.aadharNo && !formData.aadharNo.match(/^\d{12}$/)) {
       newErrors.aadharNo = "Aadhar No must be 12 digits";
     }
@@ -1292,10 +1299,15 @@ console.log(editData);
     if (formData.ifscCode && !formData.ifscCode.match(/^[A-Z]{4}0[A-Z0-9]{6}$/)) {
       newErrors.ifscCode = "Invalid IFSC Code format";
     }
-
+    if (!formData.contact.match(/^\d{10}$/)) {
+      newErrors.contact = "Contact must be exactly 10 digits";
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
