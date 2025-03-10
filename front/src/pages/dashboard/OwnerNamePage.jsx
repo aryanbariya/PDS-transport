@@ -629,7 +629,6 @@ const OwnerNamePage = () => {
               >
                 Edit
               </button>
-
               <button
                 onClick={() => setSelectedOwner(null)}
                 className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-700 "

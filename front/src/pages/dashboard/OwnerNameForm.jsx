@@ -383,15 +383,6 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
             </button>
-            {editData && (
-              <button
-                type="button"
-                className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-                onClick={() => handleDelete(editData.uuid)}
-              >
-                Delete
-              </button>
-            )}
             <button
               type="button"
               className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700"
