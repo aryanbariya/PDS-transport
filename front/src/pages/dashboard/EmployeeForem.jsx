@@ -1174,7 +1174,9 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     ifscCode: "",
     branchName: "",
     subGodown: "",
+    contact:"",
   });
+console.log(editData);
 
   const [godownList, setGodownList] = useState([]);
   const [errors, setErrors] = useState({});
@@ -1232,6 +1234,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
         ifscCode: editData.ifscCode || "",
         branchName: editData.branchName || "",
         subGodown: editData.subGodown || "",
+        contact: editData.contact || "",
       });
 
       setSearch(editData.subGodown || ""); // Set search to match subGodown
@@ -1346,7 +1349,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
               {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
             </div>
 
-            {["fullName", "username", "password", "address", "aadharNo", "panNo", "bankName", "accountNumber", "ifscCode", "branchName"].map((field) => (
+            {["fullName", "username", "password", "address", "aadharNo", "panNo", "bankName", "accountNumber", "ifscCode", "branchName", "contact"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}</label>
                 <input type={field === "password" ? "password" : "text"} name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" placeholder={field === "password" ? (editData ? "Enter new password to update" : "") : `Enter ${field.replace(/([A-Z])/g, " $1").trim()}`}  />

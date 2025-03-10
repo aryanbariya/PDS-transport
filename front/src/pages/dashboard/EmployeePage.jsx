@@ -6,6 +6,8 @@
 // import truckLoader from "@/util/Animation.json";
 // import EmployeeForm from "./EmployeeForem";
 // import Navigation from "@/util/libs/navigation";
+// import Swal from "sweetalert2"; // Import SweetAlert2
+
 // const URL = import.meta.env.VITE_API_BACK_URL;
 
 // const EmployeePage = () => {
@@ -26,10 +28,6 @@
 //     }
 //   }, [employees]);
 
-
-
-
-
 //   const fetchEmployees = async () => {
 //     try {
 //       const response = await fetch(`${URL}/api/employees`);
@@ -43,23 +41,33 @@
 //     }
 //   };
 
-
-
 //   const handleDelete = async (uuid) => {
-//     if (!window.confirm("Are you sure you want to delete this employee?")) return;
-//     try {
-//       const response = await fetch(`${URL}/api/employees/${uuid}`, {
-//         method: "DELETE",
-//       });
-//       if (response.ok) {
-//         alert("Employee deleted successfully!");
-//         fetchEmployees();
-//       } else {
-//         alert("Failed to delete Employee.");
+//     Swal.fire({
+//       title: "Are you sure?",
+//       text: "You won't be able to revert this!",
+//       icon: "warning",
+//       showCancelButton: true,
+//       confirmButtonColor: "#3085d6",
+//       cancelButtonColor: "#d33",
+//       confirmButtonText: "Yes, delete it!",
+//     }).then(async (result) => {
+//       if (result.isConfirmed) {
+//         try {
+//           const response = await fetch(`${URL}/api/employees/${uuid}`, {
+//             method: "DELETE",
+//           });
+//           if (response.ok) {
+//             Swal.fire("Deleted!", "Employee deleted successfully!", "success");
+//             fetchEmployees();
+//           } else {
+//             Swal.fire("Error", "Failed to delete Employee.", "error");
+//           }
+//         } catch (err) {
+//           console.error("Error deleting employee:", err);
+//           Swal.fire("Error", "Error deleting data.", "error");
+//         }
 //       }
-//     } catch (err) {
-//       alert("Error deleting data.");
-//     }
+//     });
 //   };
 
 //   const handleEdit = (emp) => {
@@ -72,8 +80,6 @@
 //     setEditData(null);
 //     fetchEmployees();
 //   };
-
-
 
 //   return (
 //     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -160,18 +166,12 @@
 //             </tbody>
 //           </table>
 //         </div>
-
 //       )}
-
-
 //     </div>
 //   );
 // };
 
 // export default EmployeePage;
-
-
-
 
 
 import React, { useState, useEffect, useRef } from "react";
@@ -302,10 +302,15 @@ const EmployeePage = () => {
                 employees.map((emp) => (
                   <tr key={emp.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{emp.order_number}</td>
-                    <td className="border p-2 font-semibold">{emp.category}</td>
+                    <td className="border p-2 ">
+                      <div className="font-normal">{emp.category}</div>
+                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Godown:</span>{emp.subGodown}</div>
+                    </td>
                     <td className="border p-2">
-                      <div className="font-semibold">{emp.fullName}</div>
-                      <div className="text-xs md:text-sm">{emp.address}</div>
+                      <div className="font-semibold"><span className="font-normal">Name:</span>{emp.fullName}</div>
+                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Address:</span>{emp.address}</div>
+                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Contact:</span>{emp.contact}</div>
+                      <div className="text-xs md:text-sm font-semibold"><span className="font-normal">Pan No:</span>{emp.panNo}</div>
                     </td>
                     <td className="border p-2">
                       <div className="font-semibold">{emp.username}</div>

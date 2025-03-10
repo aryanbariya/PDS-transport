@@ -171,7 +171,7 @@ app.get("/api/dropsubgodown", (req, res) => {
   });
 });
 app.get("/api/employees", (req, res) => {
-  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number FROM employee ORDER BY order_number";
+  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, contact, order_number FROM employee ORDER BY order_number";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching employees:", err);
@@ -183,7 +183,7 @@ app.get("/api/employees", (req, res) => {
 
 // **Get Employee by UUID API**
 app.get("/api/employees/:uuid", (req, res) => {
-  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, order_number FROM employee WHERE uuid = ?";
+  const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, contact, order_number FROM employee WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
     if (err) {
       console.error("Error fetching employee:", err);
@@ -196,7 +196,7 @@ app.get("/api/employees/:uuid", (req, res) => {
   });
 });
 app.post("/api/employees", async (req, res) => {
-  const { category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
+  const { category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, contact } = req.body;
   
   if (!category || !fullName || !username || !password || !subGodown) {
     return res.status(400).json({ error: "Required fields: category, fullName, username, password, subGodown" });
@@ -214,9 +214,9 @@ app.post("/api/employees", async (req, res) => {
       }
       
       const nextOrder = result[0]?.next_order || 1;
-      const insertSql = "INSERT INTO employee (uuid, category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      const insertSql = "INSERT INTO employee (uuid, category, fullName, username, password, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, contact order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-      db.query(insertSql, [uuid, category, fullName, username, hashedPassword, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, nextOrder], (insertErr) => {
+      db.query(insertSql, [uuid, category, fullName, username, hashedPassword, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null,contact || null, nextOrder], (insertErr) => {
         if (insertErr) {
           console.error("Error inserting employee:", insertErr);
           return res.status(500).json({ error: "Database insertion failed" });
@@ -230,7 +230,7 @@ app.post("/api/employees", async (req, res) => {
 });
 
 app.put("/api/employees/:uuid", async (req, res) => {
-  const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, password } = req.body;
+  const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, password, contact } = req.body;
   
   if (!category || !fullName || !username || !subGodown) {
     return res.status(400).json({ error: "Required fields: category, fullName, username, subGodown" });
@@ -245,12 +245,12 @@ app.put("/api/employees/:uuid", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, password = ? WHERE uuid = ?";
-    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, hashedPassword, req.params.uuid];
+    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, password = ?, contact = ? WHERE uuid = ?";
+    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, hashedPassword, contact|| null, req.params.uuid];
   } else {
     // Don't update password if it's not provided
-    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
-    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, req.params.uuid];
+    sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ?, contact = ? WHERE uuid = ?";
+    params = [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null,contact || null, req.params.uuid];
   }
 
   db.query(sql, params, (err, result) => {
