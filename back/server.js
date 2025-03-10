@@ -1364,42 +1364,44 @@ app.put("/api/truck/:uuid", (req, res) => {
   });
 });
 
-// app.put("/api/truck/:uuid", (req, res) => {
-//   const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
-//   if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
-//     return res.status(400).json({ error: "All required fields must be filled" });
-//   }
-
-//   const sql = "UPDATE truck SET truck_name = ?, truck_status = ?, empty_weight = ?, company = ?, gvw = ?, reg_date = ?, truck_owner_name = ?, owner_id = ?, tax_validity = ?, insurance_validity = ?, fitness_validity = ?, permit_validity = ?, direct_sale = ? WHERE uuid = ?";
-  
-//   db.query(sql, [truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null, permit_validity_date || null, direct_sale, req.params.uuid], (err, result) => {
-//     if (err) return res.status(500).json({ error: "Database error" });
-//     if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
-//     res.json({ message: "Truck updated successfully" });
-//   });
-// });
 
 // Delete a truck and reset order numbers
+
 app.delete("/api/truck/:uuid", (req, res) => {
-  const deleteSql = "DELETE FROM truck WHERE uuid = ?";
-  db.query(deleteSql, [req.params.uuid], (err, result) => {
-    if (err) return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-    if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
+  const { uuid } = req.params;
+  const updateSql = "UPDATE truck SET status = 'Inactive' WHERE uuid = ?";
 
-    // Reset order numbers
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE truck SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-    db.query(resetSql1, (resetErr1) => {
-      if (resetErr1) return res.status(500).json({ error: "Failed to reset order numbering" });
-      
-      db.query(resetSql2, (resetErr2) => {
-        if (resetErr2) return res.status(500).json({ error: "Failed to reset order numbers" });
-        res.json({ message: "Truck deleted and order numbers reset successfully!" });
-      });
-    });
+  db.query(updateSql, [uuid], (err, result) => {
+    if (err) {
+      console.error("Error updating truck status:", err);
+      return res.status(500).json({ error: "Failed to update truck status" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "truck not found" });
+    }
+    res.json({ message: "truck status updated to Inactive successfully!" });
   });
 });
+// app.delete("/api/truck/:uuid", (req, res) => {
+//   const deleteSql = "DELETE FROM truck WHERE uuid = ?";
+//   db.query(deleteSql, [req.params.uuid], (err, result) => {
+//     if (err) return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     if (result.affectedRows === 0) return res.status(404).json({ message: "Truck not found" });
+
+//     // Reset order numbers
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE truck SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) return res.status(500).json({ error: "Failed to reset order numbering" });
+      
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) return res.status(500).json({ error: "Failed to reset order numbers" });
+//         res.json({ message: "Truck deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
 
 
 ///end of truck
