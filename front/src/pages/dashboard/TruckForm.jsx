@@ -183,7 +183,6 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const [errors, setErrors] = useState({});
 
-
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -194,14 +193,43 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         reg_date: editData.reg_date ? new Date(editData.reg_date).toISOString().split('T')[0] : "",
         truck_owner_name: editData.truck_owner_name || "",
         owner_id: editData.owner_id || "",
-        tax_validity_date: editData.tax_validity_date ? new Date(editData.tax_validity_date).toISOString().split('T')[0] : "",
-        insurance_validity_date: editData.insurance_validity_date ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] : "",
-        fitness_validity_date: editData.fitness_validity_date ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] : "",
-        permit_validity_date: editData.permit_validity_date ? new Date(editData.permit_validity_date).toISOString().split('T')[0] : "",
+        tax_validity_date: editData.tax_validity_date && !isNaN(new Date(editData.tax_validity_date)) 
+          ? new Date(editData.tax_validity_date).toISOString().split('T')[0] 
+          : "",
+        insurance_validity_date: editData.insurance_validity_date && !isNaN(new Date(editData.insurance_validity_date)) 
+          ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] 
+          : "",
+        fitness_validity_date: editData.fitness_validity_date && !isNaN(new Date(editData.fitness_validity_date)) 
+          ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] 
+          : "",
+        permit_validity_date: editData.permit_validity_date && !isNaN(new Date(editData.permit_validity_date)) 
+          ? new Date(editData.permit_validity_date).toISOString().split('T')[0] 
+          : "",
         direct_sale: editData.direct_sale || "",
       });
+      console.log("Edit Dataaaaaaaaaaaaaaaaa:", editData); 
     }
   }, [editData]);
+  
+  // useEffect(() => {
+  //   if (editData) {
+  //     setFormData({
+  //       truck_name: editData.truck_name || "",
+  //       empty_weight: editData.empty_weight || "",
+  //       company: editData.company || "",
+  //       gvw: editData.gvw || "",
+  //       reg_date: editData.reg_date ? new Date(editData.reg_date).toISOString().split('T')[0] : "",
+  //       truck_owner_name: editData.truck_owner_name || "",
+  //       owner_id: editData.owner_id || "",
+  //       tax_validity_date: editData.tax_validity_date ? new Date(editData.tax_validity_date).toISOString().split('T')[0] : "",
+  //       insurance_validity_date: editData.insurance_validity_date ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] : "",
+  //       fitness_validity_date: editData.fitness_validity_date ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] : "",
+  //       permit_validity_date: editData.permit_validity_date ? new Date(editData.permit_validity_date).toISOString().split('T')[0] : "",
+  //       direct_sale: editData.direct_sale || "",
+  //     });
+  //   }
+  // }, [editData]);
+  /////////////////////////////////////////////////////////////
   // useEffect(() => {
   //   if (editData) {
   //     setFormData({
@@ -334,7 +362,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
           {editData ? "Edit Truck" : "Truck"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id", "tax_validity_date", "insurance_validity_date", "fitness_validity_date", "permit_validity_date"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">
@@ -364,8 +392,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                 <option value="No">No</option>
               </select>
             </div>
-          </div> */}
-          <div className="grid grid-cols-2 gap-4">
+          </div>
+          {/* <div className="grid grid-cols-2 gap-4">
             {[
               "truck_name",
               "empty_weight",
@@ -384,12 +412,12 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                   {field.replace("_", " ").toUpperCase()}
                 </label>
 
-                {field.includes("date" ) ? (
+                {field.includes("date") ? (
                   editData ? (
                     <input
                       type="date"
                       name={field}
-                      value={formData[field]}
+                      value={formData[field] || ""}
                       onChange={handleChange}
                       className={`p-2 border rounded-lg w-full ${errors[field] ? "border-red-500" : ""}`}
                     />
@@ -426,7 +454,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                 <option value="No">No</option>
               </select>
             </div>
-          </div>
+          </div> */}
           <div className="flex justify-end gap-2">
             <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
               {editData ? "Update" : "Submit"}
