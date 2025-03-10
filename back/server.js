@@ -1369,7 +1369,7 @@ app.put("/api/truck/:uuid", (req, res) => {
 
 app.delete("/api/truck/:uuid", (req, res) => {
   const { uuid } = req.params;
-  const updateSql = "UPDATE truck SET status = 'Inactive' WHERE uuid = ?";
+  const updateSql = "UPDATE truck SET truck_status = 'Inactive' WHERE uuid = ?";
 
   db.query(updateSql, [uuid], (err, result) => {
     if (err) {
