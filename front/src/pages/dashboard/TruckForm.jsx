@@ -207,7 +207,8 @@ const TruckForm = ({ onClose, onSave, editData }) => {
             {["truck_name", "empty_weight", "company", "gvw", "reg_date", "tax_validity_date", "insurance_validity_date", "fitness_validity_date", "permit_validity_date"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">
-                  {field.replace("_", " ").toUpperCase()}
+                {field === "truck_name" ? "Truck Number" : field.replace("_", " ").toUpperCase()}
+                  {/* {field.replace("_", " ").toUpperCase()} */}
                 </label>
                 <input
                   type={field.includes("date") ? "date" : "text"}

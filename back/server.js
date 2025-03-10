@@ -1236,6 +1236,32 @@ app.get("/api/own", (req, res) => {
   });
 });
 
+
+app.get("/api/truck/active", (req, res) => {
+  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number FROM drivers WHERE truck_status = 'Active' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching active drivers:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+// Get only "Inactive" drivers
+app.get("/api/truck/inactive", (req, res) => {
+    const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number FROM drivers WHERE truck_status = 'Inactive' ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching inactive drivers:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
+
+
 app.get("/api/truck", (req, res) => {
   const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number";
   db.query(sql, (err, results) => {
