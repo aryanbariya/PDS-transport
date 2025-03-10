@@ -353,7 +353,7 @@ const TruckPage = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="border p-2">ID</th>
-                <th className="border p-2">Name</th>
+                <th className="border p-2">Truck No.</th>
                 <th className="border p-2">Status</th>
                 <th className="border p-2">Empty Weight</th>
                 <th className="border p-2">Company</th>
