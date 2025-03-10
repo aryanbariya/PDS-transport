@@ -1225,6 +1225,17 @@ app.delete("/api/drivers/:uuid", (req, res) => {
 
 
 // Get all trucks ordered by order_number
+app.get("/api/own", (req, res) => {
+  const sql = "SELECT uuid, ownerName, order_number FROM owners ORDER BY order_number";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching owners:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
+
 app.get("/api/truck", (req, res) => {
   const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number";
   db.query(sql, (err, results) => {
