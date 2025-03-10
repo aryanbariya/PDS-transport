@@ -1635,8 +1635,6 @@ app.get("/api/scheme/:uuid", (req, res) => {
 });
 
 
-
-
 app.post("/api/scheme", (req, res) => {
   const uuid = uuidv4(); // Generate a unique UUID
   const { scheme_name, scheme_status } = req.body;
