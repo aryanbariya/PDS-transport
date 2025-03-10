@@ -193,21 +193,25 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         reg_date: editData.reg_date ? new Date(editData.reg_date).toISOString().split('T')[0] : "",
         truck_owner_name: editData.truck_owner_name || "",
         owner_id: editData.owner_id || "",
-        tax_validity_date: editData.tax_validity_date && !isNaN(new Date(editData.tax_validity_date)) 
-          ? new Date(editData.tax_validity_date).toISOString().split('T')[0] 
-          : "",
-        insurance_validity_date: editData.insurance_validity_date && !isNaN(new Date(editData.insurance_validity_date)) 
-          ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] 
-          : "",
-        fitness_validity_date: editData.fitness_validity_date && !isNaN(new Date(editData.fitness_validity_date)) 
-          ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] 
-          : "",
-        permit_validity_date: editData.permit_validity_date && !isNaN(new Date(editData.permit_validity_date)) 
-          ? new Date(editData.permit_validity_date).toISOString().split('T')[0] 
-          : "",
+        tax_validity_date: editData.tax_validity ? new Date(editData.tax_validity).toISOString().split('T')[0] : "",
+        insurance_validity_date: editData.insurance_validity ? new Date(editData.insurance_validity).toISOString().split('T')[0] : "",
+        fitness_validity_date: editData.fitness_validity ? new Date(editData.fitness_validity).toISOString().split('T')[0] : "",
+        permit_validity_date: editData.permit_validity ? new Date(editData.permit_validity).toISOString().split('T')[0] : "",
+        // tax_validity_date: editData.tax_validity_date && !isNaN(new Date(editData.tax_validity_date)) 
+        //   ? new Date(editData.tax_validity_date).toISOString().split('T')[0] 
+        //   : "",
+        // insurance_validity_date: editData.insurance_validity_date && !isNaN(new Date(editData.insurance_validity_date)) 
+        //   ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] 
+        //   : "",
+        // fitness_validity_date: editData.fitness_validity_date && !isNaN(new Date(editData.fitness_validity_date)) 
+        //   ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] 
+        //   : "",
+        // permit_validity_date: editData.permit_validity_date && !isNaN(new Date(editData.permit_validity_date)) 
+        //   ? new Date(editData.permit_validity_date).toISOString().split('T')[0] 
+        //   : "",
         direct_sale: editData.direct_sale || "",
       });
-      console.log("Edit Dataaaaaaaaaaaaaaaaa:", editData); 
+       
     }
   }, [editData]);
   
