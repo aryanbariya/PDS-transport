@@ -22,7 +22,10 @@ const TruckPage = () => {
   useEffect(() => {
     fetchTrucks();
   }, []);
-
+  useEffect(() => {
+    console.log(trucks);
+  }, [trucks]);
+  
   useEffect(() => {
     if (trucks.length > 0 && tableRef.current) {
       $(tableRef.current).DataTable();
@@ -135,10 +138,10 @@ const TruckPage = () => {
                   <td className="border p-2">{truck.empty_weight}</td>
                   <td className="border p-2">{truck.company}</td>
                   <td className="border p-2">{truck.gvw}</td>
-                  <td className="border p-2">{formatDate(truck.reg_date)}</td>
+                  <td className="border p-2">{truck.reg_date?formatDate(truck.reg_date):"No Date Provided"}</td>
                   <td className="border p-2">{truck.truck_owner_name}</td>
-                  <td className="border p-2">{formatDate(truck.tax_validity)}</td>
-                  <td className="border p-2">{formatDate(truck.insurance_validity)}</td>
+                  <td className="border p-2">{truck.tax_validity? formatDate(truck.tax_validity) : "No Date Provided"}</td>
+                  <td className="border p-2">{truck.insurance_validity?formatDate(truck.insurance_validity):"No Date Provided"}</td>
                   <td className="border p-2">
                     <div className="flex justify-start space-x-2">
                       <button

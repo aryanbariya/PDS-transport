@@ -1268,7 +1268,7 @@ app.post("/api/truck", (req, res) => {
 
 // Update an existing truck
 app.put("/api/truck/:uuid", (req, res) => {
-  const { truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+  const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
   if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
     return res.status(400).json({ error: "All required fields must be filled" });
   }

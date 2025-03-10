@@ -159,6 +159,7 @@
 
 
 import React, { useState, useEffect } from "react";
+import { formatDate } from "@/util/libs/formatDate";
 import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -166,7 +167,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   const [formData, setFormData] = useState({
     order_number: '',
     truck_name: "",
-  
+
     empty_weight: "",
     company: "",
     gvw: "",
@@ -182,6 +183,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const [errors, setErrors] = useState({});
 
+
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -189,17 +191,35 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         empty_weight: editData.empty_weight || "",
         company: editData.company || "",
         gvw: editData.gvw || "",
-        reg_date: editData.reg_date || "",
+        reg_date: editData.reg_date ? new Date(editData.reg_date).toISOString().split('T')[0] : "",
         truck_owner_name: editData.truck_owner_name || "",
         owner_id: editData.owner_id || "",
-        tax_validity_date: editData.tax_validity_date || "",
-        insurance_validity_date: editData.insurance_validity_date || "",
-        fitness_validity_date: editData.fitness_validity_date || "",
-        permit_validity_date: editData.permit_validity_date || "",
+        tax_validity_date: editData.tax_validity_date ? new Date(editData.tax_validity_date).toISOString().split('T')[0] : "",
+        insurance_validity_date: editData.insurance_validity_date ? new Date(editData.insurance_validity_date).toISOString().split('T')[0] : "",
+        fitness_validity_date: editData.fitness_validity_date ? new Date(editData.fitness_validity_date).toISOString().split('T')[0] : "",
+        permit_validity_date: editData.permit_validity_date ? new Date(editData.permit_validity_date).toISOString().split('T')[0] : "",
         direct_sale: editData.direct_sale || "",
       });
     }
   }, [editData]);
+  // useEffect(() => {
+  //   if (editData) {
+  //     setFormData({
+  //       truck_name: editData.truck_name || "",
+  //       empty_weight: editData.empty_weight || "",
+  //       company: editData.company || "",
+  //       gvw: editData.gvw || "",
+  //       reg_date: editData.reg_date || "",
+  //       truck_owner_name: editData.truck_owner_name || "",
+  //       owner_id: editData.owner_id || "",
+  //       tax_validity_date: editData.tax_validity_date || "",
+  //       insurance_validity_date: editData.insurance_validity_date || "",
+  //       fitness_validity_date: editData.fitness_validity_date || "",
+  //       permit_validity_date: editData.permit_validity_date || "",
+  //       direct_sale: editData.direct_sale || "",
+  //     });
+  //   }
+  // }, [editData]);
 
   // const handleChange = (e) => {
   //   const { name, value } = e.target;
@@ -247,17 +267,17 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   // };
   const validateForm = () => {
     const newErrors = {};
-    
+
     ["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id"].forEach((field) => {
       if (!String(formData[field] || "").trim()) { // ✅ Convert to string safely
         newErrors[field] = `${field.replace("_", " ").toUpperCase()} is required`;
       }
     });
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
 
 
   const handleSubmit = async (e) => {
@@ -268,13 +288,13 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     const url = editData
       ? `${URL}/api/truck/${editData.uuid}`
       : `${URL}/api/truck`;
-      console.log("Submitting Data:", formData);
+    console.log("Submitting Data:", formData);
     try {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-        
+
       });
       const responseData = await response.json(); // Read JSON response
       console.log("Response:", responseData); // Debug response
@@ -312,7 +332,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
           {editData ? "Edit Truck" : "Truck"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             {["truck_name", "empty_weight", "company", "gvw", "reg_date", "truck_owner_name", "owner_id", "tax_validity_date", "insurance_validity_date", "fitness_validity_date", "permit_validity_date"].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-gray-700">
@@ -329,6 +349,68 @@ const TruckForm = ({ onClose, onSave, editData }) => {
                 {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
               </div>
             ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Direct Sale</label>
+              <select
+                name="direct_sale"
+                value={formData.direct_sale}
+                onChange={handleChange}
+                className="p-2 border rounded-lg w-full"
+              >
+                <option value="">Select an option</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div> */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              "truck_name",
+              "empty_weight",
+              "company",
+              "gvw",
+              "reg_date",
+              "truck_owner_name",
+              "owner_id",
+              "tax_validity_date",
+              "insurance_validity_date",
+              "fitness_validity_date",
+              "permit_validity_date"
+            ].map((field) => (
+              <div key={field}>
+                <label className="block text-sm font-medium text-gray-700">
+                  {field.replace("_", " ").toUpperCase()}
+                </label>
+
+                {field.includes("date") ? (
+                  editData ? (
+                    <input
+                      type="date"
+                      name={field}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      className={`p-2 border rounded-lg w-full ${errors[field] ? "border-red-500" : ""}`}
+                    />
+                  ) : (
+                    <p className="p-2 border rounded-lg bg-gray-100">
+                      {formData[field] ? formatDate(formData[field]) : "No Date Provided"}
+                    </p>
+                  )
+                ) : (
+                  <input
+                    type="text"
+                    name={field}
+                    value={formData[field]}
+                    onChange={handleChange}
+                    autoComplete="off"
+                    className={`p-2 border rounded-lg w-full ${errors[field] ? "border-red-500" : ""}`}
+                  />
+                )}
+
+                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+              </div>
+            ))}
+
             <div>
               <label className="block text-sm font-medium text-gray-700">Direct Sale</label>
               <select
