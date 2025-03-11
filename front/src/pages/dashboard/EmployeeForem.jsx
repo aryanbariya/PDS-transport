@@ -274,6 +274,12 @@
 
 
 
+
+
+
+
+
+
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert2
 
@@ -298,16 +304,19 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
 
 
   const [godownList, setGodownList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
   const [errors, setErrors] = useState({});
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [categoryList, setCategoryList] = useState([]);
+  const [categorySearch, setCategorySearch] = useState("");
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const categoryDropdownRef = useRef(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch(`${URL}/api/dropcategory`);
+        const response = await fetch(`${URL}/api/dropsubgodown`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
 
         const data = await response.json();
@@ -322,21 +331,22 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   }, []);
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await fetch(`${URL}/api/dropsubgodown`);
-        if (!response.ok) throw new Error("Failed to fetch godowns");
+        const response = await fetch(`${URL}/api/dropcategory`);
+        if (!response.ok) throw new Error("Failed to fetch categories");
 
         const data = await response.json();
         setCategoryList(data || []);
       } catch (error) {
-        console.error("Error fetching godowns:", error);
+        console.error("Error fetching categories:", error);
         setCategoryList([]);
       }
     };
 
-    fetchCategory();
+    fetchCategories();
   }, []);
+
 
   // useEffect(() => {
   //   if (editData) {
@@ -359,7 +369,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     if (editData) {
       setFormData({
-        category: editData.category_name || "",
+        category: editData.category || "",
         fullName: editData.fullName || "",
         username: editData.username || "",
         password: "", // Keep it empty when editing
@@ -375,7 +385,6 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
       });
 
       setSearch(editData.subGodown || ""); // Set search to match subGodown
-      setSearch(editData.category_name || "")
     }
   }, [editData]);
 
@@ -413,12 +422,6 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   const handleSelectGodown = (subGodown) => {
     setFormData({ ...formData, subGodown });
     setSearch(subGodown); // Update search field to display selected godown
-    setShowDropdown(false);
-  };
-
-  const handleSelectCategory = (category_name) => {
-    setFormData({ ...formData, category_name });
-    setSearch(category_name); // Update search field to display selected godown
     setShowDropdown(false);
   };
 
@@ -500,31 +503,35 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
                 type="text"
                 name="category"
                 placeholder="Search or Select Category"
-                value={search}
-                onClick={() => setShowDropdown(true)}
+                value={categorySearch}
+                onClick={() => setShowCategoryDropdown(true)}
                 onChange={(e) => {
-                  setSearch(e.target.value);
-                  setShowDropdown(true);
+                  setCategorySearch(e.target.value);
+                  setShowCategoryDropdown(true);
                 }}
                 required
                 className="p-2 border rounded-lg w-full"
               />
-              {showDropdown && (
+              {showCategoryDropdown && (
                 <div
-                  ref={dropdownRef}
+                  ref={categoryDropdownRef}
                   className="absolute z-10 bg-white border  rounded-md w-full max-h-40 overflow-auto shadow-lg mt-1"
                 >
                   {categoryList
-                    .filter((godown) =>
-                      godown.category_name.toLowerCase().includes(search.toLowerCase())
+                    .filter((cat) =>
+                      cat.category_name.toLowerCase().includes(categorySearch.toLowerCase())
                     )
-                    .map((godown, index) => (
+                    .map((cat, index) => (
                       <div
                         key={index}
-                        onClick={() => handleSelectCategory(godown.category_name)}
+                        onClick={() => {
+                          setFormData({ ...formData, category: cat.category_name });
+                          setCategorySearch(cat.category_name);
+                          setShowCategoryDropdown(false);
+                        }}
                         className="p-2 hover:bg-gray-200 cursor-pointer"
                       >
-                        {godown.category_name}
+                        {cat.category_name}
                       </div>
                     ))}
                 </div>
@@ -607,3 +614,5 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
 };
 
 export default EmployeeForm;
+
+
