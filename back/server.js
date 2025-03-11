@@ -693,7 +693,7 @@ app.delete("/api/subgodown/:uuid", (req, res) => {
 //start of ownerpage
 
 app.get("/api/owners", (req, res) => {
-  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number";
+  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number DESC";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching owners:", err);
