@@ -1654,13 +1654,23 @@ app.delete("/api/categories/:category_id", (req, res) => {
 // **Start Schemes**
 
 // Get all schemes
+// app.get("/api/scheme", (req, res) => {
+//   const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+// Get all schemes
+// Get all schemes
 app.get("/api/scheme", (req, res) => {
-  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY order_number";
+  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
+
 
 // Get a specific scheme by scheme_id
 app.get("/api/scheme/:uuid", (req, res) => {
@@ -1673,6 +1683,38 @@ app.get("/api/scheme/:uuid", (req, res) => {
 });
 
 
+// app.post("/api/scheme", (req, res) => {
+//   const uuid = uuidv4(); // Generate a unique UUID
+//   const { scheme_name, scheme_status } = req.body;
+//   if (!scheme_name || !scheme_status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+  
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, order_number) VALUES (?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, scheme_name, scheme_status, nextOrder], (insertErr, insertResult) => {
+//       if (insertErr) {
+//         console.error("Error inserting scheme:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({ 
+//         message: "Scheme added successfully", 
+//         uuid, 
+//         order_number: nextOrder 
+//       });
+//     });
+//   });
+// });
 app.post("/api/scheme", (req, res) => {
   const uuid = uuidv4(); // Generate a unique UUID
   const { scheme_name, scheme_status } = req.body;
@@ -1680,7 +1722,6 @@ app.post("/api/scheme", (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  
   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
 
   db.query(getMaxOrderSql, (err, result) => {
@@ -1697,17 +1738,14 @@ app.post("/api/scheme", (req, res) => {
         console.error("Error inserting scheme:", insertErr);
         return res.status(500).json({ error: "Database insertion failed" });
       }
-      res.status(201).json({ 
-        message: "Scheme added successfully", 
-        uuid, 
-        order_number: nextOrder 
+      res.status(201).json({
+        message: "Scheme added successfully",
+        uuid,
+        order_number: nextOrder
       });
     });
   });
 });
-
-
-
 
 
 app.put("/api/scheme/:uuid", (req, res) => {
