@@ -267,7 +267,7 @@ export function Sidenav({ open, setOpen,  routes }) {
    
  
     <aside id="sidenav"
-      className={`bg-[#2A3042] text-white fixed inset-y-0 left-0 z-50 h-screen w-[260px] 
+      className={`bg-[#2A3042] text-white  fixed inset-y-0 left-0 z-50 h-screen w-[260px] 
         transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"} 
         xl:translate-x-0 shadow-lg  `}
     >
@@ -295,7 +295,7 @@ export function Sidenav({ open, setOpen,  routes }) {
       </div>
 
       {/* Sidebar Navigation */}
-      <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-64px)]">
+      <nav className="p-4 space-y-2 overflow-y-auto  h-[calc(100vh-64px)]">
         {routes.map(({ layout, title, pages }, key) => (
           <div key={key}>
             <Typography variant="small" className="text-gray-400 uppercase mb-2 px-4">

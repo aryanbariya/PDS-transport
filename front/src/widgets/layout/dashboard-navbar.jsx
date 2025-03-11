@@ -320,7 +320,7 @@ export function DashboardNavbar({ setOpenSidenav }) {
                   <Button
                     variant="text"
                     color="red"
-                    className="w-15 h-15"
+                    className="w-auto px-4 py-2 whitespace-nowrap"
                     onClick={handleLogout}
                   >
                     Log Out
