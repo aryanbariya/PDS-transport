@@ -34,6 +34,7 @@ import DriverPage from "./pages/dashboard/DriverPage";
 import TruckPage from "./pages/dashboard/TruckPage";
 import PackagingPage from "./pages/dashboard/PackagingPage";
 import SchemePage from "./pages/dashboard/SchemePage";
+import CategoryPage from "./pages/dashboard/CategoryPage";
 // import GrainPage from "./pages/dashboard/GrainPage";
 // import TruckPage from "./pages/dashboard/TruckPage";
 // import PackagingPage from "./pages/dashboard/PackagingPage";
@@ -110,6 +111,12 @@ export const routes = [
             path: "/packaging",
             element: <PackagingPage />,
           },
+          // {
+          //   icon: <FaClipboardCheck {...icon} />,
+          //   name: "Categories",
+          //   path: "/categories",
+          //   element: <CategoryPage />,
+          // },
         ],
       },
       {
