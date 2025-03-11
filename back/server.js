@@ -158,6 +158,18 @@ app.post("/google-signin", async (req, res) => {
 
 
 // **Get All Employees API**
+app.get("/api/dropcategory", (req, res) => {
+  const query = "SELECT category_name FROM categories WHERE status = 'Active'"; // Fetch only categoryname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
 app.get("/api/dropsubgodown", (req, res) => {
   const query = "SELECT subGodown FROM sub_godown WHERE status = 'Active'"; // Fetch only godownname
 
