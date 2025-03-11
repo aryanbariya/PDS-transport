@@ -309,14 +309,14 @@ export function DashboardNavbar({ setOpenSidenav }) {
               <Button
                 variant="text"
                 color="blue-gray"
-                className="hidden items-center gap-1 px-4 xl:flex normal-case"
+                className=" hidden xl:flex items-center gap-1 px-4  normal-case"
                 onClick={() => setShowLogout(!showLogout)}
               >
                 <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
                 Admin
               </Button>
               {showLogout && (
-                <div className="absolute bg-white shadow-md p-2 rounded-xl right-0 mt-1">
+                <div className="absolute bg-white shadow-md p-2  rounded-xl right-0 mt-1">
                   <Button
                     variant="text"
                     color="red"
