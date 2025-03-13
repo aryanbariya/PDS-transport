@@ -273,7 +273,7 @@
 
 import { autocompleteClasses } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
