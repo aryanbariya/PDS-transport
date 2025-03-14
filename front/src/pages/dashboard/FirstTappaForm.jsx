@@ -175,7 +175,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   const fetchDropdownData = async () => {
     try {
       const [godownsRes, trucksRes, ownersRes, driversRes] = await Promise.all([
-        fetch(`${URL}/api/godowns`),
+        fetch(`${URL}/api/subgodown/active`),
         fetch(`${URL}/api/trucks`),
         fetch(`${URL}/api/owners`),
         fetch(`${URL}/api/drivers`)
@@ -255,8 +255,8 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           >
             <option value="">Select Godown</option>
             {godownList.map((godown) => (
-              <option key={godown.id} value={godown.id}>
-                {godown.name}
+              <option key={godown.id} value={godown.subGodown}>
+                {godown.subGodown}
               </option>
             ))}
           </select>

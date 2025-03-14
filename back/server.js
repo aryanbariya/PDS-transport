@@ -2180,6 +2180,28 @@ app.delete("/api/scheme/:uuid", (req, res) => {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///tapa
+app.get("/api/tapa", (req, res) => {
+  const sql = "SELECT trans_id, stock_id, godown_id, owner_id, truck_id, driver_id, item_id, scheme_id, sup_id, empty_weight, gross_weight, bags_weight, description, latitude, longtitude, address, truck_img, load_date_time, trans_status, tp_no, do_no, subgd_id, tp_date, in_time, out_time, loaded_net_weight, net_weight, tp_type, bardan_weight, cota, pack_id, group_under, dispatch_of ORDER BY trans_id DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+
+// Get a specific scheme by scheme_id
+app.get("/api/tapa/:uuid", (req, res) => {
+  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
+  db.query(sql, [req.params.scheme_id], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
+    res.json(results[0]);
+  });
+});
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
 
 app.get("/api/getRowCounts", (req, res) => {

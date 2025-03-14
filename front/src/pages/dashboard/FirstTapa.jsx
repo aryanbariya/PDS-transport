@@ -30,7 +30,7 @@ const TransportPage = () => {
 
   const fetchTransports = async () => {
     try {
-      const response = await fetch(`${URL}/api/transports`);
+      const response = await fetch(`${URL}/api/tapa`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setTransports(data || []);
@@ -134,16 +134,16 @@ const TransportPage = () => {
                   <tr key={transport.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{index + 1}</td>
                     <td className="border p-2">👁️</td>
-                    <td className="border p-2">{transport.tpNo}</td>
+                    <td className="border p-2">{transport.tp_no}</td>
                     <td className="border p-2">{transport.dispatchDate}</td>
-                    <td className="border p-2">{transport.baseDepo}</td>
+                    <td className="border p-2">{transport.group_under}</td>
                     <td className="border p-2">{transport.truckNo}</td>
-                    <td className="border p-2">{transport.doNumber}</td>
-                    <td className="border p-2">{transport.quota}</td>
+                    <td className="border p-2">{transport.do_no}</td>
+                    <td className="border p-2">{transport.cota}</td>
                     <td className="border p-2">{transport.scheme}</td>
                     <td className="border p-2">{transport.noOfBags}</td>
                     <td className="border p-2">{transport.packaging}</td>
-                    <td className="border p-2">{transport.grossWeight}</td>
+                    <td className="border p-2">{transport.gross_weight}</td>
                     <td className="border p-2">{transport.tareWeight}</td>
                     <td className="border p-2 flex justify-start gap-2 text-xs md:text-base">
                       <button
