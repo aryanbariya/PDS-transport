@@ -240,11 +240,11 @@ const TransportPage = () => {
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200 text-start">
-                <th className="border p-2">ID</th>
+                <th className="border p-2">Sr.No</th>
                 <th className="border p-2">View TP</th>
                 <th className="border p-2">TP No</th>
                 <th className="border p-2">Dispatch Date</th>
-                <th className="border p-2">Base Depot</th>
+                <th className="border p-2">Base Depo</th>
                 <th className="border p-2">Truck No</th>
                 <th className="border p-2">D.O Number</th>
                 <th className="border p-2">Quota</th>
@@ -257,9 +257,9 @@ const TransportPage = () => {
               </tr>
             </thead>
             <tbody>
-              {transportData.map((tp, index) => (
+              {transportData.map((tp) => (
                 <tr key={tp.trans_id} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{index + 1}</td>
+                  <td className="border p-2">{tp.trans_id}</td>
                   <td className="border p-2">View</td>
                   <td className="border p-2">{tp.tp_no}</td>
                   <td className="border p-2">{tp.dispatch_date}</td>
@@ -268,7 +268,7 @@ const TransportPage = () => {
                   <td className="border p-2">{tp.do_no}</td>
                   <td className="border p-2">{tp.cota}</td>
                   <td className="border p-2">{tp.scheme}</td>
-                  <td className="border p-2">{tp.no_of_bags}</td>
+                  <td className="border p-2">{tp.bags_weight}</td>
                   <td className="border p-2">{tp.packaging}</td>
                   <td className="border p-2">{tp.gross_weight}</td>
                   <td className="border p-2">{tp.tare_weight}</td>
