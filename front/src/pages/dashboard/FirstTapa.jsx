@@ -293,7 +293,7 @@ const TransportPage = () => {
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && (
-        <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
+        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200 text-start">
@@ -324,7 +324,7 @@ const TransportPage = () => {
                     <td className="border p-2">{tp.base_depot}</td>
                     <td className="border p-2">{tp.truck_no}</td>
                     <td className="border p-2">{tp.do_no}</td>
-                    <td className="border p-2">{tp.cota}</td>
+                    <td className="border p-2">{formatDate(tp.cota)}</td>
                     <td className="border p-2">{tp.scheme}</td>
                     <td className="border p-2">{tp.bags_weight}</td>
                     <td className="border p-2">{tp.packaging}</td>

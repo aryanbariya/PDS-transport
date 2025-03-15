@@ -251,7 +251,6 @@ export function Dashboard() {
             )}
           </Routes>
         </div>
-
         {/* Footer */}
         <Footer />
       </div>
