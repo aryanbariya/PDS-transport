@@ -183,10 +183,10 @@ import { Button } from "@material-tailwind/react";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
 import "datatables.net-dt";
-import "datatables.net-buttons-dt/css/buttons.dataTables.min.css";
-import "datatables.net-buttons-dt";
+import DataTable from "datatables.net-dt";
 import { Player } from "@lottiefiles/react-lottie-player";
 import truckLoader from "@/util/Animation.json";
+import { formatDate } from "@/util/libs/formatDate";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
 
@@ -194,37 +194,94 @@ const URL = import.meta.env.VITE_API_BACK_URL;
 
 const TransportPage = () => {
   const [transportData, setTransportData] = useState([]);
+  const [editData, setEditData] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("all");
   const tableRef = useRef(null);
 
-  useEffect(() => {
-    fetchTransportData();
-  }, []);
 
-  useEffect(() => {
-    if (transportData.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable();
-    }
-  }, [transportData]);
 
   const fetchTransportData = async () => {
     try {
-      const response = await fetch(`${URL}/api/tapa`);
+      setLoading(true);
+      let endpoint = `${URL}/api/tapa`;
+      if (filter === "active") endpoint = `${URL}/api/truck/active`;
+      if (filter === "inactive") endpoint = `${URL}/api/truck/inactive`;
+
+      const response = await fetch(endpoint);
       if (!response.ok) throw new Error("Failed to fetch data");
+
       const data = await response.json();
       setTransportData(data || []);
+
+      setTimeout(() => {
+        if (tableRef.current) {
+          $(tableRef.current).DataTable().destroy(); // Destroy existing DataTable
+          $(tableRef.current).DataTable({
+            responsive: true,
+          });
+        }
+      }, 0);
+
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
+
   };
+
+  useEffect(() => {
+    fetchTransportData();
+  }, [filter]);
+
+  // Reinitialize DataTable when godowns data changes
+  useEffect(() => {
+    if (tableRef.current && transportData.length > 0) {
+      const dataTable = new DataTable(tableRef.current, {
+        destroy: true,
+        responsive: true,
+      });
+
+      return () => {
+        dataTable.destroy();
+      };
+    }
+  }, [transportData]);
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
+        <button
+          className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          onClick={() => {
+            setEditData(null);
+            setShowForm(!showForm);
+          }}
+        >
+          {showForm ? "Close" : "Add"}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="mt-3 bg-white p-4 rounded-md shadow-md">
+          <TruckForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+        </div>
+      )}
+      {/* Filter Dropdown */}
+      <div className="my-4">
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-2 py-2 border border-gray-300 rounded-md bg-white shadow-md focus:outline-none"
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
 
       {loading && (
@@ -257,31 +314,37 @@ const TransportPage = () => {
               </tr>
             </thead>
             <tbody>
-              {transportData.map((tp) => (
-                <tr key={tp.trans_id} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{tp.trans_id}</td>
-                  <td className="border p-2">View</td>
-                  <td className="border p-2">{tp.tp_no}</td>
-                  <td className="border p-2">{tp.dispatch_date}</td>
-                  <td className="border p-2">{tp.base_depot}</td>
-                  <td className="border p-2">{tp.truck_no}</td>
-                  <td className="border p-2">{tp.do_no}</td>
-                  <td className="border p-2">{tp.cota}</td>
-                  <td className="border p-2">{tp.scheme}</td>
-                  <td className="border p-2">{tp.bags_weight}</td>
-                  <td className="border p-2">{tp.packaging}</td>
-                  <td className="border p-2">{tp.gross_weight}</td>
-                  <td className="border p-2">{tp.tare_weight}</td>
-                  <td className="border p-2 flex justify-center space-x-2">
-                    <Button className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
-                      Edit
-                    </Button>
-                    <button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {transportData.length > 0 ? (
+                transportData.map((tp) => (
+                  <tr key={tp.uuid} className="text-start hover:bg-gray-100">
+                    <td className="border p-2">{tp.trans_id}</td>
+                    <td className="border p-2">View</td>
+                    <td className="border p-2">{tp.tp_no}</td>
+                    <td className="border p-2">{tp.dispatch_date}</td>
+                    <td className="border p-2">{tp.base_depot}</td>
+                    <td className="border p-2">{tp.truck_no}</td>
+                    <td className="border p-2">{tp.do_no}</td>
+                    <td className="border p-2">{tp.cota}</td>
+                    <td className="border p-2">{tp.scheme}</td>
+                    <td className="border p-2">{tp.bags_weight}</td>
+                    <td className="border p-2">{tp.packaging}</td>
+                    <td className="border p-2">{tp.gross_weight}</td>
+                    <td className="border p-2">{tp.tare_weight}</td>
+                    <td className="border p-2 flex justify-center space-x-2">
+                      <Button className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
+                        Edit
+                      </Button>
+                      <button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (<tr>
+                <td colSpan="10" className="text-center p-4">No records found</td>
+              </tr>)
+
+              }
             </tbody>
           </table>
         </div>

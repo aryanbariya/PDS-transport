@@ -2192,10 +2192,10 @@ app.get("/api/tapa", (req, res) => {
 
 // Get a specific scheme by scheme_id
 app.get("/api/tapa/:uuid", (req, res) => {
-  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
+  const sql = "SELECT * FROM transport_detail WHERE uuid = ?";
   db.query(sql, [req.params.scheme_id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
+    if (results.length === 0) return res.status(404).json({ message: "tp not found" });
     res.json(results[0]);
   });
 });
