@@ -2233,7 +2233,7 @@ app.get("/tapa/truck", (req, res) => {
   });
 });
 app.get("/tapa/driver", (req, res) => {
-  const query = "SELECT driver_name FROM drivers WHERE truck_status = 'Active'"; // Fetch only godownname
+  const query = "SELECT driver_name FROM drivers "; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
