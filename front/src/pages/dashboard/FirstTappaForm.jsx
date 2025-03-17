@@ -132,8 +132,7 @@
 // export default TransportForm;
 
 
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -157,6 +156,8 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [baseDepoList, setBaseDepoList] = useState([]);
+  const [doNoList, setDoNoList] = useState([]);
   const [godownList, setGodownList] = useState([]);
   const [truckList, setTruckList] = useState([]);
   const [ownerList, setOwnerList] = useState([]);
@@ -174,18 +175,31 @@ const TransportForm = ({ onClose, onSave, editData }) => {
 
   const fetchDropdownData = async () => {
     try {
-      const [godownsRes, trucksRes, ownersRes, driversRes] = await Promise.all([
-        fetch(`${URL}/api/subgodown/active`),
-        fetch(`${URL}/api/trucks`),
-        fetch(`${URL}/api/owners`),
-        fetch(`${URL}/api/drivers`)
+      const [
+        baseDepoRes,
+        doNoRes,
+        godownsRes,
+        trucksRes,
+        ownersRes,
+        driversRes
+      ] = await Promise.all([
+        fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
+        fetch(`${URL}/api/do-numbers`), // Fetch DO Number data
+        fetch(`${URL}/tapa/subgodown`),
+        fetch(`${URL}/tapa/owner`),
+        fetch(`${URL}/tapa/truck`),
+        fetch(`${URL}/tapa/driver`)
       ]);
 
+      const baseDepos = await baseDepoRes.json();
+      const doNumbers = await doNoRes.json();
       const godowns = await godownsRes.json();
       const trucks = await trucksRes.json();
       const owners = await ownersRes.json();
       const drivers = await driversRes.json();
 
+      setBaseDepoList(baseDepos);
+      setDoNoList(doNumbers);
       setGodownList(godowns);
       setTruckList(trucks);
       setOwnerList(owners);
@@ -207,8 +221,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   const validateForm = () => {
     let newErrors = {};
     if (!formData.baseDepo) newErrors.baseDepo = "Base Depo is required";
-    // Add more validation as needed
-
+    if (!formData.doNo) newErrors.doNo = "DO Number is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -245,91 +258,64 @@ const TransportForm = ({ onClose, onSave, editData }) => {
 
   const renderField = (field) => {
     switch (field) {
+      case "baseDepo":
+        return (
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+            <option value="">Select Base Depo</option>
+            {baseDepoList.map((depo) => (
+              <option key={depo.id} value={depo.id}>{depo.name}</option>
+            ))}
+          </select>
+        );
+      case "doNo":
+        return (
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+            <option value="">Select DO Number</option>
+            {doNoList.map((doItem) => (
+              <option key={doItem.id} value={doItem.id}>{doItem.number}</option>
+            ))}
+          </select>
+        );
       case "godown":
         return (
-          <select
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-          >
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Godown</option>
             {godownList.map((godown) => (
-              <option key={godown.id} value={godown.subGodown}>
-                {godown.subGodown}
-              </option>
+              <option key={godown.id} value={godown.subGodown}>{godown.subGodown}</option>
             ))}
           </select>
         );
       case "truck":
         return (
-          <select
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-          >
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Truck</option>
             {truckList.map((truck) => (
-              <option key={truck.id} value={truck.id}>
-                {truck.number}
-              </option>
+              <option key={truck.id} value={truck.id}>{truck.number}</option>
             ))}
           </select>
         );
       case "owner":
         return (
-          <select
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-          >
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Owner</option>
             {ownerList.map((owner) => (
-              <option key={owner.id} value={owner.id}>
-                {owner.name}
-              </option>
+              <option key={owner.id} value={owner.id}>{owner.name}</option>
             ))}
           </select>
         );
       case "driver":
         return (
-          <select
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-          >
+          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Driver</option>
             {driverList.map((driver) => (
-              <option key={driver.id} value={driver.id}>
-                {driver.name}
-              </option>
+              <option key={driver.id} value={driver.id}>{driver.name}</option>
             ))}
           </select>
         );
       case "tpDate":
-        return (
-          <input
-            type="date"
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-          />
-        );
+        return <input type="date" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" />;
       default:
-        return (
-          <input
-            type="text"
-            name={field}
-            value={formData[field]}
-            onChange={handleChange}
-            className="p-2 border rounded-lg w-full"
-            placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`}
-          />
-        );
+        return <input type="text" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`} />;
     }
   };
 
@@ -341,28 +327,15 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <div className="grid grid-cols-3 gap-4">
             {Object.keys(formData).map((field) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-gray-700">
-                  {field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}
-                </label>
+                <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim()}</label>
                 {renderField(field)}
                 {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
               </div>
             ))}
           </div>
           <div className="flex justify-end space-x-2 mt-4">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-blue-600"
-            >
-              {editData ? "Update" : "Submit"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-red-400"
-            >
-              Cancel
-            </button>
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded">Cancel</button>
           </div>
         </form>
       </div>

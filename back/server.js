@@ -2181,6 +2181,70 @@ app.delete("/api/scheme/:uuid", (req, res) => {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///tapa
+app.get("/tapa/mswc", (req, res) => {
+  const query = "SELECT godownName FROM mswc_godowns WHERE status = 'Active'"; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
+
+app.get("/tapa/subgodown", (req, res) => {
+  const query = "SELECT subGodown FROM sub_godowns WHERE status = 'Active'"; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
+
+app.get("/tapa/owner", (req, res) => {
+  const query = "SELECT owmerName FROM owners "; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
+
+app.get("/tapa/truck", (req, res) => {
+  const query = "SELECT truck_name FROM truck WHERE truck_status = 'Active'"; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
+app.get("/tapa/driver", (req, res) => {
+  const query = "SELECT driver_name FROM drivers WHERE truck_status = 'Active'"; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
+
 app.get("/api/tapa", (req, res) => {
   const sql = "SELECT trans_id, stock_id, godown_id, owner_id, truck_id, driver_id, item_id, scheme_id, sup_id, empty_weight, gross_weight, bags_weight, description, latitude, longtitude, address, truck_img, load_date_time, trans_status, tp_no, do_no, subgd_id, tp_date, in_time, out_time, loaded_net_weight, net_weight, tp_type, bardan_weight, cota, pack_id, group_under, dispatch_of FROM transport_detail ORDER BY trans_id ";
   db.query(sql, (err, results) => {

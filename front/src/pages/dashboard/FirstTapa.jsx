@@ -179,6 +179,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
+import TransportForm from "./FirstTappaForm";
 import { Button } from "@material-tailwind/react";
 import $ from "jquery";
 import "datatables.net-dt/css/dataTables.dataTables.min.css";
@@ -251,6 +252,48 @@ const TransportPage = () => {
     }
   }, [transportData]);
 
+    const handleDelete = async (uuid) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`${URL}/api/transports/${uuid}`, {
+            method: "DELETE",
+          });
+          if (response.ok) {
+            Swal.fire("Deleted!", "Transport record deleted successfully!", "success");
+            fetchTransportData();
+          } else {
+            Swal.fire("Error", "Failed to delete transport record.", "error");
+          }
+        } catch (err) {
+          console.error("Error deleting transport record:", err);
+          Swal.fire("Error", "Error deleting data.", "error");
+        }
+      }
+    });
+  };
+
+
+
+    const handleEdit = (transport) => {
+    setEditData(transport);
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    setShowForm(false);
+    setEditData(null);
+    fetchTransportData();
+  };
+
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
@@ -268,7 +311,7 @@ const TransportPage = () => {
 
       {showForm && (
         <div className="mt-3 bg-white p-4 rounded-md shadow-md">
-          <TruckForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+          <TransportForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
         </div>
       )}
       {/* Filter Dropdown */}
@@ -320,7 +363,7 @@ const TransportPage = () => {
                     <td className="border p-2">{tp.trans_id}</td>
                     <td className="border p-2">View</td>
                     <td className="border p-2">{tp.tp_no}</td>
-                    <td className="border p-2">{tp.dispatch_date}</td>
+                    <td className="border p-2">{formatDate(tp.load_date_time)}</td>
                     <td className="border p-2">{tp.base_depot}</td>
                     <td className="border p-2">{tp.truck_no}</td>
                     <td className="border p-2">{tp.do_no}</td>
