@@ -143,11 +143,13 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     doNo: "",
     godown: "",
     truck: "",
+    owner: "",
+    driver: "",
     packaging: "",
     allocation: "",
     tpDate: "",
-    owner: "",
-    driver: "",
+    
+    
     grossWeight: "",
     noOfBags: "",
     bardanWeight: "",
@@ -184,10 +186,10 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         driversRes
       ] = await Promise.all([
         fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
-        fetch(`${URL}/api/do-numbers`), // Fetch DO Number data
+        fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
         fetch(`${URL}/tapa/subgodown`),
-        fetch(`${URL}/tapa/owner`),
         fetch(`${URL}/tapa/truck`),
+        fetch(`${URL}/tapa/owner`),
         fetch(`${URL}/tapa/driver`)
       ]);
 
@@ -272,7 +274,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select DO Number</option>
             {doNoList.map((doItem) => (
-              <option key={doItem.id} value={doItem.id}>{doItem.number}</option>
+              <option key={doItem.id} value={doItem.id}>{doItem.godownName}</option>
             ))}
           </select>
         );
@@ -290,7 +292,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Truck</option>
             {truckList.map((truck) => (
-              <option key={truck.id} value={truck.id}>{truck.number}</option>
+              <option key={truck.uuid} value={truck.truck_name}>{truck.truck_name}</option>
             ))}
           </select>
         );
@@ -299,7 +301,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Owner</option>
             {ownerList.map((owner) => (
-              <option key={owner.id} value={owner.id}>{owner.name}</option>
+              <option key={owner.id} value={owner.id}>{owner.ownerName}</option>
             ))}
           </select>
         );
@@ -308,7 +310,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Driver</option>
             {driverList.map((driver) => (
-              <option key={driver.id} value={driver.id}>{driver.name}</option>
+              <option key={driver.id} value={driver.id}>{driver.driver_name}</option>
             ))}
           </select>
         );
@@ -327,7 +329,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <div className="grid grid-cols-3 gap-4">
             {Object.keys(formData).map((field) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim()}</label>
+                <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}</label>
                 {renderField(field)}
                 {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
               </div>
