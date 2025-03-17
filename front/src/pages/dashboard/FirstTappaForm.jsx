@@ -263,7 +263,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select Base Depo</option>
             {baseDepoList.map((depo) => (
-              <option key={depo.id} value={depo.id}>{depo.name}</option>
+              <option key={depo.uuid} value={depo.godownName}>{depo.godownName}</option>
             ))}
           </select>
         );

@@ -2195,7 +2195,7 @@ app.get("/tapa/mswc", (req, res) => {
 });
 
 app.get("/tapa/subgodown", (req, res) => {
-  const query = "SELECT subGodown FROM sub_godowns WHERE status = 'Active'"; // Fetch only godownname
+  const query = "SELECT subGodown FROM sub_godown WHERE status = 'Active'"; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
@@ -2208,7 +2208,7 @@ app.get("/tapa/subgodown", (req, res) => {
 });
 
 app.get("/tapa/owner", (req, res) => {
-  const query = "SELECT owmerName FROM owners "; // Fetch only godownname
+  const query = "SELECT ownerName FROM owners "; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
