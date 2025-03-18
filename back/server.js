@@ -2256,6 +2256,18 @@ app.get("/tapa/scheme", (req, res) => {
     res.json(results);
   });
 });
+app.get("/tapa/pkg", (req, res) => {
+  const query = "SELECT material_name FROM packaging "; // Fetch only godownname
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching godown names:", err);
+      return res.status(500).json({ error: "Database query error" });
+    }
+
+    res.json(results);
+  });
+});
 
 app.get("/api/tapa", (req, res) => {
   const sql = "SELECT trans_id, stock_id, godown_id, owner_id, truck_id, driver_id, item_id, scheme_id, sup_id, empty_weight, gross_weight, bags_weight, description, latitude, longtitude, address, truck_img, load_date_time, trans_status, tp_no, do_no, subgd_id, tp_date, in_time, out_time, loaded_net_weight, net_weight, tp_type, bardan_weight, cota, pack_id, group_under, dispatch_of FROM transport_detail ORDER BY trans_id ";

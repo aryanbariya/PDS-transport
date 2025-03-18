@@ -244,7 +244,8 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   const [truckList, setTruckList] = useState([]);
   const [ownerList, setOwnerList] = useState([]);
   const [driverList, setDriverList] = useState([]);
-  const [scheme, setscheme] = useState([])
+  const [scheme, setscheme] = useState([]);
+  const [packaging, setpackaging] = useState([])
 
   useEffect(() => {
     fetchDropdownData();
@@ -265,7 +266,8 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         trucksRes,
         ownersRes,
         driversRes,
-        schemeRes
+        schemeRes,
+        packagingRes
       ] = await Promise.all([
         fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
         fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
@@ -273,7 +275,8 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         fetch(`${URL}/tapa/truck`),
         fetch(`${URL}/tapa/owner`),
         fetch(`${URL}/tapa/driver`),
-        fetch(`${URL}/tapa/scheme`)
+        fetch(`${URL}/tapa/scheme`),
+        fetch(`${URL}/tapa/pkg`)
       ]);
 
       const baseDepos = await baseDepoRes.json();
@@ -283,6 +286,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       const owners = await ownersRes.json();
       const drivers = await driversRes.json();
       const schemes = await schemeRes.json();
+      const packaging = await packagingRes.json();
 
       setBaseDepoList(baseDepos);
       setDoNoList(doNumbers);
@@ -291,6 +295,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       setOwnerList(owners);
       setDriverList(drivers);
       setscheme(schemes);
+      setpackaging(packaging);
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
       Swal.fire({ icon: "error", title: "Error", text: "Failed to fetch dropdown data" });
@@ -404,10 +409,19 @@ const TransportForm = ({ onClose, onSave, editData }) => {
             <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
               <option value="">Select Scheme</option>
               {scheme.map((sch) => (
-                <option key={sch.id} value={sch.id}>{sch.driver_name}</option>
+                <option key={sch.id} value={sch.id}>{sch.scheme_name}</option>
               ))}
             </select>
           );
+          case "packaging":
+            return (
+              <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+                <option value="">Select one</option>
+                {packaging.map((p) => (
+                  <option key={p.id} value={p.id}>{p.material_name}</option>
+                ))}
+              </select>
+            );
       case "tpDate":
         return <input type="date" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" />;
       default:
