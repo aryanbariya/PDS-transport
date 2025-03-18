@@ -2221,7 +2221,7 @@ app.get("/tapa/owner", (req, res) => {
 });
 
 app.get("/tapa/truck", (req, res) => {
-  const query = "SELECT truck_name FROM truck WHERE truck_status = 'Active'"; // Fetch only godownname
+  const query = "SELECT truck_name, empty_weight FROM truck WHERE truck_status = 'Active'"; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {

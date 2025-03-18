@@ -180,8 +180,8 @@ const PackagingForm = ({ onClose, onSave, editData }) => {
     let newErrors = {};
     if (!formData.material_name.trim()) {
       newErrors.material_name = "Material name is required";
-    } else if (!/^[a-zA-Z\s]{3,}$/.test(formData.material_name)) {
-      newErrors.material_name = "Material name must be at least 3 characters and contain only letters";
+    } else if (!/^[a-zA-Z\s]{2,}$/.test(formData.material_name)) {
+      newErrors.material_name = "Material name must be at least 2 characters and contain only letters";
     }
 
     if (!formData.weight.trim()) {

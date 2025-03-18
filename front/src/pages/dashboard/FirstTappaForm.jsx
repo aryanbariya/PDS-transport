@@ -226,6 +226,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     truck: "",
     owner: "",
     driver: "",
+    emptyWeight: "",
     allocation: "",
     scheme: "",
     packaging: "",
@@ -302,13 +303,39 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     }
   };
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
+  //   if (errors[name]) {
+  //     setErrors({ ...errors, [name]: "" });
+  //   }
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    // If truck is selected, find and update empty weight
+    if (name === "truck") {
+      const selectedTruck = truckList.find(truck => truck.truck_name === value);
+      if (selectedTruck) {
+        setFormData(prevState => ({
+          ...prevState,
+          [name]: value,
+          emptyWeight: selectedTruck.empty_weight || ""  // Update empty weight
+        }));
+      } else {
+        setFormData(prevState => ({ ...prevState, [name]: value }));
+      }
+    } else {
+      setFormData(prevState => ({ ...prevState, [name]: value }));
+    }
+  
+    // Clear errors
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
+      setErrors(prevErrors => ({ ...prevErrors, [name]: "" }));
     }
   };
+  
 
   const validateForm = () => {
     let newErrors = {};
@@ -364,7 +391,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
             <option value="">Select DO Number</option>
             {doNoList.map((doItem) => (
-              <option key={doItem.id} value={doItem.id}>{doItem.godownName}</option>
+              <option key={doItem.id} value={doItem.id}>{doItem.Name}</option>
             ))}
           </select>
         );
@@ -432,7 +459,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-4xl p-6">
-        <h2 className="text-xl font-semibold py-3 px-4 text-center">Transport Form</h2>
+        <h2 className="text-xl font-semibold py-3 px-4 text-start ">Transport Form</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {Object.keys(formData).map((field) => (
