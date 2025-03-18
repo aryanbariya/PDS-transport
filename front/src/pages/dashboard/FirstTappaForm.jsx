@@ -227,15 +227,15 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     owner: "",
     driver: "",
     emptyWeight: "",
-    allocation: "",
+    grossWeight: "",
     scheme: "",
     packaging: "",
     noOfBags: "",
-    grossWeight: "",
     bardanWeight: "",
     netWeight: "",
     tpDate: "",
     tpNo: "",
+    allocation: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -321,9 +321,18 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         setFormData(prevState => ({
           ...prevState,
           [name]: value,
-          emptyWeight: selectedTruck.empty_weight || ""  // Update empty weight
+          emptyWeight: selectedTruck.empty_weight || "0"  // Update empty weight
         }));
-      } else {
+      }  else if (name === "packaging") {
+        // Find packaging details for bardan weight
+        const selectedPackaging = packaging.find(pkg => pkg.material_name === value);
+    
+        setFormData(prevState => ({
+          ...prevState,
+          [name]: value,
+          bardanWeight: selectedPackaging ? selectedPackaging.weight || "0" : "0"
+        }));
+      }  else {
         setFormData(prevState => ({ ...prevState, [name]: value }));
       }
     } else {

@@ -2257,7 +2257,7 @@ app.get("/tapa/scheme", (req, res) => {
   });
 });
 app.get("/tapa/pkg", (req, res) => {
-  const query = "SELECT material_name FROM packaging "; // Fetch only godownname
+  const query = "SELECT material_name, weight FROM packaging "; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
