@@ -145,15 +145,13 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     truck: "",
     owner: "",
     driver: "",
-    packaging: "",
     allocation: "",
-    tpDate: "",
-    
-    
-    grossWeight: "",
+    packaging: "",
     noOfBags: "",
+    grossWeight: "",
     bardanWeight: "",
     netWeight: "",
+    tpDate: "",
     tpNo: "",
   });
 

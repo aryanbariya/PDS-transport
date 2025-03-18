@@ -386,7 +386,6 @@ const TransportPage = () => {
               ) : (<tr>
                 <td colSpan="10" className="text-center p-4">No records found</td>
               </tr>)
-
               }
             </tbody>
           </table>
