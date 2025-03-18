@@ -1,4 +1,4 @@
-// import React, { useState, useEffect, useRef } from "react";
+// import React, { useState, useEffect } from "react";
 // import Swal from "sweetalert2";
 
 // const URL = import.meta.env.VITE_API_BACK_URL;
@@ -9,27 +9,28 @@
 //     doNo: "",
 //     godown: "",
 //     truck: "",
-//     packaging: "",
-//     allocation: "",
-//     tpDate: "",
 //     owner: "",
 //     driver: "",
-//     grossWeight: "",
+//     allocation: "",
+//     packaging: "",
 //     noOfBags: "",
+//     grossWeight: "",
 //     bardanWeight: "",
 //     netWeight: "",
+//     tpDate: "",
 //     tpNo: "",
 //   });
 
 //   const [errors, setErrors] = useState({});
+//   const [baseDepoList, setBaseDepoList] = useState([]);
+//   const [doNoList, setDoNoList] = useState([]);
 //   const [godownList, setGodownList] = useState([]);
 //   const [truckList, setTruckList] = useState([]);
 //   const [ownerList, setOwnerList] = useState([]);
 //   const [driverList, setDriverList] = useState([]);
 
 //   useEffect(() => {
-//     // Fetch godowns, trucks, owners, and drivers from your API
-//     // Update the respective state variables
+//     fetchDropdownData();
 //   }, []);
 
 //   useEffect(() => {
@@ -37,6 +38,43 @@
 //       setFormData(editData);
 //     }
 //   }, [editData]);
+
+//   const fetchDropdownData = async () => {
+//     try {
+//       const [
+//         baseDepoRes,
+//         doNoRes,
+//         godownsRes,
+//         trucksRes,
+//         ownersRes,
+//         driversRes
+//       ] = await Promise.all([
+//         fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
+//         fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
+//         fetch(`${URL}/tapa/subgodown`),
+//         fetch(`${URL}/tapa/truck`),
+//         fetch(`${URL}/tapa/owner`),
+//         fetch(`${URL}/tapa/driver`)
+//       ]);
+
+//       const baseDepos = await baseDepoRes.json();
+//       const doNumbers = await doNoRes.json();
+//       const godowns = await godownsRes.json();
+//       const trucks = await trucksRes.json();
+//       const owners = await ownersRes.json();
+//       const drivers = await driversRes.json();
+
+//       setBaseDepoList(baseDepos);
+//       setDoNoList(doNumbers);
+//       setGodownList(godowns);
+//       setTruckList(trucks);
+//       setOwnerList(owners);
+//       setDriverList(drivers);
+//     } catch (error) {
+//       console.error("Error fetching dropdown data:", error);
+//       Swal.fire({ icon: "error", title: "Error", text: "Failed to fetch dropdown data" });
+//     }
+//   };
 
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
@@ -48,9 +86,8 @@
 
 //   const validateForm = () => {
 //     let newErrors = {};
-//     // Add validation logic for each field
 //     if (!formData.baseDepo) newErrors.baseDepo = "Base Depo is required";
-
+//     if (!formData.doNo) newErrors.doNo = "DO Number is required";
 //     setErrors(newErrors);
 //     return Object.keys(newErrors).length === 0;
 //   };
@@ -85,6 +122,69 @@
 //     }
 //   };
 
+//   const renderField = (field) => {
+//     switch (field) {
+//       case "baseDepo":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select Base Depo</option>
+//             {baseDepoList.map((depo) => (
+//               <option key={depo.godownName} value={depo.godownName}>{depo.godownName}</option>
+//             ))}
+//           </select>
+//         );
+//       case "doNo":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select DO Number</option>
+//             {doNoList.map((doItem) => (
+//               <option key={doItem.id} value={doItem.id}>{doItem.godownName}</option>
+//             ))}
+//           </select>
+//         );
+//       case "godown":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select Godown</option>
+//             {godownList.map((godown) => (
+//               <option key={godown.id} value={godown.subGodown}>{godown.subGodown}</option>
+//             ))}
+//           </select>
+//         );
+//       case "truck":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select Truck</option>
+//             {truckList.map((truck) => (
+//               <option key={truck.uuid} value={truck.truck_name}>{truck.truck_name}</option>
+//             ))}
+//           </select>
+//         );
+//       case "owner":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select Owner</option>
+//             {ownerList.map((owner) => (
+//               <option key={owner.id} value={owner.id}>{owner.ownerName}</option>
+//             ))}
+//           </select>
+//         );
+//       case "driver":
+//         return (
+//           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+//             <option value="">Select Driver</option>
+//             {driverList.map((driver) => (
+//               <option key={driver.id} value={driver.id}>{driver.driver_name}</option>
+//             ))}
+//           </select>
+//         );
+//       case "tpDate":
+//         return <input type="date" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" />;
+//       default:
+//         return <input type="text" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`} />;
+//     }
+//   };
+
 //   return (
 //     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
 //       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-4xl p-6">
@@ -93,35 +193,15 @@
 //           <div className="grid grid-cols-3 gap-4">
 //             {Object.keys(formData).map((field) => (
 //               <div key={field}>
-//                 <label className="block text-sm font-medium text-gray-700">
-//                   {field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}
-//                 </label>
-//                 <input
-//                   type={field === "tpDate" ? "date" : "text"}
-//                   name={field}
-//                   value={formData[field]}
-//                   onChange={handleChange}
-//                   className="p-2 border rounded-lg w-full"
-//                   placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`}
-//                 />
+//                 <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}</label>
+//                 {renderField(field)}
 //                 {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
 //               </div>
 //             ))}
 //           </div>
 //           <div className="flex justify-end space-x-2 mt-4">
-//             <button
-//               type="submit"
-//               className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-blue-600"
-//             >
-//               {editData ? "Update" : "Submit"}
-//             </button>
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-red-400"
-//             >
-//               Cancel
-//             </button>
+//             <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+//             <button type="button" onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded">Cancel</button>
 //           </div>
 //         </form>
 //       </div>
@@ -130,6 +210,7 @@
 // };
 
 // export default TransportForm;
+
 
 
 import React, { useState, useEffect } from "react";
@@ -146,6 +227,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     owner: "",
     driver: "",
     allocation: "",
+    scheme: "",
     packaging: "",
     noOfBags: "",
     grossWeight: "",
@@ -162,6 +244,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
   const [truckList, setTruckList] = useState([]);
   const [ownerList, setOwnerList] = useState([]);
   const [driverList, setDriverList] = useState([]);
+  const [scheme, setscheme] = useState([])
 
   useEffect(() => {
     fetchDropdownData();
@@ -181,14 +264,16 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         godownsRes,
         trucksRes,
         ownersRes,
-        driversRes
+        driversRes,
+        schemeRes
       ] = await Promise.all([
         fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
         fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
         fetch(`${URL}/tapa/subgodown`),
         fetch(`${URL}/tapa/truck`),
         fetch(`${URL}/tapa/owner`),
-        fetch(`${URL}/tapa/driver`)
+        fetch(`${URL}/tapa/driver`),
+        fetch(`${URL}/tapa/scheme`)
       ]);
 
       const baseDepos = await baseDepoRes.json();
@@ -197,6 +282,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       const trucks = await trucksRes.json();
       const owners = await ownersRes.json();
       const drivers = await driversRes.json();
+      const schemes = await schemeRes.json();
 
       setBaseDepoList(baseDepos);
       setDoNoList(doNumbers);
@@ -204,6 +290,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       setTruckList(trucks);
       setOwnerList(owners);
       setDriverList(drivers);
+      setscheme(schemes);
     } catch (error) {
       console.error("Error fetching dropdown data:", error);
       Swal.fire({ icon: "error", title: "Error", text: "Failed to fetch dropdown data" });
@@ -312,6 +399,15 @@ const TransportForm = ({ onClose, onSave, editData }) => {
             ))}
           </select>
         );
+        case "scheme":
+          return (
+            <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+              <option value="">Select Scheme</option>
+              {scheme.map((sch) => (
+                <option key={sch.id} value={sch.id}>{sch.driver_name}</option>
+              ))}
+            </select>
+          );
       case "tpDate":
         return <input type="date" name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" />;
       default:
