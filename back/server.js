@@ -1924,7 +1924,7 @@ app.post("/api/transport", (req, res) => {
   const {
     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
-    dispatchDate, quota, tpNo, allocation, status
+    dispatchDate, quota, tpNo, allocation, status = "Active"
   } = req.body;
 
   if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
