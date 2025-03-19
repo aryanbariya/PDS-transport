@@ -207,7 +207,7 @@ const TransportPage = () => {
   const fetchTransportData = async () => {
     try {
       setLoading(true);
-      let endpoint = `${URL}/api/tapa`;
+      let endpoint = `${URL}/api/transport`;
       if (filter === "active") endpoint = `${URL}/api/truck/active`;
       if (filter === "inactive") endpoint = `${URL}/api/truck/inactive`;
 
@@ -360,26 +360,26 @@ const TransportPage = () => {
               {transportData.length > 0 ? (
                 transportData.map((tp) => (
                   <tr key={tp.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{tp.trans_id}</td>
+                    <td className="border p-2">{tp.orderNumber}</td>
                     <td className="border p-2">View</td>
-                    <td className="border p-2">{tp.tp_no}</td>
-                    <td className="border p-2">{formatDate(tp.load_date_time)}</td>
-                    <td className="border p-2">{tp.base_depot}</td>
-                    <td className="border p-2">{tp.truck_no}</td>
-                    <td className="border p-2">{tp.do_no}</td>
-                    <td className="border p-2">{formatDate(tp.cota)}</td>
+                    <td className="border p-2">{tp.tpNo}</td>
+                    <td className="border p-2">{formatDate(tp.dispatchDate)}</td>
+                    <td className="border p-2">{tp.baseDepo}</td>
+                    <td className="border p-2">{tp.truck}</td>
+                    <td className="border p-2">{tp.doNo}</td>
+                    <td className="border p-2">{formatDate(tp.quota)}</td>
                     <td className="border p-2">{tp.scheme}</td>
-                    <td className="border p-2">{tp.bags_weight}</td>
+                    <td className="border p-2">{tp.bardanWeight}</td>
                     <td className="border p-2">{tp.packaging}</td>
-                    <td className="border p-2">{tp.gross_weight}</td>
-                    <td className="border p-2">{tp.tare_weight}</td>
+                    <td className="border p-2">{tp.grossWeight}</td>
+                    <td className="border p-2">{tp.emptyWeight}</td>
                     <td className="border p-2 flex justify-center space-x-2">
                       <Button className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
                         Edit
                       </Button>
-                      <button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
+                      <Button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
                         Delete
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))
