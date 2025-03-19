@@ -27,7 +27,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
 
   const [errors, setErrors] = useState({});
   const [baseDepoList, setBaseDepoList] = useState([]);
-  const [doNoList, setDoNoList] = useState([]);
+  // const [doNoList, setDoNoList] = useState([]);
   const [godownList, setGodownList] = useState([]);
   const [truckList, setTruckList] = useState([]);
   const [ownerList, setOwnerList] = useState([]);
@@ -49,7 +49,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     try {
       const [
         baseDepoRes,
-        doNoRes,
+        // doNoRes,
         godownsRes,
         trucksRes,
         ownersRes,
@@ -58,7 +58,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         packagingRes
       ] = await Promise.all([
         fetch(`${URL}/tapa/mswc`),  // Fetch Base Depo data
-        fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
+        // fetch(`${URL}/tapa/mswc`), // Fetch DO Number data
         fetch(`${URL}/tapa/subgodown`),
         fetch(`${URL}/tapa/truck`),
         fetch(`${URL}/tapa/owner`),
@@ -68,7 +68,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       ]);
 
       const baseDepos = await baseDepoRes.json();
-      const doNumbers = await doNoRes.json();
+      // const doNumbers = await doNoRes.json();
       const godowns = await godownsRes.json();
       const trucks = await trucksRes.json();
       const owners = await ownersRes.json();
@@ -77,7 +77,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       const packaging = await packagingRes.json();
 
       setBaseDepoList(baseDepos);
-      setDoNoList(doNumbers);
+      // setDoNoList(doNumbers);
       setGodownList(godowns);
       setTruckList(trucks);
       setOwnerList(owners);
@@ -197,15 +197,15 @@ const TransportForm = ({ onClose, onSave, editData }) => {
             ))}
           </select>
         );
-      case "doNo":
-        return (
-          <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
-            <option value="">Select DO Number</option>
-            {doNoList.map((doItem) => (
-              <option key={doItem.id} value={doItem.id}>{doItem.Name}</option>
-            ))}
-          </select>
-        );
+      // case "doNo":
+      //   return (
+      //     <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">
+      //       <option value="">Select DO Number</option>
+      //       {doNoList.map((doItem) => (
+      //         <option key={doItem.id} value={doItem.id}>{doItem.Name}</option>
+      //       ))}
+      //     </select>
+      //   );
       case "godown":
         return (
           <select name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full">

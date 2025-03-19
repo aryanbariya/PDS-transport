@@ -1654,15 +1654,6 @@ app.delete("/api/categories/:category_id", (req, res) => {
 // **Start Schemes**
 
 // Get all schemes
-// app.get("/api/scheme", (req, res) => {
-//   const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-// Get all schemes
-// Get all schemes
 app.get("/api/scheme", (req, res) => {
   const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
   db.query(sql, (err, results) => {
@@ -1682,39 +1673,6 @@ app.get("/api/scheme/:uuid", (req, res) => {
   });
 });
 
-
-// app.post("/api/scheme", (req, res) => {
-//   const uuid = uuidv4(); // Generate a unique UUID
-//   const { scheme_name, scheme_status } = req.body;
-//   if (!scheme_name || !scheme_status) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-  
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
-
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error getting next order number:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-
-//     const nextOrder = result[0].next_order;
-//     const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, order_number) VALUES (?, ?, ?, ?)";
-
-//     db.query(insertSql, [uuid, scheme_name, scheme_status, nextOrder], (insertErr, insertResult) => {
-//       if (insertErr) {
-//         console.error("Error inserting scheme:", insertErr);
-//         return res.status(500).json({ error: "Database insertion failed" });
-//       }
-//       res.status(201).json({ 
-//         message: "Scheme added successfully", 
-//         uuid, 
-//         order_number: nextOrder 
-//       });
-//     });
-//   });
-// });
 app.post("/api/scheme", (req, res) => {
   const uuid = uuidv4(); // Generate a unique UUID
   const { scheme_name, scheme_status } = req.body;
@@ -1814,369 +1772,7 @@ app.delete("/api/scheme/:uuid", (req, res) => {
 
 // **End of Schemes**
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// // **Start Transport Detail API**
 
-// // Get all transport details
-// app.get("/api/transport", (req, res) => {
-//   const sql = `
-//     SELECT td.*, 
-//     g.godown_name, 
-//     o.owner_name, 
-//     t.truck_no, 
-//     p.pack_name,
-//     s.scheme_name
-//     FROM transport_detail td
-//     LEFT JOIN godown g ON td.godown_id = g.godown_id
-//     LEFT JOIN owner o ON td.owner_id = o.owner_id
-//     LEFT JOIN truck t ON td.truck_id = t.truck_id
-//     LEFT JOIN packaging p ON td.pack_id = p.pack_id
-//     LEFT JOIN scheme s ON td.scheme_id = s.scheme_id
-//     ORDER BY td.tp_date DESC, td.tp_no DESC`;
-    
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Get a specific transport detail
-// app.get("/api/transport/:id", (req, res) => {
-//   const sql = `
-//     SELECT td.*, 
-//     g.godown_name, 
-//     o.owner_name, 
-//     t.truck_no, 
-//     p.pack_name,
-//     s.scheme_name
-//     FROM transport_detail td
-//     LEFT JOIN godown g ON td.godown_id = g.godown_id
-//     LEFT JOIN owner o ON td.owner_id = o.owner_id
-//     LEFT JOIN truck t ON td.truck_id = t.truck_id
-//     LEFT JOIN packaging p ON td.pack_id = p.pack_id
-//     LEFT JOIN scheme s ON td.scheme_id = s.scheme_id
-//     WHERE td.trans_id = ?`;
-    
-//   db.query(sql, [req.params.id], (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     if (results.length === 0) return res.status(404).json({ message: "Transport detail not found" });
-//     res.json(results[0]);
-//   });
-// });
-
-// // Create a new transport detail
-// app.post("/api/transport", (req, res) => {
-//   const {
-//     stock_id,
-//     godown_id,
-//     owner_id,
-//     truck_id,
-//     driver_id,
-//     item_id,
-//     scheme_id,
-//     sup_id,
-//     empty_weight,
-//     gross_weight,
-//     bags_weight,
-//     description,
-//     latitude,
-//     longtitude,
-//     address,
-//     truck_img,
-//     trans_status,
-//     tp_no,
-//     do_no,
-//     subgd_id,
-//     tp_date,
-//     in_time,
-//     out_time,
-//     loaded_net_weight,
-//     net_weight,
-//     tp_type,
-//     bardan_weight,
-//     cota,
-//     pack_id,
-//     group_under,
-//     dispatch_of
-//   } = req.body;
-
-//   // Validate required fields
-//   if (!godown_id || !owner_id || !truck_id || !tp_no || !tp_date) {
-//     return res.status(400).json({ error: "Required fields are missing" });
-//   }
-  
-//   // Set load_date_time to current date and time if not provided
-//   const load_date_time = req.body.load_date_time || new Date();
-
-//   const sql = `INSERT INTO transport_detail (
-//     stock_id, godown_id, owner_id, truck_id, driver_id, 
-//     item_id, scheme_id, sup_id, empty_weight, gross_weight, 
-//     bags_weight, description, latitude, longtitude, address, 
-//     truck_img, load_date_time, trans_status, tp_no, do_no, 
-//     subgd_id, tp_date, in_time, out_time, loaded_net_weight, 
-//     net_weight, tp_type, bardan_weight, cota, pack_id, 
-//     group_under, dispatch_of
-//   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-//   db.query(sql, [
-//     stock_id || 0, 
-//     godown_id, 
-//     owner_id, 
-//     truck_id, 
-//     driver_id || '', 
-//     item_id || 0, 
-//     scheme_id || 0, 
-//     sup_id || 0, 
-//     empty_weight || 0, 
-//     gross_weight || 0, 
-//     bags_weight || 0, 
-//     description || '', 
-//     latitude || '', 
-//     longtitude || '', 
-//     address || '', 
-//     truck_img || '', 
-//     load_date_time, 
-//     trans_status || 'pending', 
-//     tp_no, 
-//     do_no || '', 
-//     subgd_id || 0, 
-//     tp_date, 
-//     in_time || '', 
-//     out_time || '', 
-//     loaded_net_weight || 0, 
-//     net_weight || 0, 
-//     tp_type || '', 
-//     bardan_weight || 0, 
-//     cota || null, 
-//     pack_id || 0, 
-//     group_under || '', 
-//     dispatch_of || ''
-//   ], (err, result) => {
-//     if (err) {
-//       console.error("Error creating transport detail:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-    
-//     res.status(201).json({
-//       message: "Transport detail created successfully",
-//       id: result.insertId
-//     });
-//   });
-// });
-
-// // Update a transport detail
-// app.put("/api/transport/:id", (req, res) => {
-//   const {
-//     stock_id,
-//     godown_id,
-//     owner_id,
-//     truck_id,
-//     driver_id,
-//     item_id,
-//     scheme_id,
-//     sup_id,
-//     empty_weight,
-//     gross_weight,
-//     bags_weight,
-//     description,
-//     latitude,
-//     longtitude,
-//     address,
-//     truck_img,
-//     trans_status,
-//     tp_no,
-//     do_no,
-//     subgd_id,
-//     tp_date,
-//     in_time,
-//     out_time,
-//     loaded_net_weight,
-//     net_weight,
-//     tp_type,
-//     bardan_weight,
-//     cota,
-//     pack_id,
-//     group_under,
-//     dispatch_of
-//   } = req.body;
-
-//   // Validate required fields
-//   if (!godown_id || !owner_id || !truck_id || !tp_no || !tp_date) {
-//     return res.status(400).json({ error: "Required fields are missing" });
-//   }
-
-//   const sql = `UPDATE transport_detail SET
-//     stock_id = ?,
-//     godown_id = ?,
-//     owner_id = ?,
-//     truck_id = ?,
-//     driver_id = ?,
-//     item_id = ?,
-//     scheme_id = ?,
-//     sup_id = ?,
-//     empty_weight = ?,
-//     gross_weight = ?,
-//     bags_weight = ?,
-//     description = ?,
-//     latitude = ?,
-//     longtitude = ?,
-//     address = ?,
-//     truck_img = ?,
-//     trans_status = ?,
-//     tp_no = ?,
-//     do_no = ?,
-//     subgd_id = ?,
-//     tp_date = ?,
-//     in_time = ?,
-//     out_time = ?,
-//     loaded_net_weight = ?,
-//     net_weight = ?,
-//     tp_type = ?,
-//     bardan_weight = ?,
-//     cota = ?,
-//     pack_id = ?,
-//     group_under = ?,
-//     dispatch_of = ?
-//     WHERE trans_id = ?`;
-
-//   db.query(sql, [
-//     stock_id || 0,
-//     godown_id,
-//     owner_id,
-//     truck_id,
-//     driver_id || '',
-//     item_id || 0,
-//     scheme_id || 0,
-//     sup_id || 0,
-//     empty_weight || 0,
-//     gross_weight || 0,
-//     bags_weight || 0,
-//     description || '',
-//     latitude || '',
-//     longtitude || '',
-//     address || '',
-//     truck_img || '',
-//     trans_status || 'pending',
-//     tp_no,
-//     do_no || '',
-//     subgd_id || 0,
-//     tp_date,
-//     in_time || '',
-//     out_time || '',
-//     loaded_net_weight || 0,
-//     net_weight || 0,
-//     tp_type || '',
-//     bardan_weight || 0,
-//     cota || null,
-//     pack_id || 0,
-//     group_under || '',
-//     dispatch_of || '',
-//     req.params.id
-//   ], (err, result) => {
-//     if (err) {
-//       console.error("Error updating transport detail:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-    
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Transport detail not found" });
-//     }
-    
-//     res.json({ message: "Transport detail updated successfully" });
-//   });
-// });
-
-// // Delete a transport detail
-// app.delete("/api/transport/:id", (req, res) => {
-//   const sql = "DELETE FROM transport_detail WHERE trans_id = ?";
-  
-//   db.query(sql, [req.params.id], (err, result) => {
-//     if (err) {
-//       console.error("Error deleting transport detail:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-    
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Transport detail not found" });
-//     }
-    
-//     res.json({ message: "Transport detail deleted successfully" });
-//   });
-// });
-
-// // Get transport details by date
-// app.get("/api/transport/date/:date", (req, res) => {
-//   const sql = `
-//     SELECT td.*, 
-//     g.godown_name, 
-//     o.owner_name, 
-//     t.truck_no, 
-//     p.pack_name,
-//     s.scheme_name
-//     FROM transport_detail td
-//     LEFT JOIN godown g ON td.godown_id = g.godown_id
-//     LEFT JOIN owner o ON td.owner_id = o.owner_id
-//     LEFT JOIN truck t ON td.truck_id = t.truck_id
-//     LEFT JOIN packaging p ON td.pack_id = p.pack_id
-//     LEFT JOIN scheme s ON td.scheme_id = s.scheme_id
-//     WHERE DATE(td.tp_date) = ?
-//     ORDER BY td.tp_no DESC`;
-    
-//   db.query(sql, [req.params.date], (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Additional API endpoints for dropdown data
-
-// // Get all owners for dropdown
-// app.get("/api/dropowners", (req, res) => {
-//   const sql = "SELECT owner_id, owner_name FROM owner ORDER BY owner_name";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Get all godowns for dropdown
-// app.get("/api/dropgodowns", (req, res) => {
-//   const sql = "SELECT godown_id, godown_name FROM godown ORDER BY godown_name";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Get all packaging types for dropdown
-// app.get("/api/droppackaging", (req, res) => {
-//   const sql = "SELECT pack_id, pack_name FROM packaging ORDER BY pack_name";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Get all trucks for dropdown/search
-// app.get("/api/droptrucks", (req, res) => {
-//   const sql = "SELECT truck_id, truck_no FROM truck ORDER BY truck_no";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // Search trucks by truck number
-// app.get("/api/searchtrucks", (req, res) => {
-//   const query = req.query.q || '';
-//   const sql = "SELECT truck_id, truck_no FROM truck WHERE truck_no LIKE ? ORDER BY truck_no LIMIT 10";
-  
-//   db.query(sql, [`%${query}%`], (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// // **End Transport Detail API**
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2288,6 +1884,123 @@ app.get("/api/tapa/:uuid", (req, res) => {
   });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Get all transport records
+app.get("/api/transport", (req, res) => {
+  const sql = "SELECT * FROM transport ORDER BY orderNumber DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+// Get a specific transport record by uuid
+app.get("/api/transport/:uuid", (req, res) => {
+  const sql = "SELECT * FROM transport WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Record not found" });
+    res.json(results[0]);
+  });
+});
+
+// Add a new transport record
+app.post("/api/transport", (req, res) => {
+  const uuid = uuidv4(); // Generate a unique UUID
+  const {
+    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+    dispatchDate, quota, tpNo, allocation, status
+  } = req.body;
+
+  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
+      !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+      !dispatchDate || !quota || !tpNo || !allocation || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const getMaxOrderSql = "SELECT COALESCE(MAX(orderNumber), 0) + 1 AS next_order FROM transport";
+
+  db.query(getMaxOrderSql, (err, result) => {
+    if (err) {
+      console.error("Error getting next order number:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    const nextOrder = result[0].next_order;
+    const insertSql = `INSERT INTO transport 
+      (uuid, orderNumber, baseDepo, doNo, godown, truck, owner, driver, emptyWeight, 
+      grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, 
+      netWeight, dispatchDate, quota, tpNo, allocation, status) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(insertSql, [
+      uuid, nextOrder, baseDepo, doNo, godown, truck, owner, driver, emptyWeight,
+      grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight,
+      netWeight, dispatchDate, quota, tpNo, allocation, status
+    ], (insertErr) => {
+      if (insertErr) {
+        console.error("Error inserting transport record:", insertErr);
+        return res.status(500).json({ error: "Database insertion failed" });
+      }
+      res.status(201).json({
+        message: "Transport record added successfully",
+        uuid,
+        orderNumber: nextOrder
+      });
+    });
+  });
+});
+
+// Update a transport record
+app.put("/api/transport/:uuid", (req, res) => {
+  const {
+    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+    dispatchDate, quota, tpNo, allocation, status
+  } = req.body;
+
+  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
+      !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+      !dispatchDate || !quota || !tpNo || !allocation || !status) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  const sql = `UPDATE transport SET 
+    baseDepo = ?, doNo = ?, godown = ?, truck = ?, owner = ?, driver = ?, emptyWeight = ?, 
+    grossWeight = ?, scheme = ?, packaging = ?, noOfBags = ?, bardanWeight = ?, loadedNetWeight = ?, 
+    netWeight = ?, dispatchDate = ?, quota = ?, tpNo = ?, allocation = ?, status = ? 
+    WHERE uuid = ?`;
+
+  db.query(sql, [
+    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+    dispatchDate, quota, tpNo, allocation, status, req.params.uuid
+  ], (err, result) => {
+    if (err) {
+      console.error("Error updating transport record:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+    res.json({ message: "Transport record updated successfully" });
+  });
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
