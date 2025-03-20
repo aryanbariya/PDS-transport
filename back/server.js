@@ -1966,31 +1966,83 @@ app.post("/api/transport", (req, res) => {
   });
 });
 
-// Update a transport record
-app.put("/api/transport/:uuid", (req, res) => {
-  const {
-    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
-    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
-    dispatchDate, quota, tpNo, allocation, status
-  } = req.body;
+// // Update a transport record
+// app.put("/api/transport/:uuid", (req, res) => {
+//   const {
+//     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+//     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+//     dispatchDate, quota, tpNo, allocation, status
+//   } = req.body;
 
-  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
-      !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
-      !dispatchDate || !quota || !tpNo || !allocation || !status) {
-    return res.status(400).json({ error: "All fields are required" });
+//   if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
+//       !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+//       !dispatchDate || !quota || !tpNo || !allocation || !status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = `UPDATE transport SET 
+//     baseDepo = ?, doNo = ?, godown = ?, truck = ?, owner = ?, driver = ?, emptyWeight = ?, 
+//     grossWeight = ?, scheme = ?, packaging = ?, noOfBags = ?, bardanWeight = ?, loadedNetWeight = ?, 
+//     netWeight = ?, dispatchDate = ?, quota = ?, tpNo = ?, allocation = ?, status = ? 
+//     WHERE uuid = ?`;
+
+//   db.query(sql, [
+//     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+//     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+//     dispatchDate, quota, tpNo, allocation, status, req.params.uuid
+//   ], (err, result) => {
+//     if (err) {
+//       console.error("Error updating transport record:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Record not found" });
+//     }
+//     res.json({ message: "Transport record updated successfully" });
+//   });
+// });
+app.put("/api/transport/:uuid", (req, res) => {
+  const { baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight, dispatchDate, quota, tpNo, allocation, status = "Active" } = req.body;
+
+  // Ensure required fields are present
+  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight || !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight || !dispatchDate || !quota || !tpNo || !allocation) {
+    return res.status(400).json({ error: "Required fields are missing" });
   }
 
-  const sql = `UPDATE transport SET 
-    baseDepo = ?, doNo = ?, godown = ?, truck = ?, owner = ?, driver = ?, emptyWeight = ?, 
-    grossWeight = ?, scheme = ?, packaging = ?, noOfBags = ?, bardanWeight = ?, loadedNetWeight = ?, 
-    netWeight = ?, dispatchDate = ?, quota = ?, tpNo = ?, allocation = ?, status = ? 
-    WHERE uuid = ?`;
+  // Prepare dynamic update query
+  let updates = [];
+  let values = [];
 
-  db.query(sql, [
-    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
-    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
-    dispatchDate, quota, tpNo, allocation, status, req.params.uuid
-  ], (err, result) => {
+  if (baseDepo) updates.push("baseDepo = ?"), values.push(baseDepo);
+  if (doNo) updates.push("doNo = ?"), values.push(doNo);
+  if (godown) updates.push("godown = ?"), values.push(godown);
+  if (truck) updates.push("truck = ?"), values.push(truck);
+  if (owner) updates.push("owner = ?"), values.push(owner);
+  if (driver) updates.push("driver = ?"), values.push(driver);
+  if (emptyWeight) updates.push("emptyWeight = ?"), values.push(emptyWeight);
+  if (grossWeight) updates.push("grossWeight = ?"), values.push(grossWeight);
+  if (scheme) updates.push("scheme = ?"), values.push(scheme);
+  if (packaging) updates.push("packaging = ?"), values.push(packaging);
+  if (noOfBags) updates.push("noOfBags = ?"), values.push(noOfBags);
+  if (bardanWeight) updates.push("bardanWeight = ?"), values.push(bardanWeight);
+  if (loadedNetWeight) updates.push("loadedNetWeight = ?"), values.push(loadedNetWeight);
+  if (netWeight) updates.push("netWeight = ?"), values.push(netWeight);
+  if (dispatchDate) updates.push("dispatchDate = ?"), values.push(dispatchDate);
+  if (quota) updates.push("quota = ?"), values.push(quota);
+  if (tpNo) updates.push("tpNo = ?"), values.push(tpNo);
+  if (allocation) updates.push("allocation = ?"), values.push(allocation);
+  if (status) updates.push("status = ?"), values.push(status);
+
+  // Ensure at least one additional field is updated
+  if (updates.length < 5) {
+    return res.status(400).json({ error: "At least one additional field must be updated along with required fields" });
+  }
+
+  // Construct SQL query
+  const sql = `UPDATE transport SET ${updates.join(", ")} WHERE uuid = ?`;
+  values.push(req.params.uuid);
+
+  db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error updating transport record:", err);
       return res.status(500).json({ error: "Database error" });

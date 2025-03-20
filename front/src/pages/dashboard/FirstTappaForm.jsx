@@ -41,7 +41,27 @@ const TransportForm = ({ onClose, onSave, editData }) => {
 
   useEffect(() => {
     if (editData) {
-      setFormData(editData);
+      setFormData({
+        baseDepo:editData.baseDepo || "",
+        doNo:editData.doNo || "",
+        godown: editData.godown ||"",
+        truck: editData.truck ||"",
+        owner:editData.owner ||"",
+        driver:editData.driver|| "",
+        emptyWeight:editData.emptyWeight|| "",
+        grossWeight:editData.grossWeight || "",
+        scheme:editData.scheme ||"",
+        packaging:editData.packaging ||"",
+        noOfBags:editData.noOfBags|| "",
+        bardanWeight:editData.bardanWeight ||"",
+        loadedNetWeight:editData.loadedNetWeight|| "",
+        netWeight:editData.netWeight ||"",
+        dispatchDate:editData.dispatchDate ? new Date(editData.dispatchDate).toISOString().split('T')[0] : "",
+        quota:editData.quota ? new Date(editData.quota).toISOString().split('T')[0] : "",
+        tpNo:editData.tpNo|| "",
+        allocation:editData.allocation|| "",
+
+      });
     }
   }, [editData]);
 
@@ -156,21 +176,59 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   try {
+  //     const response = await fetch(`${URL}/api/transport`, {
+  //       method: editData ? "PUT" : "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     if (response.ok) {
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: editData ? "Transport updated successfully!" : "Transport added successfully!",
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //       }).then(() => {
+  //         onSave();
+  //         onClose();
+  //       });
+  //     } else {
+  //       Swal.fire({ icon: "error", title: "Error", text: "Failed to submit form" });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //     Swal.fire({ icon: "error", title: "Error", text: "Error submitting data" });
+  //   }
+  // };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    const method = editData ? "PUT" : "POST";
+    const url = editData
+      ? `${URL}/api/transport/${editData.uuid}`
+      : `${URL}/api/transport`;
+    console.log("Submitting Data:", formData);
     try {
-      const response = await fetch(`${URL}/api/transport`, {
-        method: editData ? "PUT" : "POST",
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      });
 
+      });
+      const responseData = await response.json(); // Read JSON response
+      console.log("Response:", responseData); // Debug response
       if (response.ok) {
         Swal.fire({
           icon: "success",
-          title: editData ? "Transport updated successfully!" : "Transport added successfully!",
+          title: editData ? "Truck updated successfully!" : "Truck added successfully!",
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -178,13 +236,26 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           onClose();
         });
       } else {
-        Swal.fire({ icon: "error", title: "Error", text: "Failed to submit form" });
+        const errorData = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorData.message || "Error submitting form",
+        });
       }
     } catch (error) {
-      console.error("Error submitting data:", error);
-      Swal.fire({ icon: "error", title: "Error", text: "Error submitting data" });
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error submitting form",
+      });
     }
   };
+
+
+
+
+
 
   const renderField = (field) => {
     switch (field) {

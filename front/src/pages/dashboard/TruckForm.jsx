@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert2
+
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const TruckForm = ({ onClose, onSave, editData }) => {
@@ -60,7 +61,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log("Selected value:", value); // Debugging
+    
   
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
