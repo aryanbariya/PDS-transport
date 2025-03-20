@@ -28,8 +28,8 @@ const TransportPage = () => {
     try {
       setLoading(true);
       let endpoint = `${URL}/api/transport`;
-      if (filter === "active") endpoint = `${URL}/api/truck/active`;
-      if (filter === "inactive") endpoint = `${URL}/api/truck/inactive`;
+      if (filter === "active") endpoint = `${URL}/api/tapa/active`;
+      if (filter === "inactive") endpoint = `${URL}/api/tapa/inactive`;
 
       const response = await fetch(endpoint);
       if (!response.ok) throw new Error("Failed to fetch data");
