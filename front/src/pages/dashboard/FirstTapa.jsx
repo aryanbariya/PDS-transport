@@ -136,15 +136,15 @@ const TransportPage = () => {
       )}
       {/* Filter Dropdown */}
       <div className="my-4">
-        <select
+        {/* <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="px-2 py-2 border border-gray-300 rounded-md bg-white shadow-md focus:outline-none"
         >
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+          {/* <option value="all">All</option> */}
+          {/* <option value="active">Active</option>
+          <option value="inactive">Inactive</option> */}
+        {/* </select> */} 
       </div>
 
       {loading && (
