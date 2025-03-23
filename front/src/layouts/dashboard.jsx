@@ -226,7 +226,7 @@ export function Dashboard() {
       <Sidenav open={openSidenav} setOpen={setOpenSidenav} routes={routes} />
 
       {/* Main Content Wrapper */}
-      <div className="flex flex-col w-full xl:ml-[260px] min-h-screen ">
+      <div className="flex flex-col w-full xl:w-[calc(100%-260px)] xl:ml-[260px] min-h-screen ">
 
         {/* Fixed Navbar */}
         <div className="fixed top-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white shadow-md h-16 z-40">
