@@ -89,7 +89,7 @@ const DOCards = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Document Orders</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Delivery Orders</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* DO Generate Card */}
@@ -105,7 +105,7 @@ const DOCards = () => {
                 DO Generate
               </h2>
               <p className="text-gray-600">
-                Click to create new Document Orders and initiate workflow processes
+                Create new Delivery Orderd
               </p>
             </div>
           </div>
@@ -123,7 +123,7 @@ const DOCards = () => {
                 DO Allocation
               </h2>
               <p className="text-gray-600">
-                Click to manage resource allocation and assignment for active Document Orders
+               Allocation and Assignment for active Delivery Orders
               </p>
             </div>
           </div>
