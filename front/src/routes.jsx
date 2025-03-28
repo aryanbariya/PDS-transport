@@ -38,6 +38,7 @@ import CategoryPage from "./pages/dashboard/CategoryPage";
 import DOPage from "./pages/dashboard/DOCards";
 import DOCards from "./pages/dashboard/DOCards";
 import DOGenerateForm from "./pages/dashboard/DOGenerateForm";
+import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
 // import GrainPage from "./pages/dashboard/GrainPage";
 // import TruckPage from "./pages/dashboard/TruckPage";
 // import PackagingPage from "./pages/dashboard/PackagingPage";
@@ -157,6 +158,12 @@ export const routes = [
         name: "DOCards",
         path: "/DOCards",
         element: <DOCards />,
+      },
+      {
+        icon: <FaClipboardCheck {...icon} />,
+        name: "DOGeneratePage",
+        path: "/DOGeneratePage",
+        element: <DOGeneratePage />,
       },
     ],
   },
