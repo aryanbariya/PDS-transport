@@ -209,7 +209,7 @@ const DOGeneratePage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${URL}/api/orders/${uuid}`, { method: "DELETE" });
+          const response = await fetch(`${URL}/api/do/${uuid}`, { method: "DELETE" });
           if (response.ok) {
             Swal.fire("Deleted!", "Order deleted successfully!", "success");
             fetchOrders();
