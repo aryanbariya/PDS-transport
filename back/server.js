@@ -2076,6 +2076,27 @@ app.delete("/api/transport/:uuid", (req, res) => {
     res.json({ message: "truck status updated to Inactive successfully!" });
   });
 });
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////Do
+// Get all records from 'do' table
+app.get("/api/do", (req, res) => {
+  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY do_no DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
+// Get a specific record from 'do' table by do_no
+app.get("/api/do/:do_no", (req, res) => {
+  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do WHERE do_no = ?";
+  db.query(sql, [req.params.do_no], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Record not found" });
+    res.json(results[0]);
+  });
+});
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
 

@@ -186,7 +186,7 @@ const DOGeneratePage = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`${URL}/api/orders`);
+      const response = await fetch(`${URL}/api/do`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setOrders(data || []);
