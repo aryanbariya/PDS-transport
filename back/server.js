@@ -171,7 +171,7 @@ app.get("/api/dropcategory", (req, res) => {
   });
 });
 app.get("/api/dropsubgodown", (req, res) => {
-  const query = "SELECT subGodown FROM sub_godown WHERE status = 'Active'"; // Fetch only godownname
+  const query = "SELECT subGodown FROM sub_godown WHERE status = 'Active' ORDER BY order_number ASC;"; // Fetch only godownname
 
   db.query(query, (err, results) => {
     if (err) {
