@@ -93,65 +93,65 @@ app.post("/signin", async (req, res) => {
 });
 ///////////////////////////////////////////////////////////////////
 
-app.post("/google-signin", async (req, res) => {
-  try {
-    const { email, name, sub } = req.body; // sub = Google user ID
+// app.post("/google-signin", async (req, res) => {
+//   try {
+//     const { email, name, sub } = req.body; // sub = Google user ID
 
-    if (!email || !name || !sub) {
-      return res.status(400).json({ error: "Missing required Google data" });
-    }
+//     if (!email || !name || !sub) {
+//       return res.status(400).json({ error: "Missing required Google data" });
+//     }
 
-    // Check if the user already exists in the database
-    const sqlCheck = "SELECT * FROM users WHERE email = ?";
-    db.query(sqlCheck, [email], (err, results) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ error: "Database error" });
-      }
+//     // Check if the user already exists in the database
+//     const sqlCheck = "SELECT * FROM users WHERE email = ?";
+//     db.query(sqlCheck, [email], (err, results) => {
+//       if (err) {
+//         console.error("Database error:", err);
+//         return res.status(500).json({ error: "Database error" });
+//       }
 
-      if (results.length > 0) {
-        // User exists, generate token
-        const user = results[0];
-        const token = jwt.sign(
-          { id: user.id, email: user.email, name: user.name },
-          "your_secret_key",
-          { expiresIn: "1h" }
-        );
-        return res.json({ message: "Login successful", token, user });
-      } else {
-        // New user, insert into database
-        const sqlInsert =
-          "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)";
-        db.query(sqlInsert, [name, email, sub], (err, result) => {
-          if (err) {
-            console.error("Database insert error:", err);
-            return res.status(500).json({ error: "Database insert error" });
-          }
+//       if (results.length > 0) {
+//         // User exists, generate token
+//         const user = results[0];
+//         const token = jwt.sign(
+//           { id: user.id, email: user.email, name: user.name },
+//           "your_secret_key",
+//           { expiresIn: "1h" }
+//         );
+//         return res.json({ message: "Login successful", token, user });
+//       } else {
+//         // New user, insert into database
+//         const sqlInsert =
+//           "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)";
+//         db.query(sqlInsert, [name, email, sub], (err, result) => {
+//           if (err) {
+//             console.error("Database insert error:", err);
+//             return res.status(500).json({ error: "Database insert error" });
+//           }
 
-          const newUser = {
-            id: result.insertId,
-            name,
-            email,
-          };
+//           const newUser = {
+//             id: result.insertId,
+//             name,
+//             email,
+//           };
 
-          const token = jwt.sign(
-            { id: newUser.id, email: newUser.email, name: newUser.name },
-            "your_secret_key",
-            { expiresIn: "1h" }
-          );
+//           const token = jwt.sign(
+//             { id: newUser.id, email: newUser.email, name: newUser.name },
+//             "your_secret_key",
+//             { expiresIn: "1h" }
+//           );
 
-          return res.status(201).json({
-            message: "User registered successfully",
-            token,
-            user: newUser,
-          });
-        });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Google authentication failed" });
-  }
-});
+//           return res.status(201).json({
+//             message: "User registered successfully",
+//             token,
+//             user: newUser,
+//           });
+//         });
+//       }
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: "Google authentication failed" });
+//   }
+// });
 
 
 
@@ -2096,7 +2096,26 @@ app.get("/api/do/:do_no", (req, res) => {
     res.json(results[0]);
   });
 });
+////////////////////////////////////////////////////////////////////////////////////////////////
+////Do Alloc
+app.get("/api/alloc", (req, res) => {
+  const sql = "SELECT * FROM do_allocate ORDER BY do_allocate_id DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
 
+// Get a specific record from 'do' table by do_no
+app.get("/api/alloc/:do_allocate_id", (req, res) => {
+  const sql = "SELECT * FROM do_alloc WHERE do_allocate_id = ?";
+  db.query(sql, [req.params.do_no], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: "Record not found" });
+    res.json(results[0]);
+  });
+});
+////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
 
