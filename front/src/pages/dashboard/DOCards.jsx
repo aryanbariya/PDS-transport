@@ -1,23 +1,25 @@
-import React, { useState } from "react";
-import DOGenerateForm from "./DOGeneratePage"; // Import the DOGenerateForm
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const DOCards = () => {
-  const [isDOFormOpen, setIsDOFormOpen] = useState(false);
+  const navigate = useNavigate();
 
-  // Click handler functions
   const handleGenerateDO = () => {
-    console.log("DO Generate clicked");
-    setIsDOFormOpen(true); // Open the DO Generate form
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard/DOGeneratePage");
+    } else {
+      navigate("/auth/sign-in");
+    }
   };
-  
 
   const handleAllocateDO = () => {
-    console.log("DO Allocation clicked");
-    alert("Opening DO Allocation...");
-  };
-
-  const handleDOFormClose = () => {
-    setIsDOFormOpen(false);
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard/DOAllocationPage");
+    } else {
+      navigate("/auth/sign-in");
+    }
   };
 
   return (
@@ -57,12 +59,8 @@ const DOCards = () => {
           </div>
         </div>
       </div>
-
-      {/* Render the DOGenerateForm conditionally */}
-      {isDOFormOpen && <DOGenerateForm onClose={handleDOFormClose} />}
     </div>
   );
 };
 
 export default DOCards;
-

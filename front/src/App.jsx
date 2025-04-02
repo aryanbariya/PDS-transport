@@ -1,44 +1,3 @@
-// import { Routes, Route, Navigate } from "react-router-dom";
-// import { Auth, Dashboard } from "@/layouts";
-// import HomePage from "./layouts/HomePage";
-// import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
-// import EmployeePage from "./pages/dashboard/EmployeePage";
-// import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
-// import SubGodownPage from "./pages/dashboard/SubGodownPage";
-// import PackagingPage from "./pages/dashboard/PackagingPage";
-// import SchemePage from "./pages/dashboard/SchemePage";
-// import TruckPage from "./pages/dashboard/TruckPage";
-// import DriverPage from "./pages/dashboard/DriverPage";
-// import { Notifications } from "./pages/dashboard";
-// import GrainPage from "./pages/dashboard/GrainPage";
-// import CategoryPage from "./pages/dashboard/CategoryPage";
-
-// function App() {
-//   return (
-//     <Routes>
-      
-//       <Route path="/dashboard/*" element={<Dashboard />} />
-//       <Route path="/auth/*" element={<Auth />} />
-//       <Route path="*" element={<Navigate to="/dashboard" replace />} />
-//       <Route path="/owners" element={<OwnerNamePage />} />
-//       <Route path="/employee" element={<EmployeePage />} />
-//       <Route path="/mswc" element={<MSWCGodownPage />} />
-//       <Route path="/godown" element={<SubGodownPage />} />
-//       <Route path="/driver" element={<DriverPage />} />
-//       <Route path="/truck" element={<TruckPage />} />
-//       <Route path="/scheme" element={<SchemePage />} />
-//       <Route path="/packaging" element={<PackagingPage />} />
-//       <Route path="/notifications" element={<Notifications />} />
-//       <Route path="/HomePage/*" element={<HomePage />} />
-//       <Route path="/grain/*" element={<GrainPage />} />
-//       <Route path="/category/*" element={<CategoryPage />} />
-      
-//     </Routes>
-//   );
-// }
-
-// export default App;
-
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Dashboard, Auth } from "@/layouts";
 import { SignIn } from "./pages/auth/sign-in";
@@ -54,6 +13,8 @@ import DriverPage from "./pages/dashboard/DriverPage";
 import { Notifications } from "./pages/dashboard";
 import GrainPage from "./pages/dashboard/GrainPage";
 import CategoryPage from "./pages/dashboard/CategoryPage";
+import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
+import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -86,6 +47,10 @@ function App() {
       <Route path="/HomePage/*" element={<PrivateRoute><HomePage /></PrivateRoute>} />
       <Route path="/grain/*" element={<PrivateRoute><GrainPage /></PrivateRoute>} />
       <Route path="/category/*" element={<PrivateRoute><CategoryPage /></PrivateRoute>} />
+
+      {/* DO Related Routes */}
+      <Route path="/DOGeneratePage" element={<PrivateRoute><Dashboard><DOGeneratePage /></Dashboard></PrivateRoute>} />
+      <Route path="/DOAllocationPage" element={<PrivateRoute><Dashboard><DOAllocationPage /></Dashboard></PrivateRoute>} />
 
       {/* Redirect to Sign-In by default if no valid route */}
       <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
