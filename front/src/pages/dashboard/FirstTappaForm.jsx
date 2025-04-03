@@ -63,11 +63,20 @@ const TransportForm = ({ onClose, onSave, editData }) => {
         fetch(`${URL}/api/do`),
         fetch(`${URL}/api/subgodown`),
         fetch(`${URL}/api/truck`),
-        fetch(`${URL}/api/owner`),
-        fetch(`${URL}/api/driver`),
+        fetch(`${URL}/api/owners`),
+        fetch(`${URL}/api/drivers`),
         fetch(`${URL}/api/scheme`),
         fetch(`${URL}/api/packaging`)
       ]);
+
+      if (!baseDepoRes.ok) throw new Error("Failed to fetch base depo data");
+      if (!doNoRes.ok) throw new Error("Failed to fetch DO numbers");
+      if (!godownsRes.ok) throw new Error("Failed to fetch godowns");
+      if (!trucksRes.ok) throw new Error("Failed to fetch trucks");
+      if (!ownersRes.ok) throw new Error("Failed to fetch owners");
+      if (!driversRes.ok) throw new Error("Failed to fetch drivers");
+      if (!schemeRes.ok) throw new Error("Failed to fetch schemes");
+      if (!packagingRes.ok) throw new Error("Failed to fetch packaging");
 
       const baseDepos = await baseDepoRes.json();
       const doNumbers = await doNoRes.json();
@@ -91,7 +100,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       Swal.fire({ 
         icon: "error", 
         title: "Error", 
-        text: "Failed to fetch dropdown data" 
+        text: "Failed to fetch dropdown data: " + error.message 
       });
     } finally {
       setIsLoading(false);
@@ -231,11 +240,51 @@ const TransportForm = ({ onClose, onSave, editData }) => {
           className={`p-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
         >
           <option value="">Select {label}</option>
-          {options.map((option) => (
-            <option key={option[valueKey]} value={field === "doNo" ? option.do_no : option[displayKey]}>
-              {field === "doNo" ? option.do_no : option[displayKey]}
-            </option>
-          ))}
+          {options.map((option) => {
+            let value, display;
+            switch (field) {
+              case "baseDepo":
+                value = option.godownName;
+                display = option.godownName;
+                break;
+              case "doNo":
+                value = option.do_no;
+                display = option.do_no;
+                break;
+              case "godown":
+                value = option.subGodown;
+                display = option.subGodown;
+                break;
+              case "truck":
+                value = option.truck_name;
+                display = option.truck_name;
+                break;
+              case "owner":
+                value = option.ownerName;
+                display = option.ownerName;
+                break;
+              case "driver":
+                value = option.driver_name;
+                display = option.driver_name;
+                break;
+              case "scheme":
+                value = option.scheme_name;
+                display = option.scheme_name;
+                break;
+              case "packaging":
+                value = option.material_name;
+                display = option.material_name;
+                break;
+              default:
+                value = option[valueKey];
+                display = option[displayKey];
+            }
+            return (
+              <option key={option.uuid || option.id} value={value}>
+                {display}
+              </option>
+            );
+          })}
         </select>
         {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
       </div>
