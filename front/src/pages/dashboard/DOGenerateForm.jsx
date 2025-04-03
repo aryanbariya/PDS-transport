@@ -83,12 +83,24 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === 'quantity') {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSecondFormChange = (e) => {
     const { name, value } = e.target;
-    setSecondFormData({ ...secondFormData, [name]: value });
+    if (name === 'quantity') {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setSecondFormData({ ...secondFormData, [name]: value });
+      }
+    } else {
+      setSecondFormData({ ...secondFormData, [name]: value });
+    }
   };
 
   const handleAddEntry = () => {

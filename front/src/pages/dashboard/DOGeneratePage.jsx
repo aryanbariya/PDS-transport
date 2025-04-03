@@ -15,6 +15,7 @@ const URL = import.meta.env.VITE_API_BACK_URL;
 
 const DOGeneratePage = () => {
   const [orders, setOrders] = useState([]);
+  const [grains, setGrains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
@@ -22,7 +23,7 @@ const DOGeneratePage = () => {
   const tableRef = useRef(null);
 
   useEffect(() => {
-    fetchOrders();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -31,12 +32,21 @@ const DOGeneratePage = () => {
     }
   }, [orders]);
 
-  const fetchOrders = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch(`${URL}/api/do`);
-      if (!response.ok) throw new Error("Failed to fetch data");
-      const data = await response.json();
-      setOrders(data || []);
+      const [ordersRes, grainsRes] = await Promise.all([
+        fetch(`${URL}/api/do`),
+        fetch(`${URL}/api/grains`)
+      ]);
+
+      if (!ordersRes.ok) throw new Error("Failed to fetch orders");
+      if (!grainsRes.ok) throw new Error("Failed to fetch grains");
+
+      const ordersData = await ordersRes.json();
+      const grainsData = await grainsRes.json();
+
+      setOrders(ordersData);
+      setGrains(grainsData);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -59,7 +69,7 @@ const DOGeneratePage = () => {
           const response = await fetch(`${URL}/api/do/${uuid}`, { method: "DELETE" });
           if (response.ok) {
             Swal.fire("Deleted!", "Order deleted successfully!", "success");
-            fetchOrders();
+            fetchData();
           } else {
             Swal.fire("Error", "Failed to delete order.", "error");
           }
@@ -68,6 +78,11 @@ const DOGeneratePage = () => {
         }
       }
     });
+  };
+
+  const getGrainName = (grainId) => {
+    const grain = grains.find(g => g.order_number === grainId);
+    return grain ? grain.grainName : "Unknown Grain";
   };
 
   return (
@@ -107,7 +122,7 @@ const DOGeneratePage = () => {
                 setEditData(null);
               }} 
               onSave={() => {
-                fetchOrders();
+                fetchData();
                 setShowForm(false);
                 setEditData(null);
               }} 
@@ -129,8 +144,7 @@ const DOGeneratePage = () => {
         <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
-              <tr className="bg-gray-200 text-start">
-                <th className="border p-2 text-left">Sr. No.</th>
+              <tr className="bg-gray-200">
                 <th className="border p-2 text-left">D.O. No.</th>
                 <th className="border p-2 text-left">Base Godown</th>
                 <th className="border p-2 text-left">D.O. Date</th>
@@ -138,33 +152,34 @@ const DOGeneratePage = () => {
                 <th className="border p-2 text-left">Scheme</th>
                 <th className="border p-2 text-left">Grain</th>
                 <th className="border p-2 text-left">Quantity</th>
-                <th className="border p-2 text-left">Action</th>
+                <th className="border p-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, index) => (
-                <tr key={order.uuid} className="text-start hover:bg-gray-100">
-                  <td className="border p-2 text-left">{index + 1}</td>
+              {orders.map((order) => (
+                <tr key={order.stock_id} className="hover:bg-gray-100">
                   <td className="border p-2 text-left">{order.do_no}</td>
                   <td className="border p-2 text-left">{order.godown_id}</td>
                   <td className="border p-2 text-left">{order.do_date}</td>
                   <td className="border p-2 text-left">{order.cota}</td>
                   <td className="border p-2 text-left">{order.scheme_id}</td>
-                  <td className="border p-2 text-left">{order.grain_id}</td>
+                  <td className="border p-2 text-left">{getGrainName(order.grain_id)}</td>
                   <td className="border p-2 text-left">{order.quantity}</td>
-                  <td className="border p-2 text-left flex justify-start space-x-2">
-                    <Button
-                      onClick={() => setEditData(order)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                    >
-                      Edit
-                    </Button>
-                    <button
-                      onClick={() => handleDelete(order.uuid)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
+                  <td className="border p-2 text-left">
+                    <div className="flex justify-start space-x-2">
+                      <button
+                        onClick={() => setEditData(order)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(order.stock_id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
