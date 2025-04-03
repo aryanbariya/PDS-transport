@@ -10,6 +10,7 @@ import loadingAnimation from "@/util/Animation.json";
 import DOGenerateForm from "./DOGenerateForm";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
+import {formatDate} from "@/util/libs/formatDate"; 
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -160,8 +161,8 @@ const DOGeneratePage = () => {
                 <tr key={order.stock_id} className="hover:bg-gray-100">
                   <td className="border p-2 text-left">{order.do_no}</td>
                   <td className="border p-2 text-left">{order.godown_id}</td>
-                  <td className="border p-2 text-left">{order.do_date}</td>
-                  <td className="border p-2 text-left">{order.cota}</td>
+                  <td className="border p-2 text-left">{formatDate(order.do_date)}</td>
+                  <td className="border p-2 text-left">{formatDate(order.cota)}</td>
                   <td className="border p-2 text-left">{order.scheme_id}</td>
                   <td className="border p-2 text-left">{getGrainName(order.grain_id)}</td>
                   <td className="border p-2 text-left">{order.quantity}</td>

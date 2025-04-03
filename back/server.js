@@ -2127,6 +2127,17 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
     res.json(results[0]);
   });
 });
+
+app.post("/api/do-entries", (req, res) => {
+  const { stock_id = "0", godown,	quantity,	vahtuk,	status="Active" } = req.body;
+
+  const sql = "INSERT INTO  do_allocate (stock_id,	subgd_id,	qty,	vahtuk,	status) VALUES (?, ?, ?, ?, ?)";
+  
+  db.query(sql, [stock_id,	godown,	quantity,	vahtuk,	status], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Data inserted successfully", insertedId: result.insertId });
+  });
+});
 ////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS

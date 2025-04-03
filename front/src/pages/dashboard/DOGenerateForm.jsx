@@ -23,6 +23,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   const [secondFormEntries, setSecondFormEntries] = useState([]);
   const [showSecondForm, setShowSecondForm] = useState(false);
   const [godowns, setGodowns] = useState([]);
+  const [subgodowns, setsubGodowns] = useState([]);
   const [schemes, setSchemes] = useState([]);
   const [grains, setGrains] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +33,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     fetchGodowns();
     fetchSchemes();
     fetchGrains();
+    fetchsubGodowns();
     if (editData) {
       setFormData({
         doNo: editData.do_no || "",
@@ -51,6 +53,16 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       if (!response.ok) throw new Error("Failed to fetch godowns");
       const data = await response.json();
       setGodowns(data || []);
+    } catch (err) {
+      setError("Error fetching godowns: " + err.message);
+    }
+  };
+  const fetchsubGodowns = async () => {
+    try {
+      const response = await fetch(`${URL}/api/subgodown`);
+      if (!response.ok) throw new Error("Failed to fetch godowns");
+      const data = await response.json();
+      setsubGodowns(data || []);
     } catch (err) {
       setError("Error fetching godowns: " + err.message);
     }
@@ -135,14 +147,66 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     setShowSecondForm(true);
   };
 
+  // const handleFinalSubmit = async () => {
+  //   try {
+  //     const url = editData 
+  //       ? `${URL}/api/do/${editData.stock_id}`
+  //       : `${URL}/api/do`;
+      
+  //     const method = editData ? "PUT" : "POST";
+
+  //     const requestData = {
+  //       doNo: formData.doNo,
+  //       baseDepot: formData.baseDepot,
+  //       doDate: formData.doDate,
+  //       doExpiryDate: formData.doExpiryDate,
+  //       scheme: formData.scheme,
+  //       grain: formData.grain,
+  //       quantity: formData.quantity,
+  //       quintal: formData.quantity,
+  //       total_amount: 0,
+  //       expire_date: formData.doExpiryDate,
+  //       entries: secondFormEntries
+  //     };
+
+  //     const response = await fetch(url, {
+  //       method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(requestData),
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.error || "Failed to save data");
+  //     }
+
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Success!",
+  //       text: editData ? "Data updated successfully!" : "Data saved successfully!",
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     });
+
+  //     onSave();
+  //     onClose();
+  //   } catch (err) {
+  //     console.error("Error saving data:", err);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Error!",
+  //       text: err.message || "Failed to save data",
+  //     });
+  //   }
+  // };
   const handleFinalSubmit = async () => {
     try {
-      const url = editData 
-        ? `${URL}/api/do/${editData.stock_id}`
-        : `${URL}/api/do`;
-      
+      // Save the first form data (D.O details)
+      const url = editData ? `${URL}/api/do/${editData.stock_id}` : `${URL}/api/do`;
       const method = editData ? "PUT" : "POST";
-
+  
       const requestData = {
         doNo: formData.doNo,
         baseDepot: formData.baseDepot,
@@ -154,9 +218,8 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
         quintal: formData.quantity,
         total_amount: 0,
         expire_date: formData.doExpiryDate,
-        entries: secondFormEntries
       };
-
+  
       const response = await fetch(url, {
         method,
         headers: {
@@ -164,20 +227,44 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
         },
         body: JSON.stringify(requestData),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save data");
+        throw new Error(errorData.error || "Failed to save first form data");
       }
-
+  
+      // Get the ID of the newly created D.O entry (if needed)
+      const doData = await response.json();
+      const doId = doData.id || editData?.stock_id;
+  
+      // Save the second form data (entries for another DB table)
+      if (secondFormEntries.length > 0) {
+        const secondFormUrl = `${URL}/api/do-entries`; // New API endpoint
+  
+        const secondFormResponse = await fetch(secondFormUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            doId, // Associate with the first form entry
+            entries: secondFormEntries,
+          }),
+        });
+  
+        if (!secondFormResponse.ok) {
+          throw new Error("Failed to save second form data");
+        }
+      }
+  
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: editData ? "Data updated successfully!" : "Data saved successfully!",
+        text: "Data saved successfully!",
         showConfirmButton: false,
         timer: 1500,
       });
-
+  
       onSave();
       onClose();
     } catch (err) {
@@ -189,7 +276,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       });
     }
   };
-
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -390,9 +477,9 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 required
               >
                 <option value="">Select Godown</option>
-                {godowns.map((godown) => (
-                  <option key={godown.uuid} value={godown.godownName}>
-                    {godown.godownName}
+                {subgodowns.map((godown) => (
+                  <option key={godown.uuid} value={godown.subGodown}>
+                    {godown.subGodown}
                   </option>
                 ))}
               </select>
