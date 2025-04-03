@@ -82,8 +82,11 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'quantity') {
-      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+    
+    // Validation for numeric fields
+    if (name === 'doNo' || name === 'quantity') {
+      // Only allow numbers and empty string
+      if (value === '' || /^\d+$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
     } else {
@@ -94,7 +97,8 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   const handleSecondFormChange = (e) => {
     const { name, value } = e.target;
     if (name === 'quantity') {
-      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      // Only allow numbers and empty string
+      if (value === '' || /^\d+$/.test(value)) {
         setSecondFormData({ ...secondFormData, [name]: value });
       }
     } else {
@@ -208,8 +212,13 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter D.O Number"
+                pattern="[0-9]*"
+                inputMode="numeric"
                 required
               />
+              {formData.doNo && !/^\d+$/.test(formData.doNo) && (
+                <p className="mt-1 text-sm text-red-600">Please enter only numbers</p>
+              )}
             </div>
 
             {/* Base Depot */}
@@ -323,8 +332,13 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter Quantity"
+                pattern="[0-9]*"
+                inputMode="numeric"
                 required
               />
+              {formData.quantity && !/^\d+$/.test(formData.quantity) && (
+                <p className="mt-1 text-sm text-red-600">Please enter only numbers</p>
+              )}
             </div>
           </div>
 
@@ -414,8 +428,13 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 onChange={handleSecondFormChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter Quantity"
+                pattern="[0-9]*"
+                inputMode="numeric"
                 required
               />
+              {secondFormData.quantity && !/^\d+$/.test(secondFormData.quantity) && (
+                <p className="mt-1 text-sm text-red-600">Please enter only numbers</p>
+              )}
             </div>
           </div>
 
