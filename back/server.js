@@ -2080,7 +2080,7 @@ app.delete("/api/transport/:uuid", (req, res) => {
 ////Do
 // Get all records from 'do' table
 app.get("/api/do", (req, res) => {
-  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY do_no DESC";
+  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY stock_id DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -2096,6 +2096,18 @@ app.get("/api/do/:do_no", (req, res) => {
     res.json(results[0]);
   });
 });
+
+app.post("/api/do", (req, res) => {
+  const { doNo, baseDepot, doDate, doExpiryDate, scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
+
+  const sql = "INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity quintal,  total_amount, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  
+  db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quota , quantity,  quintal, total_amount, expire_date], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: "Data inserted successfully", insertedId: result.insertId });
+  });
+});
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////Do Alloc
 app.get("/api/alloc", (req, res) => {

@@ -272,7 +272,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                   />
                 </div>
 
-                {/* Quota */}
+                {/* Quota 
                 <div>
             <label htmlFor="quota" className="block text-sm font-medium text-gray-700 mb-1">
                     Quota
@@ -287,7 +287,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                     placeholder="Enter Quota"
               required
                   />
-                </div>
+                </div>*/}
 
                 {/* Quantity */}
                 <div>
