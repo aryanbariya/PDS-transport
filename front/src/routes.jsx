@@ -40,7 +40,7 @@ import DOCards from "./pages/dashboard/DOCards";
 import DOGenerateForm from "./pages/dashboard/DOGenerateForm";
 import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
 import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
-// import GrainPage from "./pages/dashboard/GrainPage";
+import GrainPage from "./pages/dashboard/GrainPage";
 // import TruckPage from "./pages/dashboard/TruckPage";
 // import PackagingPage from "./pages/dashboard/PackagingPage";
 // import CategoryPage from "./pages/dashboard/CategoryPage";
@@ -103,6 +103,12 @@ export const routes = [
             name: "Trucks",
             path: "/trucks",
             element: <TruckPage />,
+          },
+          {
+            icon: TruckIcon,
+            name: "GrainPage",
+            path: "/GrainPage",
+            element: <GrainPage />,
           },
           {
             icon: ClipboardDocumentListIcon,

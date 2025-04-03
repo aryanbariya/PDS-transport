@@ -10,6 +10,8 @@ import truckLoader from "@/util/Animation.json";
 import { formatDate } from "@/util/libs/formatDate";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -21,8 +23,6 @@ const TransportPage = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const tableRef = useRef(null);
-
-
 
   const fetchTransportData = async () => {
     try {
@@ -51,7 +51,6 @@ const TransportPage = () => {
       setError(err.message);
       setLoading(false);
     }
-
   };
 
   useEffect(() => {
@@ -72,7 +71,7 @@ const TransportPage = () => {
     }
   }, [transportData]);
 
-    const handleDelete = async (uuid) => {
+  const handleDelete = async (uuid) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -101,9 +100,7 @@ const TransportPage = () => {
     });
   };
 
-
-
-    const handleEdit = (transport) => {
+  const handleEdit = (transport) => {
     setEditData(transport);
     setShowForm(true);
   };
@@ -112,6 +109,96 @@ const TransportPage = () => {
     setShowForm(false);
     setEditData(null);
     fetchTransportData();
+  };
+
+  const generatePDF = (transport) => {
+    Swal.fire({
+      title: "Download PDF",
+      text: "Do you want to download the transport details as PDF?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, download it!",
+      cancelButtonText: "No, cancel"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          const doc = new jsPDF();
+          
+          // Add title with larger font and centered
+          doc.setFontSize(20);
+          doc.setTextColor(0, 0, 0); // Black color
+          doc.text("Transport Details", 105, 20, { align: 'center' });
+          
+          // Add transport details with improved formatting
+          doc.setFontSize(14);
+          const details = [
+            ["TP No", transport.tpNo || "N/A"],
+            ["Dispatch Date", transport.dispatchDate ? formatDate(transport.dispatchDate) : "N/A"],
+            ["Base Depo", transport.baseDepo || "N/A"],
+            ["Truck No", transport.truck || "N/A"],
+            ["D.O Number", transport.doNo || "N/A"],
+            ["Quota", transport.quota ? formatDate(transport.quota) : "N/A"],
+            ["Scheme", transport.scheme || "N/A"],
+            ["No of Bags", transport.bardanWeight || "N/A"],
+            ["Packaging", transport.packaging || "N/A"],
+            ["Gross Weight", transport.grossWeight || "N/A"],
+            ["Tare Weight", transport.emptyWeight || "N/A"]
+          ];
+
+          autoTable(doc, {
+            startY: 30,
+            head: [['Field', 'Value']],
+            body: details,
+            theme: 'grid',
+            headStyles: { 
+              fillColor: [42, 48, 66],
+              textColor: [255, 255, 255],
+              fontSize: 14,
+              halign: 'center',
+              fontStyle: 'bold'
+            },
+            bodyStyles: {
+              fontSize: 12,
+              halign: 'center',
+              cellPadding: 6,
+              textColor: [0, 0, 0] // Black color
+            },
+            styles: {
+              cellPadding: 6,
+              fontSize: 12,
+              lineColor: [0, 0, 0], // Black borders
+              lineWidth: 0.5
+            },
+            columnStyles: {
+              0: { cellWidth: 60, fontStyle: 'bold' },
+              1: { cellWidth: 120 }
+            },
+            margin: { left: 15, right: 15 }
+          });
+
+          // Save the PDF
+          doc.save(`Transport_${transport.tpNo || 'Details'}.pdf`);
+          
+          // Show success message
+          Swal.fire({
+            icon: "success",
+            title: "PDF Downloaded",
+            text: "The transport details have been downloaded successfully!",
+            timer: 1500,
+            showConfirmButton: false
+          });
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to generate PDF. Please try again."
+          });
+        }
+      }
+    });
   };
 
   return (
@@ -181,7 +268,14 @@ const TransportPage = () => {
                 transportData.map((tp) => (
                   <tr key={tp.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{tp.orderNumber}</td>
-                    <td className="border p-2">View</td>
+                    <td className="border p-2">
+                      <button
+                        onClick={() => generatePDF(tp)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        View
+                      </button>
+                    </td>
                     <td className="border p-2">{tp.tpNo}</td>
                     <td className="border p-2">{formatDate(tp.dispatchDate)}</td>
                     <td className="border p-2">{tp.baseDepo}</td>
@@ -203,10 +297,11 @@ const TransportPage = () => {
                     </td>
                   </tr>
                 ))
-              ) : (<tr>
-                <td colSpan="10" className="text-center p-4">No records found</td>
-              </tr>)
-              }
+              ) : (
+                <tr>
+                  <td colSpan="10" className="text-center p-4">No records found</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

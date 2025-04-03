@@ -25,12 +25,14 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   const [showSecondForm, setShowSecondForm] = useState(false);
   const [godowns, setGodowns] = useState([]);
   const [schemes, setSchemes] = useState([]);
+  const [grains, setGrains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchGodowns();
     fetchSchemes();
+    fetchGrains();
     if (editData) {
       setFormData({
         doNo: editData.do_number || "",
@@ -64,6 +66,17 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       setSchemes(data || []);
     } catch (err) {
       setError("Error fetching schemes: " + err.message);
+    }
+  };
+
+  const fetchGrains = async () => {
+    try {
+      const response = await fetch(`${URL}/api/grains`);
+      if (!response.ok) throw new Error("Failed to fetch grains");
+      const data = await response.json();
+      setGrains(data || []);
+    } catch (err) {
+      setError("Error fetching grains: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -257,19 +270,24 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
                 {/* Grain */}
                 <div>
-            <label htmlFor="grain" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="grain" className="block text-sm font-medium text-gray-700 mb-1">
                     Grain
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="grain"
                     name="grain"
                     value={formData.grain}
                     onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter Grain"
-              required
-                  />
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  >
+                    <option value="">Select Grain</option>
+                    {grains.map((grain) => (
+                      <option key={grain.uuid} value={grain.grainName}>
+                        {grain.grainName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Quota 

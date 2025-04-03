@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import GrainForm from "./GrainForm";
-const URL = import.meta.env.VITE_API_BACK_URL
+import $ from "jquery";
+import "datatables.net-dt/css/dataTables.dataTables.min.css";
+import "datatables.net-dt";
+import { Player } from "@lottiefiles/react-lottie-player";
+import loadingAnimation from "@/util/Animation.json";
+import Navigation from "@/util/libs/navigation";
+import Swal from "sweetalert2";
+
+const URL = import.meta.env.VITE_API_BACK_URL;
 
 const GrainPage = () => {
   const [grains, setGrains] = useState([]);
@@ -9,8 +17,9 @@ const GrainPage = () => {
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const tableRef = useRef(null);
 
-  // ✅ Fetch grains from backend
+  // Fetch grains from backend
   const fetchGrains = async () => {
     try {
       const response = await fetch(`${URL}/api/grains`);
@@ -28,39 +37,56 @@ const GrainPage = () => {
     fetchGrains();
   }, []);
 
-  // ✅ Handle Delete
-  const handleDelete = async (uuid) => {
-    if (!window.confirm("Are you sure you want to delete this grain?")) return;
-    try {
-      const response = await fetch(`${URL}/api/grains/${uuid}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        alert("Grain deleted successfully!");
-        fetchGrains();
-      } else {
-        alert("Failed to delete grain.");
-      }
-    } catch (err) {
-      console.error("Error deleting grain:", err);
-      alert("Error deleting data.");
+  useEffect(() => {
+    if (grains.length > 0 && tableRef.current) {
+      $(tableRef.current).DataTable();
     }
+  }, [grains]);
+
+  // Handle Delete
+  const handleDelete = async (uuid) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`${URL}/api/grains/${uuid}`, {
+            method: "DELETE",
+          });
+          if (response.ok) {
+            Swal.fire("Deleted!", "Grain deleted successfully!", "success");
+            fetchGrains();
+          } else {
+            Swal.fire("Error", "Failed to delete grain.", "error");
+          }
+        } catch (err) {
+          console.error("Error deleting grain:", err);
+          Swal.fire("Error", "Error deleting data.", "error");
+        }
+      }
+    });
   };
 
-  // ✅ Handle Edit
+  // Handle Edit
   const handleEdit = (grain) => {
     setEditData(grain);
     setShowForm(true);
   };
 
-  // ✅ Handle Save after Form Submission
+  // Handle Save after Form Submission
   const handleSave = async () => {
     setShowForm(false);
     setEditData(null);
     fetchGrains();
   };
 
-  // ✅ Filter Grains by Search Term
+  // Filter Grains by Search Term
   const filteredGrains = grains.filter(
     (g) =>
       g.grainName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,18 +95,8 @@ const GrainPage = () => {
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
-      <div className="bg-blue-600 text-white text-lg font-semibold py-4 px-6 rounded-md w-full">
-        Grain Management
-      </div>
-
-      <div className="flex justify-between items-center bg-white p-3 mt-2 rounded-md shadow-md">
-        <input
-          type="text"
-          placeholder="Search Grain..."
-          className="border p-2 rounded-md w-full max-w-lg"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -98,44 +114,57 @@ const GrainPage = () => {
         </div>
       )}
 
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <Player autoplay loop src={loadingAnimation} className="w-48 h-48" />
+        </div>
+      )}
+
       {error && <p className="text-red-500">{error}</p>}
 
-      <table className="w-full border-collapse border border-gray-300 mt-4 bg-white shadow-md rounded-md">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Grain Name</th>
-            <th className="border p-2">Godown Name</th>
-            <th className="border p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredGrains.length > 0 ? (
-            filteredGrains.map((g) => (
-              <tr key={g.uuid} className="text-center hover:bg-gray-100">
-                <td className="border p-2">{g.order_number}</td>
-                <td className="border p-2">{g.grainName}</td>
-                <td className="border p-2">{g.godownName}</td>
-                <td className="border p-2">
-                  <div className="flex justify-center space-x-2">
-                    <button onClick={() => handleEdit(g)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
-                      ✏️
-                    </button>
-                    <button onClick={() => handleDelete(g.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
-                      🗑️
-                    </button>
-                  </div>
-                </td>
+      {!loading && (
+        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
+          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border p-2">ID</th>
+                <th className="border p-2">Grain Name</th>
+                <th className="border p-2">Godown Name</th>
+                <th className="border p-2">Actions</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center p-4">No records found</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {filteredGrains.length > 0 ? (
+                filteredGrains.map((grain) => (
+                  <tr key={grain.uuid} className="text-start hover:bg-gray-100">
+                    <td className="border p-2">{grain.order_number}</td>
+                    <td className="border p-2">{grain.grainName}</td>
+                    <td className="border p-2">{grain.godownName}</td>
+                    <td className="border p-2 flex justify-start space-x-2">
+                      <button
+                        onClick={() => handleEdit(grain)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(grain.uuid)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center p-4">No grains found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
