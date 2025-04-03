@@ -2098,11 +2098,11 @@ app.get("/api/do/:do_no", (req, res) => {
 });
 
 app.post("/api/do", (req, res) => {
-  const { doNo, baseDepot, doDate, doExpiryDate, scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
+  const { doNo, baseDepot, doDate, doExpiryDate,  scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
 
   const sql = "INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity quintal,  total_amount, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   
-  db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quota , quantity,  quintal, total_amount, expire_date], (err, result) => {
+  db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity,  quintal, total_amount, expire_date], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
   });
