@@ -130,29 +130,29 @@ const DOGeneratePage = () => {
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
             <thead>
               <tr className="bg-gray-200 text-start">
-                <th className="border p-2">Sr. No.</th>
-                <th className="border p-2">D.O. No.</th>
-                <th className="border p-2">Base Godown</th>
-                <th className="border p-2">D.O. Date</th>
-                <th className="border p-2">Quota Validity Date</th>
-                <th className="border p-2">Scheme</th>
-                <th className="border p-2">Grain</th>
-                <th className="border p-2">Quantity</th>
-                <th className="border p-2">Action</th>
+                <th className="border p-2 text-left">Sr. No.</th>
+                <th className="border p-2 text-left">D.O. No.</th>
+                <th className="border p-2 text-left">Base Godown</th>
+                <th className="border p-2 text-left">D.O. Date</th>
+                <th className="border p-2 text-left">Quota Validity Date</th>
+                <th className="border p-2 text-left">Scheme</th>
+                <th className="border p-2 text-left">Grain</th>
+                <th className="border p-2 text-left">Quantity</th>
+                <th className="border p-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order, index) => (
                 <tr key={order.uuid} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{order.do_number}</td>
-                  <td className="border p-2">{order.base_godown}</td>
-                  <td className="border p-2">{order.do_date}</td>
-                  <td className="border p-2">{order.quota_validity_date}</td>
-                  <td className="border p-2">{order.scheme}</td>
-                  <td className="border p-2">{order.grain}</td>
-                  <td className="border p-2">{order.quantity}</td>
-                  <td className="border p-2 flex justify-center space-x-2">
+                  <td className="border p-2 text-left">{index + 1}</td>
+                  <td className="border p-2 text-left">{order.do_no}</td>
+                  <td className="border p-2 text-left">{order.godown_id}</td>
+                  <td className="border p-2 text-left">{order.do_date}</td>
+                  <td className="border p-2 text-left">{order.cota}</td>
+                  <td className="border p-2 text-left">{order.scheme_id}</td>
+                  <td className="border p-2 text-left">{order.grain_id}</td>
+                  <td className="border p-2 text-left">{order.quantity}</td>
+                  <td className="border p-2 text-left flex justify-start space-x-2">
                     <Button
                       onClick={() => setEditData(order)}
                       className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"

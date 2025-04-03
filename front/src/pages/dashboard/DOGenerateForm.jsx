@@ -35,13 +35,12 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     fetchGrains();
     if (editData) {
       setFormData({
-        doNo: editData.do_number || "",
-        baseDepot: editData.base_godown || "",
+        doNo: editData.do_no || "",
+        baseDepot: editData.godown_id || "",
         doDate: editData.do_date || "",
-        doExpiryDate: editData.quota_validity_date || "",
-        scheme: editData.scheme || "",
-        grain: editData.grain || "",
-        quota: editData.quota || "",
+        doExpiryDate: editData.cota || "",
+        scheme: editData.scheme_id || "",
+        grain: editData.grain_id || "",
         quantity: editData.quantity || "",
       });
     }
@@ -120,14 +119,16 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       const method = editData ? "PUT" : "POST";
 
       const requestData = {
-        do_number: formData.doNo,
-        base_godown: formData.baseDepot,
-        do_date: formData.doDate,
-        quota_validity_date: formData.doExpiryDate,
+        doNo: formData.doNo,
+        baseDepot: formData.baseDepot,
+        doDate: formData.doDate,
+        doExpiryDate: formData.doExpiryDate,
         scheme: formData.scheme,
         grain: formData.grain,
-        quota: formData.quota,
         quantity: formData.quantity,
+        quintal: formData.quantity,
+        total_amount: 0,
+        expire_date: formData.doExpiryDate
       };
 
       console.log('Sending request to:', url);
@@ -141,22 +142,21 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
         body: JSON.stringify(requestData),
       });
 
-      const responseData = await response.json();
-
       if (!response.ok) {
-        throw new Error(responseData.error || "Failed to save data");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save data");
       }
 
-    Swal.fire({
-      icon: "success",
+      Swal.fire({
+        icon: "success",
         title: "Success!",
-        text: "Data saved successfully!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
+        text: editData ? "Data updated successfully!" : "Data saved successfully!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
       onSave();
-      setShowSecondForm(true);
+      onClose();
     } catch (err) {
       console.error("Error saving data:", err);
       Swal.fire({
@@ -283,7 +283,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                   >
                     <option value="">Select Grain</option>
                     {grains.map((grain) => (
-                      <option key={grain.uuid} value={grain.grainName}>
+                      <option key={grain.uuid} value={grain.order_number}>
                         {grain.grainName}
                       </option>
                     ))}
