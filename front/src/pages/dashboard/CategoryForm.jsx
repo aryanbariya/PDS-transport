@@ -1,123 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// const URL = import.meta.env.VITE_API_BACK_URL
-
-// const CategoryForm = ({ onClose, onSave, editData }) => {
-//   const [formData, setFormData] = useState({
-//     category_name: "",
-//     status: "Active",
-//   });
-
-//   useEffect(() => {
-//     if (editData) {
-//       setFormData({
-//         category_name: editData.category_name || "",
-//         status: editData.status || "Active",
-//       });
-//     } else {
-//       setFormData({ category_name: "", status: "Active" });
-//     }
-//   }, [editData]);
-
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!isFormValid) {
-//       alert("Please fill in all fields.");
-//       return;
-//     }
-
-//     const method = editData ? "PUT" : "POST";
-//     const url = editData
-//       ? `${URL}/api/categories/${editData.uuid}`
-//       : `${URL}/api/categories`;
-
-//     try {
-//       const response = await fetch(url, {
-//         method,
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(formData),
-//       });
-
-//       if (response.ok) {
-//         alert(editData ? "Category updated successfully!" : "Category added successfully!");
-//         onSave();
-//         onClose();
-//       } else {
-//         alert("Error submitting form");
-//       }
-//     } catch (error) {
-//       console.error("Error submitting data:", error);
-//       alert("Error submitting form");
-//     }
-//   };
-
-//   return (
-//     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-//       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-//         <h2 className="bg-blue-600 text-white text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
-//           {editData ? "Edit Category" : "Add Category"}
-//         </h2>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           {["category_name", "status"].map((field) => (
-//             <div key={field}>
-//               <label className="block text-sm font-medium text-gray-700">
-//                 {field.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-//               </label>
-//               {field === "status" ? (
-//                 <select
-//                   name={field}
-//                   value={formData[field]}
-//                   onChange={handleChange}
-//                   className="p-2 border rounded-lg w-full"
-//                 >
-//                   <option value="Active">Active</option>
-//                   <option value="Inactive">Inactive</option>
-//                 </select>
-//               ) : (
-//                 <input
-//                   type="text"
-//                   name={field}
-//                   placeholder={`Enter ${field.replace(/_/g, " ")}`}
-//                   value={formData[field]}
-//                   onChange={handleChange}
-//                   required
-//                   className="p-2 border rounded-lg w-full"
-//                 />
-//               )}
-//             </div>
-//           ))}
-//           <div className="flex justify-between">
-//             <button
-//               type="submit"
-//               disabled={!isFormValid}
-//               className={`py-2 px-4 rounded-lg ${
-//                 isFormValid ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
-//               }`}
-//             >
-//               {editData ? "Update" : "Submit"}
-//             </button>
-//             <button
-//               type="button"
-//               className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-//               onClick={onClose}
-//             >
-//               Close
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CategoryForm;
-
-
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; // Import SweetAlert2
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -127,6 +7,8 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
     category_name: "",
     status: "Active",
   });
+
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (editData) {
@@ -139,34 +21,37 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
     }
   }, [editData]);
 
+  const validateForm = () => {
+    let newErrors = {};
+    if (!formData.category_name.trim()) {
+      newErrors.category_name = "Category name is required";
+    } else if (!/^[a-zA-Z\s]{2,}$/.test(formData.category_name)) {
+      newErrors.category_name = "Category name must be at least 2 characters and contain only letters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isFormValid = Object.values(formData).every((value) => value.trim() !== "");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Please fill in all fields.",
-      });
-      return;
-    }
-
-    const method = editData ? "PUT" : "POST";
-    const url = editData
-      ? `${URL}/api/categories/${editData.uuid}`
-      : `${URL}/api/categories`;
+    if (!validateForm()) return;
 
     try {
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        editData
+          ? `${URL}/api/categories/${editData.uuid}`
+          : `${URL}/api/categories`,
+        {
+          method: editData ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         Swal.fire({
@@ -179,10 +64,12 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
           onClose();
         });
       } else {
+        const data = await response.json();
+        console.error("Error submitting data:", data); // Log server response error
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Error submitting form",
+          text: data.message || "Failed to submit form",
         });
       }
     } catch (error) {
@@ -196,61 +83,58 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-        <h2 className="bg-blue-600 text-white text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
-          {editData ? "Edit Category" : "Add Category"}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {["category_name", "status"].map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-medium text-gray-700">
-                {field.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </label>
-              {field === "status" ? (
-                <select
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  className="p-2 border rounded-lg w-full"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  name={field}
-                  placeholder={`Enter ${field.replace(/_/g, " ")}`}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  required
-                  autoComplete="off" // Prevent autocomplete
-                  className="p-2 border rounded-lg w-full"
-                />
-              )}
-            </div>
-          ))}
-          <div className="flex justify-between">
-            <button
-              type="submit"
-              disabled={!isFormValid}
-              className={`py-2 px-4 rounded-lg ${
-                isFormValid ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
-            >
-              {editData ? "Update" : "Submit"}
-            </button>
-            <button
-              type="button"
-              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-              onClick={onClose}
-            >
-              Close
-            </button>
-          </div>
-        </form>
-      </div>
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold py-2 px-4 border-b-2 border-gray-200">
+        {editData ? "Edit Category" : "Add Category"}
+      </h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-4">
+        <div className="col-span-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Category Name
+          </label>
+          <input
+            type="text"
+            name="category_name"
+            value={formData.category_name}
+            onChange={handleChange}
+            placeholder="Enter category name"
+            autoComplete="off"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          {errors.category_name && <p className="text-red-500 text-sm mt-1">{errors.category_name}</p>}
+        </div>
+
+        <div className="col-span-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div className="col-span-1 flex justify-end space-x-3 mt-6 pt-4 border-t">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {editData ? "Update" : "Submit"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
