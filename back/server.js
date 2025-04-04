@@ -2128,16 +2128,43 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
   });
 });
 
-app.post("/api/do-entries", (req, res) => {
-  const { stock_id = "0", godown,	quantity,	vahtuk,	status="Active" } = req.body;
+// app.post("/api/do-entries", (req, res) => {
+//   const { stock_id = "0", godown,	quantity,	vahtuk,	status="Active" } = req.body;
 
-  const sql = "INSERT INTO  do_allocate (stock_id,	subgd_id,	qty,	vahtuk,	status) VALUES (?, ?, ?, ?, ?)";
+//   const sql = "INSERT INTO do_allocate (stock_id,	subgd_id,	qty,	vahtuk,	status) VALUES (?, ?, ?, ?, ?)";
   
-  db.query(sql, [stock_id,	godown,	quantity,	vahtuk,	status], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Data inserted successfully", insertedId: result.insertId });
-  });
+//   db.query(sql, [stock_id,	godown,	quantity,	vahtuk,	status], (err, result) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
+//   });
+// });
+app.post('/api/do-entries', async (req, res) => {
+  const { doId, entries } = req.body;
+
+  if (!doId || !Array.isArray(entries)) {
+    return res.status(400).json({ error: 'Invalid data' });
+  }
+
+  try {
+    const insertPromises = entries.map(entry => {
+      const { godown, vahtuk, quantity } = entry;
+
+      // Assuming you're using MySQL with a query function:
+      return db.query(
+        'INSERT INTO do_allocate (do_allocate_id, subgodown_id, vahtuk, quantity) VALUES (?, ?, ?, ?)',
+        [doId, godown, vahtuk, quantity]
+      );
+    });
+
+    await Promise.all(insertPromises);
+
+    res.status(200).json({ message: 'Entries saved successfully' });
+  } catch (err) {
+    console.error('Error saving entries:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
 ////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///  COUNT OF CARDS
