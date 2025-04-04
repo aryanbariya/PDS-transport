@@ -2151,7 +2151,7 @@ app.post('/api/do-entries', async (req, res) => {
 
       // Assuming you're using MySQL with a query function:
       return db.query(
-        'INSERT INTO do_allocate (do_allocate_id, subgodown_id, vahtuk, quantity) VALUES (?, ?, ?, ?)',
+        'INSERT INTO do_allocate (do_allocate_id,	subgd_id, vahtuk, qty) VALUES (?, ?, ?, ?)',
         [doId, godown, vahtuk, quantity]
       );
     });
