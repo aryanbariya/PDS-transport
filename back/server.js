@@ -2139,7 +2139,7 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
 //   });
 // });
 // POST /api/do-entries
-app.post('/do-entries', async (req, res) => {
+app.post('api/do-entries', async (req, res) => {
   const { doId, entries } = req.body;
 
   if (!doId || !Array.isArray(entries) || entries.length === 0) {
