@@ -2155,7 +2155,7 @@ app.post("/api/do", (req, res) => {
       `;
 
       const entryValues = entries.map(entry => [
-        insertedDoId,
+        doNo,
         entry.godown,
         entry.vahtuk,
         entry.quantity
