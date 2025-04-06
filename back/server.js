@@ -2150,7 +2150,7 @@ app.post("/api/do", (req, res) => {
 
       // 3. Prepare entries for bulk insertion
       const insertEntriesSql = `
-        INSERT INTO do_entries (do_id, godown_id, vahtuk_id, quantity)
+        INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
         VALUES ?
       `;
 
