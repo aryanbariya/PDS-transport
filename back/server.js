@@ -2097,16 +2097,91 @@ app.get("/api/do/:do_no", (req, res) => {
   });
 });
 
-app.post("/api/do", (req, res) => {
-  const { doNo, baseDepot, doDate, doExpiryDate,  scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
+// app.post("/api/do", (req, res) => {
+//   const { doNo, baseDepot, doDate, doExpiryDate,  scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
 
-  const sql = "INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal,  total_amount, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//   const sql = "INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal,  total_amount, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   
-  db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity,  quintal, total_amount, expire_date], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Data inserted successfully", insertedId: result.insertId });
-  });
+//   db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity,  quintal, total_amount, expire_date], (err, result) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
+//   });
+// });
+
+app.post("/api/do", (req, res) => {
+  const {
+    doNo,
+    baseDepot,
+    doDate,
+    doExpiryDate,
+    scheme,
+    grain,
+    quantity,
+    quintal,
+    total_amount,
+    expire_date,
+    entries // <-- Entries from secondForm
+  } = req.body;
+
+  // 1. First insert into DO table
+  const insertDoSql = `
+    INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal, total_amount, expire_date)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    insertDoSql,
+    [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity, quintal, total_amount, expire_date],
+    (err, result) => {
+      if (err) {
+        console.error("❌ Error inserting DO:", err);
+        return res.status(500).json({ error: "Failed to insert DO" });
+      }
+
+      const insertedDoId = result.insertId;
+
+      // 2. If no entries are provided, return success just for DO
+      if (!entries || entries.length === 0) {
+        return res.json({
+          message: "✅ DO inserted (no entries)",
+          do_id: insertedDoId
+        });
+      }
+
+      // 3. Prepare entries for bulk insertion
+      const insertEntriesSql = `
+        INSERT INTO do_entries (do_id, godown_id, vahtuk_id, quantity)
+        VALUES ?
+      `;
+
+      const entryValues = entries.map(entry => [
+        insertedDoId,
+        entry.godown,
+        entry.vahtuk,
+        entry.quantity
+      ]);
+
+      // 4. Insert entries
+      db.query(insertEntriesSql, [entryValues], (entryErr, entryResult) => {
+        if (entryErr) {
+          console.error("❌ Error inserting DO entries:", entryErr);
+          return res.status(500).json({
+            error: "DO inserted but failed to insert entries",
+            do_id: insertedDoId
+          });
+        }
+
+        // 5. Return success response
+        res.json({
+          message: "✅ DO and entries inserted successfully",
+          do_id: insertedDoId,
+          entries_inserted: entryResult.affectedRows
+        });
+      });
+    }
+  );
 });
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////Do Alloc
@@ -2139,41 +2214,6 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
 //   });
 // });
 // POST /api/do-entries
-app.post('api/do-entries', async (req, res) => {
-  const { doId, entries } = req.body;
-
-  if (!doId || !Array.isArray(entries) || entries.length === 0) {
-    return res.status(400).json({ error: 'Invalid request data' });
-  }
-
-  try {
-    // Prepare an array of values for bulk insert
-    const values = entries.map(entry => [
-      doId,
-      entry.godown,
-      entry.vahtuk,
-      entry.quantity,
-    ]);
-
-    // Insert into `do_entries` table (adjust table/column names as per your DB)
-    const sql = `
-      INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
-      VALUES (?, ?, ?, ?);
-    `;
-
-    db.query(sql, [values], (err, result) => {
-      if (err) {
-        console.error('Error inserting entries:', err);
-        return res.status(500).json({ error: 'Failed to save second form entries' });
-      }
-
-      res.status(201).json({ message: 'Entries saved successfully', insertedRows: result.affectedRows });
-    });
-  } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 ////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
