@@ -2158,7 +2158,7 @@ app.post('api/do-entries', async (req, res) => {
     // Insert into `do_entries` table (adjust table/column names as per your DB)
     const sql = `
       INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
-      VALUES ?
+      VALUES (?, ?, ?, ?);
     `;
 
     db.query(sql, [values], (err, result) => {
