@@ -29,7 +29,7 @@ const DOAllocationPage = () => {
       $(tableRef.current).DataTable();
     }
   }, [orders, subGodowns]);
-  
+
   // Fetch Orders Data
   const fetchOrders = async () => {
     try {
@@ -49,10 +49,10 @@ const DOAllocationPage = () => {
     try {
       const response = await fetch(`${URL}/api/dropsubgodown`);
       if (!response.ok) throw new Error("Failed to fetch subgodowns");
-      
+
       const data = await response.json();
       console.log("Fetched SubGodowns:", data); // Debugging
-      
+
       if (Array.isArray(data)) {
         setSubGodowns(data.map((sg) => sg.subGodown)); // Fix: Use correct key
       } else {
@@ -63,13 +63,13 @@ const DOAllocationPage = () => {
       console.error("Error fetching subgodowns:", err);
     }
   };
-  
-  
+
+
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => setShowForm(!showForm)}
@@ -104,7 +104,7 @@ const DOAllocationPage = () => {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            {/* <tbody>
               {orders.map((order, index) => (
                 <tr key={order.uuid} className="text-start hover:bg-gray-100">
                   <td className="border p-2">{index + 1}</td>
@@ -116,7 +116,36 @@ const DOAllocationPage = () => {
                   ))}
                 </tr>
               ))}
+            </tbody> */}
+            <tbody>
+              {
+                // Group orders by do_id
+                Object.entries(
+                  orders.reduce((acc, order) => {
+                    if (!acc[order.do_id]) acc[order.do_id] = [];
+                    acc[order.do_id].push(order);
+                    return acc;
+                  }, {})
+                ).map(([doId, entries], index) => (
+                  <tr key={doId} className="text-start hover:bg-gray-100">
+                    <td className="border p-2">{index + 1}</td>
+                    <td className="border p-2">{doId}</td>
+                    {
+                      subGodowns.map((name) => {
+                        const match = entries.find((entry) => entry.godown === name);
+                        return (
+                          <td key={name} className="border p-2">
+                            {match ? match.quantity : ""}<br/>
+                            {match ? match.vahtuk : ""}
+                          </td>
+                        );
+                      })
+                    }
+                  </tr>
+                ))
+              }
             </tbody>
+
           </table>
         </div>
       )}
