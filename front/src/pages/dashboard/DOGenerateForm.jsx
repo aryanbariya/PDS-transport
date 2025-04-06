@@ -236,7 +236,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   
       // Get the ID of the newly created D.O entry (if needed)
       const doData = await response.json();
-      const doId = doData.id || editData?.stock_id;
+      const doId = doData.stock_id || editData?.stock_id;
   
       // Save the second form data (entries for another DB table)
       if (secondFormEntries.length > 0) {

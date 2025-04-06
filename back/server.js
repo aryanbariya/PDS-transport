@@ -2138,30 +2138,40 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
 //     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
 //   });
 // });
-app.post('/api/do-entries', async (req, res) => {
+// POST /api/do-entries
+app.post('/do-entries', async (req, res) => {
   const { doId, entries } = req.body;
 
-  if (!doId || !Array.isArray(entries)) {
-    return res.status(400).json({ error: 'Invalid data' });
+  if (!doId || !Array.isArray(entries) || entries.length === 0) {
+    return res.status(400).json({ error: 'Invalid request data' });
   }
 
   try {
-    const insertPromises = entries.map(entry => {
-      const { godown, vahtuk, quantity } = entry;
+    // Prepare an array of values for bulk insert
+    const values = entries.map(entry => [
+      doId,
+      entry.godown,
+      entry.vahtuk,
+      entry.quantity,
+    ]);
 
-      // Assuming you're using MySQL with a query function:
-      return db.query(
-        'INSERT INTO do_allocate (do_allocate_id,	subgd_id, vahtuk, qty) VALUES (?, ?, ?, ?)',
-        [doId, godown, vahtuk, quantity]
-      );
+    // Insert into `do_entries` table (adjust table/column names as per your DB)
+    const sql = `
+      INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
+      VALUES ?
+    `;
+
+    db.query(sql, [values], (err, result) => {
+      if (err) {
+        console.error('Error inserting entries:', err);
+        return res.status(500).json({ error: 'Failed to save second form entries' });
+      }
+
+      res.status(201).json({ message: 'Entries saved successfully', insertedRows: result.affectedRows });
     });
-
-    await Promise.all(insertPromises);
-
-    res.status(200).json({ message: 'Entries saved successfully' });
-  } catch (err) {
-    console.error('Error saving entries:', err);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
