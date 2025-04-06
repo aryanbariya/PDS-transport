@@ -2186,7 +2186,7 @@ app.post("/api/do", (req, res) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////Do Alloc
 app.get("/api/alloc", (req, res) => {
-  const sql = "SELECT * FROM do_allocate ORDER BY do_allocate_id DESC";
+  const sql = "SELECT * FROM do_entries ORDER BY id DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);

@@ -108,7 +108,7 @@ const DOAllocationPage = () => {
               {orders.map((order, index) => (
                 <tr key={order.uuid} className="text-start hover:bg-gray-100">
                   <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{order.do_allocate_id}</td>
+                  <td className="border p-2">{order.do_id}</td>
                   {subGodowns.map((name) => (
                     <td key={name} className="border p-2">
                       {order.subgodown_id === name ? "✔️" : ""}
