@@ -360,7 +360,9 @@ export function Sidenav({ open, setOpen,  routes }) {
                       onClick={() => setOpen(false)}
                     >
                       {icon}
+                      
                       <Typography className="text-sm">{name || "Unnamed"}</Typography>
+                      
                     </NavLink>
 
                   )}

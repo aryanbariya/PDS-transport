@@ -1,4 +1,3 @@
-import { autocompleteClasses } from "@mui/material";
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 
@@ -21,9 +20,9 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     contact: "",
   });
 
-
   const [godownList, setGodownList] = useState([]);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
@@ -37,7 +36,6 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
       try {
         const response = await fetch(`${URL}/api/dropsubgodown`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
-
         const data = await response.json();
         setGodownList(data || []);
       } catch (error) {
@@ -46,15 +44,10 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
       }
     };
 
-    fetchGodowns();
-  }, []);
-
-  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch(`${URL}/api/dropcategory`);
         if (!response.ok) throw new Error("Failed to fetch categories");
-
         const data = await response.json();
         setCategoryList(data || []);
       } catch (error) {
@@ -63,28 +56,10 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
       }
     };
 
+    fetchGodowns();
     fetchCategories();
   }, []);
 
-
-  // useEffect(() => {
-  //   if (editData) {
-  //     setFormData({
-  //       category: editData.category || "",
-  //       fullName: editData.fullName || "",
-  //       username: editData.username || "",
-  //       password: editData.password || "",
-  //       address: editData.address || "",
-  //       aadharNo: editData.aadharNo || "",
-  //       panNo: editData.panNo || "",
-  //       bankName: editData.bankName || "",
-  //       accountNumber: editData.accountNumber || "",
-  //       ifscCode: editData.ifscCode || "",
-  //       branchName: editData.branchName || "",
-  //       subGodown: editData.subGodown || "",
-  //     });
-  //   }
-  // }, [editData]);
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -102,45 +77,31 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
         subGodown: editData.subGodown || "",
         contact: editData.contact || "",
       });
-
-      setSearch(editData.subGodown || ""); // Set search to match subGodown
+      setSearch(editData.subGodown || "");
     }
   }, [editData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     let updatedValue = value;
 
     if (name === "contact") {
-      updatedValue = value.replace(/\D/g, ""); // Remove non-numeric characters
-      if (updatedValue.length > 10) return; // Restrict to 10 digits
+      updatedValue = value.replace(/\D/g, "").slice(0, 10);
     }
 
-    updatedValue = ["fullName", "bankName"].includes(name)
-      ? updatedValue.charAt(0).toUpperCase() + updatedValue.slice(1)
-      : updatedValue;
+    if (["fullName", "bankName"].includes(name)) {
+      updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+    }
 
     setFormData({ ...formData, [name]: updatedValue });
-
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
+      setErrors(prevErrors => ({ ...prevErrors, [name]: "" }));
     }
   };
 
-  // const handleSelectGodown = (subGodown) => {
-  //   setFormData({ ...formData, subGodown });
-  //   setSearch(subGodown);
-  //   setShowDropdown(false);
-
-  //   // Remove error when a valid subGodown is selected
-  //   if (errors.subGodown) {
-  //     setErrors({ ...errors, subGodown: "" });
-  //   }
-  // };
   const handleSelectGodown = (subGodown) => {
     setFormData({ ...formData, subGodown });
-    setSearch(subGodown); // Update search field to display selected godown
+    setSearch(subGodown);
     setShowDropdown(false);
   };
 
@@ -152,6 +113,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     if (!formData.username) newErrors.username = "Username is required";
     if (!editData && !formData.password) newErrors.password = "Password is required";
     if (!formData.subGodown) newErrors.subGodown = "Sub Godown is required";
+    if (!formData.contact) newErrors.contact = "Contact is required";
 
     if (formData.aadharNo && !formData.aadharNo.match(/^\d{12}$/)) {
       newErrors.aadharNo = "Aadhar No must be 12 digits";
@@ -165,7 +127,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     if (formData.ifscCode && !formData.ifscCode.match(/^[A-Z]{4}0[A-Z0-9]{6}$/)) {
       newErrors.ifscCode = "Invalid IFSC Code format";
     }
-    if (!formData.contact.match(/^\d{10}$/)) {
+    if (formData.contact && !formData.contact.match(/^\d{10}$/)) {
       newErrors.contact = "Contact must be exactly 10 digits";
     }
 
@@ -173,18 +135,15 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const method = editData ? "PUT" : "POST";
-    const url = editData
-      ? `${URL}/api/employees/${editData.uuid}`
-      : `${URL}/api/employees`;
-
+    setIsLoading(true);
     try {
+      const method = editData ? "PUT" : "POST";
+      const url = editData ? `${URL}/api/employees/${editData.uuid}` : `${URL}/api/employees`;
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -207,123 +166,141 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     } catch (error) {
       console.error("Error submitting data:", error);
       Swal.fire({ icon: "error", title: "Error", text: "Error submitting data" });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const renderInputField = (field, label, type = "text") => {
+  return (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+          {["category", "fullName", "username", "password", "subGodown", "contact"].includes(field) && 
+            <span className="text-red-500 ml-1">*</span>}
+        </label>
+              <input
+          type={type}
+          name={field}
+          value={formData[field]}
+          onChange={handleChange}
+          className={`p-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          placeholder={`Enter ${label}`}
+        />
+        {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
+                      </div>
+    );
+  };
+
+  const renderDropdown = (field, label, options, searchValue, setSearchValue, showDropdown, setShowDropdown, handleSelect) => {
+    return (
+      <div className="mb-4 relative">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+          <span className="text-red-500 ml-1">*</span>
+        </label>
+              <input
+                type="text"
+          value={searchValue}
+                onClick={() => setShowDropdown(true)}
+                onChange={(e) => {
+            setSearchValue(e.target.value);
+                  setShowDropdown(true);
+                }}
+          className={`p-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          placeholder={`Search ${label}`}
+              />
+              {showDropdown && (
+          <div className="absolute z-10 bg-white border rounded-md w-full max-h-40 overflow-auto shadow-lg mt-1">
+            {options
+              .filter((option) =>
+                option[field === "category" ? "category_name" : "subGodown"]
+                  .toLowerCase()
+                  .includes(searchValue.toLowerCase())
+              )
+              .map((option, index) => (
+                      <div
+                        key={index}
+                  onClick={() => handleSelect(option[field === "category" ? "category_name" : "subGodown"])}
+                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                      >
+                  {option[field === "category" ? "category_name" : "subGodown"]}
+                      </div>
+                    ))}
+                </div>
+              )}
+        {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-6 h-6 border-t-2 border-blue-500 border-solid rounded-full animate-spin"></div>
+            <span>Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-        <h2 className="text-xl font-semibold py-3 px-4 text-center">Employee</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">Category</label>
-              <input
-                type="text"
-                name="category"
-                placeholder="Search or Select Category"
-                value={categorySearch}
-                onClick={() => setShowCategoryDropdown(true)}
-                onChange={(e) => {
-                  setCategorySearch(e.target.value);
-                  setShowCategoryDropdown(true);
-                }}
-                required
-                className="p-2 border rounded-lg w-full"
-              />
-              {showCategoryDropdown && (
-                <div
-                  ref={categoryDropdownRef}
-                  className="absolute z-10 bg-white border  rounded-md w-full max-h-40 overflow-auto shadow-lg mt-1"
-                >
-                  {categoryList
-                    .filter((cat) =>
-                      cat.category_name.toLowerCase().includes(categorySearch.toLowerCase())
-                    )
-                    .map((cat, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          setFormData({ ...formData, category: cat.category_name });
-                          setCategorySearch(cat.category_name);
-                          setShowCategoryDropdown(false);
-                        }}
-                        className="p-2 hover:bg-gray-200 cursor-pointer"
-                      >
-                        {cat.category_name}
-                      </div>
-                    ))}
-                </div>
-              )}
+        <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+          {editData ? "Edit Employee" : "Employee"}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+            {/* Section: Basic Information */}
+            <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Basic Information</h3>
+              {renderDropdown("category", "Category", categoryList, categorySearch, setCategorySearch, showCategoryDropdown, setShowCategoryDropdown, (value) => {
+                setFormData({ ...formData, category: value });
+                setCategorySearch(value);
+                setShowCategoryDropdown(false);
+              })}
+              {renderInputField("fullName", "Full Name")}
+              {renderInputField("contact", "Contact Number")}
+              {renderInputField("address", "Address")}
             </div>
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700">Category</label>
-              <select name="category" value={formData.category} onChange={handleChange} className="p-2 border rounded-lg w-full">
-                <option value="">-- Select Category --</option>
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Worker">Worker</option>
-              </select>
-              {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
-            </div> */}
 
-            {["fullName", "username", "password", "address", "aadharNo", "panNo", "bankName", "accountNumber", "ifscCode", "branchName", "contact"].map((field) => (
-              <div key={field}>
-                <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, " $1").trim().replace(/^./, (str) => str.toUpperCase())}</label>
-                <input type={field === "password" ? "password" : "text"} name={field} value={formData[field]} onChange={handleChange} className="p-2 border rounded-lg w-full" placeholder={field === "password" ? (editData ? "Enter new password to update" : "") : `Enter ${field.replace(/([A-Z])/g, " $1").trim()}`} />
-                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
-              </div>
-            ))}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">Sub Godown</label>
-              <input
-                type="text"
-                name="subGodown"
-                placeholder="Search or Select Godown"
-                value={search}
-                onClick={() => setShowDropdown(true)}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setShowDropdown(true);
-                }}
-                required
-                className="p-2 border rounded-lg w-full"
-              />
-              {showDropdown && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute z-10 bg-white border bottom-full rounded-md w-full max-h-40 overflow-auto shadow-lg mt-1"
-                >
-                  {godownList
-                    .filter((godown) =>
-                      godown.subGodown.toLowerCase().includes(search.toLowerCase())
-                    )
-                    .map((godown, index) => (
-                      <div
-                        key={index}
-                        onClick={() => handleSelectGodown(godown.subGodown)}
-                        className="p-2 hover:bg-gray-200 cursor-pointer"
-                      >
-                        {godown.subGodown}
-                      </div>
-                    ))}
-                </div>
-              )}
+            {/* Section: Login Information */}
+            <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Login Information</h3>
+              {renderInputField("username", "Username")}
+              {renderInputField("password", "Password", "password")}
+              {renderDropdown("subGodown", "Sub Godown", godownList, search, setSearch, showDropdown, setShowDropdown, handleSelectGodown)}
+            </div>
+
+            {/* Section: Bank Information */}
+            <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Bank Information</h3>
+              {renderInputField("bankName", "Bank Name")}
+              {renderInputField("accountNumber", "Account Number")}
+              {renderInputField("ifscCode", "IFSC Code")}
+              {renderInputField("branchName", "Branch Name")}
+              {renderInputField("aadharNo", "Aadhar Number")}
+              {renderInputField("panNo", "PAN Number")}
             </div>
           </div>
-          <div className="flex justify-end space-x-4">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-            >
-              {editData ? "Update" : "Submit"}
-            </button>
+
+          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t">
             <button
               type="button"
-              className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
               onClick={onClose}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
-              Close
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              {editData ? "Update" : "Submit"}
             </button>
           </div>
         </form>

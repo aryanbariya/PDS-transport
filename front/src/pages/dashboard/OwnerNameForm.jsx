@@ -1,238 +1,3 @@
-// import React, { useState, useEffect } from "react";
-// import Swal from "sweetalert2"; // Import SweetAlert2
-// const URL = import.meta.env.VITE_API_BACK_URL;
-
-// const OwnerNameForm = ({ onClose, onSave, editData }) => {
-//   const [formData, setFormData] = useState({
-//     ownerName: "",
-//     contact: "",
-//     address: "",
-//     emailID: "",
-//   });
-
-//   const [ownerNameError, setOwnerNameError] = useState(""); // Track error
-//   const [loading, setLoading] = useState(false);
-
-//   useEffect(() => {
-//     if (editData) {
-//       setFormData({
-//         ownerName: editData.ownerName || "",
-//         contact: editData.contact || "",
-//         address: editData.address || "",
-//         emailID: editData.emailID || "",
-//       });
-//     } else {
-//       setFormData({ ownerName: "", contact: "", address: "", emailID: "" });
-//     }
-//   }, [editData]);
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     let updatedValue = value;
-
-//     if (name === "ownerName") {
-//       updatedValue = value
-//         .toLowerCase()
-//         .split(" ")
-//         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-//         .join(" ");
-//       setOwnerNameError(""); // Clear error when user types
-//     }
-
-//     if (name === "contact") {
-//       // Allow only digits and limit to 10 characters
-//       updatedValue = value.replace(/\D/g, "").slice(0, 10);
-//     }
-
-//     setFormData({ ...formData, [name]: updatedValue });
-//   };
-
-//   // New focus handler to clear input field
-//   const handleFocus = (name) => {
-//     setFormData({ ...formData, [name]: "" });
-//   };
-
-//   // const handleSubmit = async (e) => {
-//   //   e.preventDefault();
-
-//   //   if (!formData.ownerName.trim()) {
-//   //     setOwnerNameError("Owner Name is required."); // Show error message
-//   //     return;
-//   //   }
-
-//   //   setLoading(true); // Start loading
-
-//   //   const method = editData ? "PUT" : "POST";
-//   //   const url = editData
-//   //     ? `${URL}/api/owners/${editData.uuid}`
-//   //     : `${URL}/api/owners`;
-
-//   //   try {
-//   //     const response = await fetch(url, {
-//   //       method,
-//   //       headers: { "Content-Type": "application/json" },
-//   //       body: JSON.stringify(formData),
-//   //     });
-
-//   //     const data = await response.json();
-
-//   //     if (response.ok) {
-//   //       Swal.fire({
-//   //         icon: "success",
-//   //         title: editData ? "Owner updated successfully!" : "Owner added successfully!",
-//   //         showConfirmButton: false,
-//   //         timer: 1500,
-//   //       }).then(() => {
-//   //         onSave();
-//   //         onClose();
-//   //       });
-//   //     } else {
-//   //       console.error("Server error:", data);
-//   //       Swal.fire({
-//   //         icon: "error",
-//   //         title: "Error",
-//   //         text: data.error || "Error submitting form",
-//   //       });
-//   //     }
-//   //   } catch (error) {
-//   //     console.error("Error submitting data:", error);
-//   //     Swal.fire({
-//   //       icon: "error",
-//   //       title: "Error",
-//   //       text: "Error submitting form",
-//   //     });
-//   //   } finally {
-//   //     setLoading(false); // Stop loading after request is completed
-//   //   }
-//   // };
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     // Validation: Only `ownerName` is required in both Add and Edit
-//     if (!formData.ownerName.trim()) {
-//         Swal.fire({
-//             icon: "error",
-//             title: "Validation Error",
-//             text: "Owner Name is required.",
-//         });
-//         return;
-//     }
-
-//     setLoading(true); // Start loading
-
-//     const method = editData ? "PUT" : "POST";
-//     const url = editData
-//         ? `${URL}/api/owners/${editData.uuid}`
-//         : `${URL}/api/owners`;
-
-//     // Send only modified fields during update
-//     const updatedData = editData
-//         ? Object.fromEntries(
-//               Object.entries(formData).filter(([key, value]) => value !== editData[key])
-//           )
-//         : formData;
-
-//     // Ensure at least `ownerName` is sent in update
-//     if (editData && !updatedData.ownerName) {
-//         updatedData.ownerName = formData.ownerName;
-//     }
-
-//     try {
-//         const response = await fetch(url, {
-//             method,
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify(updatedData),
-//         });
-
-//         const data = await response.json();
-
-//         if (response.ok) {
-//             Swal.fire({
-//                 icon: "success",
-//                 title: editData ? "Owner updated successfully!" : "Owner added successfully!",
-//                 showConfirmButton: false,
-//                 timer: 1500,
-//             }).then(() => {
-//                 onSave();
-//                 onClose();
-//             });
-//         } else {
-//             console.error("Server error:", data);
-//             Swal.fire({
-//                 icon: "error",
-//                 title: "Error",
-//                 text: data.error || "Error submitting form",
-//             });
-//         }
-//     } catch (error) {
-//         console.error("Error submitting data:", error);
-//         Swal.fire({
-//             icon: "error",
-//             title: "Error",
-//             text: "Error submitting form",
-//         });
-//     } finally {
-//         setLoading(false); // Stop loading after request is completed
-//     }
-// };
-
-
-//   return (
-//     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-//       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
-//         <h2 className="text-xl font-semibold text-center py-3">
-//           {editData ? "Edit Owner" : "Owner"}
-//         </h2>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           {Object.keys(formData).map((field) => (
-//             <div key={field}>
-//               <label className="block text-sm font-medium text-gray-700">
-//                 {field
-//                   .replace(/([A-Z])/g, " $1")
-//                   .replace(/\b\w/g, (char) => char.toUpperCase())
-//                   .trim()}
-//               </label>
-//               <input
-//                 type={field === "emailID" ? "email" : "text"}
-//                 name={field}
-//                 placeholder={`Enter ${field}`}
-//                 value={formData[field]}
-//                 onChange={handleChange}
-//                 onFocus={() => handleFocus(field)} // Attach focus handler here
-//                 className={`p-2 border rounded-lg w-full ${field === "ownerName" && ownerNameError ? "border-red-500" : ""
-//                   }`}
-//               />
-//               {field === "ownerName" && ownerNameError && (
-//                 <p className="text-red-500 text-sm mt-1">{ownerNameError}</p>
-//               )}
-//             </div>
-//           ))}
-//           <div className="flex justify-end space-x-2">
-//             <button
-//               type="submit"
-//               className="py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-//               disabled={loading}
-//             >
-//               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
-//             </button>
-//             <button
-//               type="button"
-//               className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700"
-//               onClick={onClose}
-//             >
-//               Close
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default OwnerNameForm;
-
-
-
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
@@ -272,7 +37,6 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     }
 
     setFormData({ ...formData, [name]: updatedValue });
-
     if (errors[name]) {
       setErrors(prevErrors => ({ ...prevErrors, [name]: "" }));
     }
@@ -282,7 +46,12 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     let newErrors = {};
     if (!formData.ownerName.trim()) newErrors.ownerName = "Owner Name is required";
     if (!formData.contact.trim()) newErrors.contact = "Contact is required";
-    // Add more validation as needed
+    if (formData.contact && !/^\d{10}$/.test(formData.contact)) {
+      newErrors.contact = "Contact must be exactly 10 digits";
+    }
+    if (formData.emailID && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.emailID)) {
+      newErrors.emailID = "Invalid email format";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -368,7 +137,9 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b pb-4 mb-6">
-          <h2 className="text-xl font-semibold">{editData ? "Edit Owner Details" : "Add New Owner"}</h2>
+          <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+            {editData ? "Edit Owner" : "Owner"}
+          </h2>
           <button 
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -380,17 +151,24 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6">
+            {/* Section: Basic Information */}
             <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Owner Information</h3>
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Basic Information</h3>
               {renderInputField("ownerName", "Owner Name")}
-              {renderInputField("contact", "Contact")}
+              {renderInputField("contact", "Contact Number")}
             </div>
 
+            {/* Section: Contact Information */}
             <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Additional Information</h3>
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Contact Information</h3>
+              {renderInputField("emailID", "Email Address", "email")}
+            </div>
+
+            {/* Section: Address Information */}
+            <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Address Information</h3>
               {renderInputField("address", "Address")}
-              {renderInputField("emailID", "Email", "email")}
             </div>
           </div>
 
@@ -398,7 +176,7 @@ const OwnerNameForm = ({ onClose, onSave, editData }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               Cancel
             </button>

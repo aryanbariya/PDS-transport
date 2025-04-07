@@ -33,6 +33,7 @@ const CategoryPage = () => {
     try {
       const response = await fetch(`${URL}/api/categories`);
       if (!response.ok) throw new Error("Failed to fetch categories");
+
       const data = await response.json();
       setCategories(data || []);
       setLoading(false);
@@ -42,7 +43,7 @@ const CategoryPage = () => {
     }
   };
 
-  const handleDelete = async (uuid) => {
+  const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -53,21 +54,19 @@ const CategoryPage = () => {
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        try {
-          const response = await fetch(`${URL}/api/categories/${uuid}`, {
-            method: "DELETE",
-          });
-          if (response.ok) {
+    try {
+      const response = await fetch(`${URL}/api/categories/${id}`, { method: "DELETE" });
+      if (response.ok) {
             Swal.fire("Deleted!", "Category deleted successfully!", "success");
-            fetchCategories();
-          } else {
+        fetchCategories();
+      } else {
             Swal.fire("Error", "Failed to delete category.", "error");
-          }
-        } catch (err) {
+      }
+    } catch (err) {
           console.error("Error deleting record:", err);
           Swal.fire("Error", "Error deleting data.", "error");
         }
-      }
+    }
     });
   };
 
@@ -110,49 +109,50 @@ const CategoryPage = () => {
       {!loading && (
         <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">ID</th>
-                <th className="border p-2">Category Name</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">ID</th>
+              <th className="border p-2">Category Name</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
               {categories.length > 0 ? (
                 categories.map((category) => (
-                  <tr key={category.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{category.category_id}</td>
-                    <td className="border p-2">{category.category_name}</td>
-                    <td className="border p-2">{category.status}</td>
-                    <td className="border p-2">
+                  <tr key={category.category_id} className="text-start hover:bg-gray-100">
+                  <td className="border p-2">{category.category_id}</td>
+                  <td className="border p-2">{category.category_name}</td>
+                  <td className="border p-2">{category.status}</td>
+                  <td className="border p-2">
                       <div className="flex justify-start space-x-2">
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                        >
+                      <button
+                        onClick={() => handleEdit(category)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
                           Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category.uuid)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                        >
+                      </button>
+                      <button
+                        onClick={() => handleDelete(category.category_id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                      >
                           Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
                   <td colSpan="4" className="text-center p-4">
                     No records found
                   </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>)}
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      )}
     </div>
   );
 };

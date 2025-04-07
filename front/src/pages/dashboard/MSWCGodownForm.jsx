@@ -120,7 +120,7 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 z-50">
       <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-8">
-        <h2 className="text-xl font-semibold text-center py-3">
+        <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
           {editData ? "Edit MSWC Godown" : "MSWC Godown"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -148,8 +148,7 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
             <button
               type="submit"
               disabled={loading}
-              className={`py-2 px-5 rounded-lg  ${!loading ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
-                }`}
+              className={`py-2 px-5 rounded-lg ${!loading ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
             </button>

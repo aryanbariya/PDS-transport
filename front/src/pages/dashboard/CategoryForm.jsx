@@ -83,58 +83,56 @@ const CategoryForm = ({ onClose, onSave, editData }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold py-2 px-4 border-b-2 border-gray-200">
-        {editData ? "Edit Category" : "Add Category"}
-      </h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 p-4">
-        <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category Name
-          </label>
-          <input
-            type="text"
-            name="category_name"
-            value={formData.category_name}
-            onChange={handleChange}
-            placeholder="Enter category name"
-            autoComplete="off"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          {errors.category_name && <p className="text-red-500 text-sm mt-1">{errors.category_name}</p>}
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+      <div className="bg-white rounded-lg shadow-lg w-4/5 max-w-3xl p-6">
+        <h2 className="bg--600 text-black text-xl font-semibold py-3 px-4 rounded-t-lg text-center">
+          {editData ? "Edit Category" : "Category"}
+        </h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 p-4">
+          <div className="col-span-2">
+            <label className="block text-gray-700">Category Name</label>
+            <input
+              type="text"
+              name="category_name"
+              value={formData.category_name}
+              onChange={handleChange}
+              placeholder="Enter category name"
+              autoComplete="off" // Prevent autocomplete
+              className="p-2 border rounded-lg w-full"
+              required
+            />
+            {errors.category_name && <p className="text-red-500 text-sm">{errors.category_name}</p>}
+          </div>
 
-        <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
+          <div className="col-span-2">
+            <label className="block text-gray-700">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="p-2 border rounded-lg w-full"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
 
-        <div className="col-span-1 flex justify-end space-x-3 mt-6 pt-4 border-t">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            {editData ? "Update" : "Submit"}
-          </button>
-        </div>
-      </form>
+          <div className="col-span-2 flex justify-end gap-2">
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded-lg ${
+                Object.keys(errors).length === 0 ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-400 text-gray-700 cursor-not-allowed"
+              }`}
+              disabled={Object.keys(errors).length > 0}
+            >
+              {editData ? "Update" : "Submit"}
+            </button>
+            <button onClick={onClose} className="bg-red-600 text-white px-4 py-2 rounded-lg">
+              Close
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
