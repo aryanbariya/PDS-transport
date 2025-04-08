@@ -25,8 +25,6 @@ import SecondDispatchReport from "./pages/dashboard/SecondDispatchReport";
 import SecondDispatch from "./pages/dashboard/SecondDispatch";
 import SecondTapa from "./pages/dashboard/SecondTapa";
 import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
-// import EmployeePage from "./pages/dashboard/EmployeePage";
-// import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
 import SubGodownPage from "./pages/dashboard/SubGodownPage";
 import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
 import EmployeePage from "./pages/dashboard/EmployeePage";
@@ -41,11 +39,7 @@ import DOGenerateForm from "./pages/dashboard/DOGenerateForm";
 import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
 import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
 import GrainPage from "./pages/dashboard/GrainPage";
-// import TruckPage from "./pages/dashboard/TruckPage";
-// import PackagingPage from "./pages/dashboard/PackagingPage";
-// import CategoryPage from "./pages/dashboard/CategoryPage";
-// import SchemePage from "./pages/dashboard/SchemePage";
-
+import FirstTransport from "@/pages/dashboard/FirstTransport";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -177,6 +171,12 @@ export const routes = [
         name: "DOAllocationPage",
         path: "/DOAllocationPage",
         element: <DOAllocationPage />,
+      },
+      {
+        icon: <FaClipboardCheck {...icon} />,
+        name: "First Transport",
+        path: "/firstTransport",
+        element: <FirstTransport />,
       },
     ],
   },

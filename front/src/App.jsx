@@ -15,6 +15,7 @@ import GrainPage from "./pages/dashboard/GrainPage";
 import CategoryPage from "./pages/dashboard/CategoryPage";
 import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
 import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
+import FirstTransport from "@/pages/dashboard/FirstTransport";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -47,6 +48,9 @@ function App() {
       <Route path="/HomePage/*" element={<PrivateRoute><HomePage /></PrivateRoute>} />
       <Route path="/grain/*" element={<PrivateRoute><GrainPage /></PrivateRoute>} />
       <Route path="/category/*" element={<PrivateRoute><CategoryPage /></PrivateRoute>} />
+
+      {/* First Transport Route */}
+      <Route path="/firstTransport" element={<PrivateRoute><Dashboard><FirstTransport /></Dashboard></PrivateRoute>} />
 
       {/* DO Related Routes */}
       <Route path="/DOGeneratePage" element={<PrivateRoute><Dashboard><DOGeneratePage /></Dashboard></PrivateRoute>} />
