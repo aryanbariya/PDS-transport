@@ -42,7 +42,27 @@ const TransportForm = ({ onClose, onSave, editData }) => {
 
   useEffect(() => {
     if (editData) {
-      setFormData(editData);
+      setFormData({
+        baseDepo: editData.baseDepo || "",
+        doNo: editData.doNo || "",
+        godown: editData.godown || "",
+        truck: editData.truck || "",
+        owner: editData.owner || "",
+        driver: editData.driver || "",
+        emptyWeight: editData.emptyWeight || "",
+        grossWeight: editData.grossWeight || "",
+        scheme: editData.scheme || "",
+        packaging: editData.packaging || "",
+        noOfBags: editData.noOfBags || "",
+        bardanWeight: editData.bardanWeight || "",
+        loadedNetWeight: editData.loadedNetWeight || "",
+        netWeight: editData.netWeight || "",
+        dispatchDate: editData.dispatchDate ? new Date(editData.dispatchDate).toISOString().split('T')[0] : "",
+        quota: editData.quota ? new Date(editData.quota).toISOString().split('T')[0] : "",
+        tpNo: editData.tpNo || "",
+        allocation: editData.allocation || ""
+      });
+      
     }
   }, [editData]);
 
@@ -173,7 +193,7 @@ const TransportForm = ({ onClose, onSave, editData }) => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch(`${URL}/api/transport`, {
+      const response = await fetch(editData ? `${URL}/api/transport/${editData.uuid}` :`${URL}/api/transport`, {
         method: editData ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -323,6 +343,9 @@ const TransportForm = ({ onClose, onSave, editData }) => {
       </div>
     );
   }
+
+
+
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

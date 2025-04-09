@@ -1975,40 +1975,6 @@ app.post("/api/transport", (req, res) => {
 });
 
 // // Update a transport record
-// app.put("/api/transport/:uuid", (req, res) => {
-//   const {
-//     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
-//     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
-//     dispatchDate, quota, tpNo, allocation, status
-//   } = req.body;
-
-//   if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
-//       !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
-//       !dispatchDate || !quota || !tpNo || !allocation || !status) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   const sql = `UPDATE transport SET 
-//     baseDepo = ?, doNo = ?, godown = ?, truck = ?, owner = ?, driver = ?, emptyWeight = ?, 
-//     grossWeight = ?, scheme = ?, packaging = ?, noOfBags = ?, bardanWeight = ?, loadedNetWeight = ?, 
-//     netWeight = ?, dispatchDate = ?, quota = ?, tpNo = ?, allocation = ?, status = ? 
-//     WHERE uuid = ?`;
-
-//   db.query(sql, [
-//     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
-//     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
-//     dispatchDate, quota, tpNo, allocation, status, req.params.uuid
-//   ], (err, result) => {
-//     if (err) {
-//       console.error("Error updating transport record:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Record not found" });
-//     }
-//     res.json({ message: "Transport record updated successfully" });
-//   });
-// });
 app.put("/api/transport/:uuid", (req, res) => {
   const { baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight, dispatchDate, quota, tpNo, allocation, status = "Active" } = req.body;
 
@@ -2097,16 +2063,7 @@ app.get("/api/do/:do_no", (req, res) => {
   });
 });
 
-// app.post("/api/do", (req, res) => {
-//   const { doNo, baseDepot, doDate, doExpiryDate,  scheme, grain,  quantity,  quintal, total_amount, expire_date } = req.body;
 
-//   const sql = "INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal,  total_amount, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  
-//   db.query(sql, [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity,  quintal, total_amount, expire_date], (err, result) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
-//   });
-// });
 
 app.post("/api/do", (req, res) => {
   const {
@@ -2182,6 +2139,59 @@ app.post("/api/do", (req, res) => {
   );
 });
 
+// Assuming you're using Express and connected to a MySQL or MongoDB DB
+app.put("/api/do/:stock_id", async (req, res) => {
+  const { stock_id } = req.params;
+  const {
+    doNo,
+    baseDepot,
+    doDate,
+    doExpiryDate,
+    scheme,
+    grain,
+    quantity
+  } = req.body;
+
+  try {
+    // Example for MySQL
+    const updateQuery = `
+      UPDATE do_table 
+      SET 
+      do_no = ?,
+        godown_id = ?, 
+        do_date = ?, 
+        cota = ?, 
+        scheme_id = ?, 
+        grain_id = ?, 
+        quantity = ?
+      WHERE stock_id = ?
+    `;
+
+    const values = [
+      doNo,
+      baseDepot,
+      doDate,
+      doExpiryDate,
+      scheme,
+      grain,
+      quantity,
+      
+    ];
+
+    const [result] = await db.execute(updateQuery, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "DO not found" });
+    }
+
+    res.json({ message: "DO updated successfully" });
+  } catch (error) {
+    console.error("Error updating DO:", error);
+    res.status(500).json({ message: "Server error while updating DO" });
+  }
+});
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////Do Alloc
@@ -2203,17 +2213,6 @@ app.get("/api/alloc/:do_allocate_id", (req, res) => {
   });
 });
 
-// app.post("/api/do-entries", (req, res) => {
-//   const { stock_id = "0", godown,	quantity,	vahtuk,	status="Active" } = req.body;
-
-//   const sql = "INSERT INTO do_allocate (stock_id,	subgd_id,	qty,	vahtuk,	status) VALUES (?, ?, ?, ?, ?)";
-  
-//   db.query(sql, [stock_id,	godown,	quantity,	vahtuk,	status], (err, result) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json({ message: "Data inserted successfully", insertedId: result.insertId });
-//   });
-// });
-// POST /api/do-entries
 
 ////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

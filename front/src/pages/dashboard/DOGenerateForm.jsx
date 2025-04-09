@@ -39,8 +39,8 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       setFormData({
         doNo: editData.do_no || "",
         baseDepot: editData.godown_id || "",
-        doDate: editData.do_date || "",
-        doExpiryDate: editData.cota || "",
+        doDate: editData.do_date ? new Date(editData.do_date).toISOString().split('T')[0] : "",
+        doExpiryDate: editData.cota ? new Date(editData.cota).toISOString().split('T')[0] : "",
         scheme: editData.scheme_id || "",
         grain: editData.grain_id || "",
         quantity: editData.quantity || "",

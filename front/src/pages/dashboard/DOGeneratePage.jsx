@@ -169,7 +169,9 @@ const DOGeneratePage = () => {
                   <td className="border p-2 text-left">
                     <div className="flex justify-start space-x-2">
                       <button
-                        onClick={() => setEditData(order)}
+                        onClick={() => {setEditData(order)
+                        setShowForm(true)}
+                        }
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                       >
                         Edit
