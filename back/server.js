@@ -2155,7 +2155,7 @@ app.put("/api/do/:stock_id", async (req, res) => {
   try {
     // Example for MySQL
     const updateQuery = `
-      UPDATE do_table 
+      UPDATE do 
       SET 
       do_no = ?,
         godown_id = ?, 
