@@ -2140,7 +2140,7 @@ app.post("/api/do", (req, res) => {
 });
 
 // Assuming you're using Express and connected to a MySQL or MongoDB DB
-app.put("/api/do/:stock_id", async (req, res) => {
+app.put("/api/do/:stock_id", (req, res) => {
   const { stock_id } = req.params;
   const {
     doNo,
@@ -2152,43 +2152,42 @@ app.put("/api/do/:stock_id", async (req, res) => {
     quantity
   } = req.body;
 
-  try {
-    // Example for MySQL
-    const updateQuery = `
-      UPDATE do 
-      SET 
-      do_no = ?,
-        godown_id = ?, 
-        do_date = ?, 
-        cota = ?, 
-        scheme_id = ?, 
-        grain_id = ?, 
-        quantity = ?
-      WHERE stock_id = ?
-    `;
+  const updateQuery = `
+    UPDATE do 
+    SET 
+      do_no = ?, 
+      godown_id = ?, 
+      do_date = ?, 
+      cota = ?, 
+      scheme_id = ?, 
+      grain_id = ?, 
+      quantity = ?
+    WHERE stock_id = ?
+  `;
 
-    const values = [
-      doNo,
-      baseDepot,
-      doDate,
-      doExpiryDate,
-      scheme,
-      grain,
-      quantity,
-      
-    ];
+  const values = [
+    doNo,
+    baseDepot,
+    doDate,
+    doExpiryDate,
+    scheme,
+    grain,
+    quantity,
+    stock_id
+  ];
 
-    const [result] = await db.execute(updateQuery, values);
+  db.query(updateQuery, values, (err, result) => {
+    if (err) {
+      console.error("Error updating DO:", err);
+      return res.status(500).json({ message: "Server error while updating DO" });
+    }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "DO not found" });
     }
 
     res.json({ message: "DO updated successfully" });
-  } catch (error) {
-    console.error("Error updating DO:", error);
-    res.status(500).json({ message: "Server error while updating DO" });
-  }
+  });
 });
 
 
