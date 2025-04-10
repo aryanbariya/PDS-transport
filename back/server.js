@@ -218,31 +218,6 @@ app.put("/api/employees/:uuid", async (req, res) => {
 });
 
 
-// app.put("/api/employees/:uuid", (req, res) => {
-//   const { category, fullName, username, subGodown, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName } = req.body;
-  
-//   if (!category || !fullName || !username || !subGodown) {
-//     return res.status(400).json({ error: "Required fields: category, fullName, username, subGodown" });
-//   }
-
-//   const sql = "UPDATE employee SET category = ?, fullName = ?, username = ?, subGodown = ?, address = ?, aadharNo = ?, panNo = ?, bankName = ?, accountNumber = ?, ifscCode = ?, branchName = ? WHERE uuid = ?";
-
-//   db.query(sql, [category, fullName, username, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating employee:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Employee not found" });
-//     }
-//     res.json({ message: "Employee updated successfully" });
-//   });
-// });
-
-
-
-
-
 // **Delete Employee API**
 app.delete("/api/employees/:uuid", (req, res) => {
   const { uuid } = req.params;
@@ -284,133 +259,6 @@ app.delete("/api/employees/:uuid", (req, res) => {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start of mswc godown
-// Get only "Active" godowns
-// app.get("/api/mswcgodown/active", (req, res) => {
-//   const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns WHERE status = 'Active' ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching active godowns:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-
-// // Get only "Inactive" godowns
-// app.get("/api/mswcgodown/inactive", (req, res) => {
-//   const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns WHERE status = 'Inactive' ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching inactive godowns:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-
-// app.get("/api/mswcgodown", (req, res) => {
-//   const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching godowns:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-
-// // Get a specific godown by UUID
-// app.get("/api/mswcgodown/:uuid", (req, res) => {
-//   const sql = "SELECT uuid, godownName, godownUnder, order_number, status FROM mswc_godowns WHERE uuid = ?";
-//   db.query(sql, [req.params.uuid], (err, results) => {
-//     if (err) {
-//       console.error("Error fetching godown:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     if (results.length === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-//     res.json(results[0]);
-//   });
-// });
-
-// // Add a new godown with auto-incremented order_number and default status "Active"
-// app.post("/api/mswcgodown", (req, res) => {
-//   const { godownName, godownUnder } = req.body;
-//   if (!godownName ) {
-//     return res.status(400).json({ error: "Godown Name and Godown Under are required" });
-//   }
-//   const uuid = uuidv4();
-//   const status = "Active";
-
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM mswc_godowns";
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error getting next order number:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-
-//     const nextOrder = result[0]?.next_order || 1;
-//     const insertSql = "INSERT INTO mswc_godowns (uuid, godownName, godownUnder, order_number, status) VALUES (?, ?, ?, ?, ?)";
-
-//     db.query(insertSql, [uuid, godownName, godownUnder, nextOrder, status], (insertErr) => {
-//       if (insertErr) {
-//         console.error("Database Insertion Error:", insertErr);
-//         return res.status(500).json({ error: "Database insertion failed" });
-//       }
-//       res.status(201).json({ message: "Godown added successfully", uuid, order_number: nextOrder, status });
-//     });
-//   });
-// });
-
-// // Update an existing godown
-// app.put("/api/mswcgodown/:uuid", (req, res) => {
-//   const { godownName, godownUnder, status } = req.body;
-
-//   if (!godownName) {
-//     return res.status(400).json({ error: "Godown name is required" });
-//   }
-
-//   // If no status is provided, default to "Active"
-//   const updatedStatus = status || "Active";
-
-//   const sql = `
-//     UPDATE mswc_godowns 
-//     SET godownName = ?, godownUnder = ?, status = ? 
-//     WHERE uuid = ?
-//   `;
-
-//   db.query(sql, [godownName, godownUnder, updatedStatus, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating godown:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-//     res.json({ message: "Godown updated successfully" });
-//   });
-// });
-
-
-// // Delete a godown and reset order numbers
-// // Soft Delete a godown (Change status from Active to Inactive)
-// app.delete("/api/mswcgodown/:uuid", (req, res) => {
-//   const { uuid } = req.params;
-//   const updateSql = "UPDATE mswc_godowns SET status = 'Inactive' WHERE uuid = ?";
-
-//   db.query(updateSql, [uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating godown status:", err);
-//       return res.status(500).json({ error: "Failed to update godown status" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-//     res.json({ message: "Godown status updated to Inactive successfully!" });
-//   });
-// });
-
 app.get("/api/mswcgodown/active", (req, res) => {
   const sql = "SELECT uuid, godownName, godownUnder, mswc_id, status FROM mswc_godowns WHERE status = 'Active' ORDER BY mswc_id";
   db.query(sql, (err, results) => {
@@ -530,46 +378,6 @@ app.delete("/api/mswcgodown/:uuid", (req, res) => {
 });
 
 
-
-
-
-////future delete button
-// app.delete("/api/mswcgodown/:uuid", (req, res) => {
-//   const { uuid } = req.params;
-//   const deleteSql = "DELETE FROM mswc_godowns WHERE uuid = ?";
-
-//   db.query(deleteSql, [uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error deleting godown:", err);
-//       return res.status(500).json({ error: "Database deletion failed" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-
-//     console.log(`✅ Deleted Godown with UUID: ${uuid}`);
-
-//     // Reset order numbers sequentially
-//     const resetSql1 = "SET @new_order = 0";
-//     const resetSql2 = "UPDATE mswc_godowns SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-//     db.query(resetSql1, (resetErr1) => {
-//       if (resetErr1) {
-//         console.error("Error resetting order numbers:", resetErr1);
-//         return res.status(500).json({ error: "Failed to reset order numbering" });
-//       }
-//       db.query(resetSql2, (resetErr2) => {
-//         if (resetErr2) {
-//           console.error("Error resetting order numbers:", resetErr2);
-//           return res.status(500).json({ error: "Failed to reset order numbers" });
-//         }
-//         console.log("✅ Order numbers reset successfully!");
-//         res.json({ message: "Godown deleted and order numbers reset successfully!" });
-//       });
-//     });
-//   });
-// });
-
 //end of mswc godown
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -580,118 +388,7 @@ app.delete("/api/mswcgodown/:uuid", (req, res) => {
 
 
 //////////////////////////////////////////////////////////////////////////////
-//part of subgodwon
-// app.get("/api/subgodown/active", (req, res) => {
-//   const sql = "SELECT uuid, parentGodown, subGodown, order_number, status FROM sub_godown WHERE status = 'Active' ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching active godowns:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-
-// // Get only "Inactive" godowns
-// app.get("/api/subgodown/inactive", (req, res) => {
-//   const sql = "SELECT uuid, parentGodown, subGodown, order_number, status FROM sub_godown WHERE status = 'Inactive' ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching inactive godowns:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-// app.get("/api/godowns", (req, res) => {
-//   const query = "SELECT godownName FROM mswc_godowns WHERE status = 'Active'"; // Fetch only godownname
-
-//   db.query(query, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching godown names:", err);
-//       return res.status(500).json({ error: "Database query error" });
-//     }
-
-//     res.json(results);
-//   });
-// });
-
-
-// app.get("/api/subgodown", (req, res) => {
-//   const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown ORDER BY order_number";
-//   db.query(sql, (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     res.json(results);
-//   });
-// });
-
-// app.get("/api/subgodown/:uuid", (req, res) => {
-//   const sql = "SELECT uuid, parentGodown, subGodown , status, order_number FROM sub_godown WHERE uuid = ?";
-//   db.query(sql, [req.params.uuid], (err, results) => {
-//     if (err) return res.status(500).json({ error: err.message });
-//     if (results.length === 0) return res.status(404).json({ message: "Godown not found" });
-//     res.json(results[0]);
-//   });
-// });
-
-// app.post("/api/subgodown", (req, res) => {
-//   const { parentGodown, subGodown, status = "Active" } = req.body;
-//   const uuid = uuidv4();
-
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM sub_godown";
-
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error getting next order number:", err.sqlMessage || err);
-//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-//     }
-
-//     const nextOrder = result[0].next_order;
-//     const insertSql = "INSERT INTO sub_godown (uuid, parentGodown, subGodown, status, order_number) VALUES (?, ?, ?, ?, ?)";
-    
-//     db.query(insertSql, [uuid, parentGodown, subGodown, status, nextOrder], (err, result) => {
-//       if (err) return res.status(500).json({ error: err.message });
-//       res.status(201).json({ message: "Sub-Godown added successfully", uuid });
-//     });
-//   });
-// });
-
-// // Update an existing MSWC Godown
-// app.put("/api/subgodown/:uuid", (req, res) => {
-//   const { parentGodown, subGodown, status } = req.body;
-
-//   const updatedstatus = status || "Active";
-//   const sql = "UPDATE sub_godown SET parentGodown = ?, subGodown = ?, status = ? WHERE uuid = ?";
-  
-//   db.query(sql, [parentGodown, subGodown, updatedstatus, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-//     res.json({ message: "Godown updated successfully" });
-//   });
-// });
-
-// // Soft Delete a godown (Change status from Active to Inactive)
-// app.delete("/api/subgodown/:uuid", (req, res) => {
-//   const { uuid } = req.params;
-//   const updateSql = "UPDATE sub_godown SET status = 'Inactive' WHERE uuid = ?";
-
-//   db.query(updateSql, [uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating godown status:", err);
-//       return res.status(500).json({ error: "Failed to update godown status" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Godown not found" });
-//     }
-//     res.json({ message: "Godown status updated to Inactive successfully!" });
-//   });
-// });
-
+//start of sub godown
 app.get("/api/subgodown/active", (req, res) => {
   const sql = "SELECT uuid, parentGodown, subGodown, subgodown_id, status FROM sub_godown WHERE status = 'Active' ORDER BY subgodown_id";
   db.query(sql, (err, results) => {
@@ -842,149 +539,6 @@ app.delete("/api/subgodown/:uuid", (req, res) => {
 // });
 //////////////////////////////////////////
 //start of ownerpage
-
-// app.get("/api/owners", (req, res) => {
-//   const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number DESC";
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Error fetching owners:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     res.json(results);
-//   });
-// });
-
-
-// app.get("/api/owners/:uuid", (req, res) => {
-//   const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners WHERE uuid = ?";
-//   db.query(sql, [req.params.uuid], (err, results) => {
-//     if (err) {
-//       console.error("Error fetching owner:", err);
-//       return res.status(500).json({ error: "Database fetch error" });
-//     }
-//     if (results.length === 0) {
-//       return res.status(404).json({ message: "Owner not found" });
-//     }
-//     res.json(results[0]);
-//   });
-// });
-
-// app.post("/api/owners", (req, res) => {
-//   const { ownerName, contact, address, emailID } = req.body;
-  
-//    // Log request body for debugging
-
-//   if (!ownerName) {
-//     return res.status(400).json({ error: "Owner Name is required" });
-//   }
-
-//   const uuid = uuidv4();
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM owners";
-
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("❌ Error getting next order number:", err);
-//       return res.status(500).json({ error: "Database error", details: err.message });
-//     }
-
-//     const nextOrder = result[0]?.next_order || 1;
-//     console.log("✅ Next order number:", nextOrder);
-
-//     const insertSql = `
-//       INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) 
-//       VALUES (?, ?, ?, ?, ?, ?)`;
-
-//     db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr, result) => {
-//       if (insertErr) {
-//         console.error("❌ Database Insertion Error:", insertErr);
-//         return res.status(500).json({ error: "Database insertion failed", details: insertErr.message });
-//       }
-//       res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
-//     });
-//   });
-// });
-
-
-// app.put("/api/owners/:uuid", (req, res) => {
-//   const { ownerName, contact, address, emailID } = req.body;
-
-//   // `ownerName` is required, but other fields can be empty or missing
-//   if (!ownerName) {
-//     return res.status(400).json({ error: "Owner name is required" });
-//   }
-
-//   // Prepare fields for update (only update provided values)
-//   let updateFields = ["ownerName = ?"];
-//   let values = [ownerName];
-
-//   if (contact !== undefined) {
-//     updateFields.push("contact = ?");
-//     values.push(contact);
-//   }
-//   if (address !== undefined) {
-//     updateFields.push("address = ?");
-//     values.push(address);
-//   }
-//   if (emailID !== undefined) {
-//     updateFields.push("emailID = ?");
-//     values.push(emailID);
-//   }
-
-//   // Construct SQL query dynamically
-//   const sql = `UPDATE owners SET ${updateFields.join(", ")} WHERE uuid = ?`;
-//   values.push(req.params.uuid);
-
-//   db.query(sql, values, (err, result) => {
-//     if (err) {
-//       console.error("Error updating owner:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Owner not found" });
-//     }
-//     res.json({ message: "Owner updated successfully" });
-//   });
-// });
-
-// app.delete("/api/owners/:uuid", (req, res) => {
-//   const { uuid } = req.params;
-
-//   // Step 1: Delete the specific record
-//   const deleteSql = "DELETE FROM owners WHERE uuid = ?";
-//   db.query(deleteSql, [uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error deleting owner:", err);
-//       return res.status(500).json({ error: "Database deletion failed" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Owner not found" });
-//     }
-
-//     console.log(`✅ Deleted Owner with UUID: ${uuid}`);
-
-//     // Step 2: Reset order numbers sequentially
-//     const resetSql1 = "SET @new_order = 0";
-//     const resetSql2 = "UPDATE owners SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
-
-//     db.query(resetSql1, (resetErr1) => {
-//       if (resetErr1) {
-//         console.error("Error resetting order numbers:", resetErr1);
-//         return res.status(500).json({ error: "Failed to reset order numbering" });
-//       }
-
-//       db.query(resetSql2, (resetErr2) => {
-//         if (resetErr2) {
-//           console.error("Error resetting order numbers:", resetErr2);
-//           return res.status(500).json({ error: "Failed to reset order numbers" });
-//         }
-
-//         console.log("✅ Order numbers reset successfully!");
-//         res.json({ message: "Owner deleted and order numbers reset successfully!" });
-//       });
-//     });
-//   });
-// });
-
 // GET all owners (sorted by owner_id)
 app.get("/api/owners", (req, res) => {
   const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners ORDER BY owner_id DESC";
@@ -1162,9 +716,6 @@ app.get("/api/grains/:uuid", (req, res) => {
   });
 });
 
-
-
-
 app.post("/api/grains", (req, res) => {
   console.log("Incoming Request Body:", req.body); // Debugging log
 
@@ -1195,9 +746,6 @@ app.post("/api/grains", (req, res) => {
     });
   });
 });
-
-
-
 
 app.put("/api/grains/:uuid", (req, res) => {
   const { grainName, mswcGodown, subGodown } = req.body;
@@ -1263,8 +811,158 @@ app.delete("/api/grains/:uuid", (req, res) => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start of driver page
 
+// app.get("/api/drivers/active", (req, res) => {
+//   const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Active' ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching active drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// // Get only "Inactive" drivers
+// app.get("/api/drivers/inactive", (req, res) => {
+//     const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Inactive' ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching inactive drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// app.get("/api/drivers", (req, res) => {
+//   const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number FROM drivers ORDER BY order_number";
+  
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// app.get("/api/drivers/:uuid", (req, res) => {
+//   const sql = "SELECT * FROM drivers WHERE uuid = ?";
+  
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Driver not found" });
+    
+//     res.json(results[0]);
+//   });
+// });
+
+
+// // Add Driver (POST)
+// app.post("/api/drivers", (req, res) => {
+//   const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
+//   const uuid = uuidv4();
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = `
+//       INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number) 
+//       VALUES (?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     db.query(insertSql, [uuid, driver_name, aadhar_card_no || null, contact || null, driving_license_no || null, status, nextOrder], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting:", insertErr);
+//         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//       }
+
+//       console.log(`✅ New driver added with order_number: ${nextOrder}, Status: ${status}`);
+//       res.json({ message: "Driver added successfully", uuid, order_number: nextOrder, status });
+//     });
+//   });
+// });
+
+// // Update Driver (PUT)
+// app.put("/api/drivers/:uuid", (req, res) => {
+//   const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
+
+//   // Ensure driver_name is provided
+//   if (!driver_name || driver_name.trim() === "") {
+//     return res.status(400).json({ error: "Driver name is required" });
+//   }
+
+//   // Prepare dynamic query based on provided fields
+//   let updates = [];
+//   let values = [];
+
+//   if (driver_name) {
+//     updates.push("driver_name = ?");
+//     values.push(driver_name);
+//   }
+//   if (aadhar_card_no) {
+//     updates.push("aadhar_card_no = ?");
+//     values.push(aadhar_card_no);
+//   }
+//   if (contact) {
+//     updates.push("contact = ?");
+//     values.push(contact);
+//   }
+//   if (driving_license_no) {
+//     updates.push("driving_license_no = ?");
+//     values.push(driving_license_no);
+//   }
+//   if (status) {
+//     updates.push("status = ?");
+//     values.push(status);
+//   }
+
+//   // If no valid fields provided (besides driver_name), return an error
+//   if (updates.length < 2) {
+//     return res.status(400).json({ error: "At least one additional field must be updated along with driver_name" });
+//   }
+
+//   // Build the SQL query dynamically
+//   const sql = `UPDATE drivers SET ${updates.join(", ")} WHERE uuid = ?`;
+//   values.push(req.params.uuid);
+
+//   db.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Driver not found" });
+//     }
+//     res.json({ message: "Driver updated successfully" });
+//   });
+// });
+
+
+
+// // Soft Delete a driver (Change status from Active to Inactive)
+// app.delete("/api/drivers/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+//   const updateSql = "UPDATE drivers SET status = 'Inactive' WHERE uuid = ?";
+
+//   db.query(updateSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating drivers status:", err);
+//       return res.status(500).json({ error: "Failed to update driver status" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "driver not found" });
+//     }
+//     res.json({ message: "driver status updated to Inactive successfully!" });
+//   });
+// });
+
+// Get only "Active" drivers
 app.get("/api/drivers/active", (req, res) => {
-  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Active' ORDER BY order_number";
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Active' ORDER BY driver_id";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching active drivers:", err);
@@ -1276,7 +974,7 @@ app.get("/api/drivers/active", (req, res) => {
 
 // Get only "Inactive" drivers
 app.get("/api/drivers/inactive", (req, res) => {
-    const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number  FROM drivers WHERE status = 'Inactive' ORDER BY order_number";
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Inactive' ORDER BY driver_id";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching inactive drivers:", err);
@@ -1286,43 +984,41 @@ app.get("/api/drivers/inactive", (req, res) => {
   });
 });
 
+// Get all drivers
 app.get("/api/drivers", (req, res) => {
-  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number FROM drivers ORDER BY order_number";
-  
+  const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers ORDER BY driver_id";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
+// Get a single driver by UUID
 app.get("/api/drivers/:uuid", (req, res) => {
   const sql = "SELECT * FROM drivers WHERE uuid = ?";
-  
   db.query(sql, [req.params.uuid], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Driver not found" });
-    
     res.json(results[0]);
   });
 });
 
-
-// Add Driver (POST)
+// Add Driver
 app.post("/api/drivers", (req, res) => {
   const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
   const uuid = uuidv4();
 
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
+  const getMaxOrderSql = "SELECT COALESCE(MAX(driver_id), 0) + 1 AS next_order FROM drivers";
 
   db.query(getMaxOrderSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
+      console.error("Error getting next driver ID:", err);
       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
     }
 
     const nextOrder = result[0].next_order;
     const insertSql = `
-      INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, order_number) 
+      INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id) 
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -1332,22 +1028,20 @@ app.post("/api/drivers", (req, res) => {
         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
       }
 
-      console.log(`✅ New driver added with order_number: ${nextOrder}, Status: ${status}`);
-      res.json({ message: "Driver added successfully", uuid, order_number: nextOrder, status });
+      console.log(`✅ New driver added with driver_id: ${nextOrder}, Status: ${status}`);
+      res.json({ message: "Driver added successfully", uuid, driver_id: nextOrder, status });
     });
   });
 });
 
-// Update Driver (PUT)
+// Update Driver
 app.put("/api/drivers/:uuid", (req, res) => {
   const { driver_name, aadhar_card_no, contact, driving_license_no, status = "Active" } = req.body;
 
-  // Ensure driver_name is provided
   if (!driver_name || driver_name.trim() === "") {
     return res.status(400).json({ error: "Driver name is required" });
   }
 
-  // Prepare dynamic query based on provided fields
   let updates = [];
   let values = [];
 
@@ -1372,12 +1066,10 @@ app.put("/api/drivers/:uuid", (req, res) => {
     values.push(status);
   }
 
-  // If no valid fields provided (besides driver_name), return an error
   if (updates.length < 2) {
     return res.status(400).json({ error: "At least one additional field must be updated along with driver_name" });
   }
 
-  // Build the SQL query dynamically
   const sql = `UPDATE drivers SET ${updates.join(", ")} WHERE uuid = ?`;
   values.push(req.params.uuid);
 
@@ -1393,51 +1085,7 @@ app.put("/api/drivers/:uuid", (req, res) => {
   });
 });
 
-
-
-// app.post("/api/drivers", (req, res) => {
-//   const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
-//   const uuid = uuidv4(); // Generate UUID
-
-//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM drivers";
-
-//   db.query(getMaxOrderSql, (err, result) => {
-//     if (err) {
-//       console.error("Error getting next order number:", err);
-//       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
-//     }
-
-//     const nextOrder = result[0].next_order;
-//     const insertSql = "INSERT INTO drivers (uuid, driver_name, aadhar_card_no, contact, driving_license_no, order_number) VALUES (?, ?, ?, ?, ?, ?)";
-
-//     db.query(insertSql, [uuid, driver_name, aadhar_card_no, contact, driving_license_no, nextOrder], (insertErr) => {
-//       if (insertErr) {
-//         console.error("Error inserting:", insertErr);
-//         return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
-//       }
-      
-//       console.log(`✅ New driver added with order_number: ${nextOrder}`);
-//       res.json({ message: "Driver added successfully", uuid, order_number: nextOrder });
-//     });
-//   });
-// });
-
-// app.put("/api/drivers/:uuid", (req, res) => {
-//   const { driver_name, aadhar_card_no, contact, driving_license_no } = req.body;
-//   const sql = "UPDATE drivers SET driver_name = ?, aadhar_card_no = ?, contact = ?, driving_license_no = ? WHERE uuid = ?";
-  
-//   db.query(sql, [driver_name, aadhar_card_no, contact, driving_license_no, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating:", err);
-//       return res.status(500).json({ error: "Database error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Driver not found" });
-//     }
-//     res.json({ message: "Driver updated successfully" });
-//   });
-// });
-// Soft Delete a driver (Change status from Active to Inactive)
+// Soft Delete Driver (set status to Inactive)
 app.delete("/api/drivers/:uuid", (req, res) => {
   const { uuid } = req.params;
   const updateSql = "UPDATE drivers SET status = 'Inactive' WHERE uuid = ?";
@@ -1448,11 +1096,13 @@ app.delete("/api/drivers/:uuid", (req, res) => {
       return res.status(500).json({ error: "Failed to update driver status" });
     }
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "driver not found" });
+      return res.status(404).json({ message: "Driver not found" });
     }
-    res.json({ message: "driver status updated to Inactive successfully!" });
+    res.json({ message: "Driver status updated to Inactive successfully!" });
   });
 });
+
+
 
 // app.delete("/api/drivers/:uuid", (req, res) => {
 //   const { uuid } = req.params;

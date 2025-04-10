@@ -172,7 +172,7 @@ const DriverPage = () => {
               {drivers.length > 0 ? (
                 drivers.map((driver) => (
                   <tr key={driver.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{driver.order_number}</td>
+                    <td className="border p-2">{driver.driver_id}</td>
                     <td className="border p-2">{driver.driver_name}</td>
                     <td className="border p-2">{driver.aadhar_card_no}</td>
                     <td className="border p-2">{driver.contact}</td>
