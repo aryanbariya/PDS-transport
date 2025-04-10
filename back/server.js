@@ -93,66 +93,6 @@ app.post("/signin", async (req, res) => {
 });
 ///////////////////////////////////////////////////////////////////
 
-// app.post("/google-signin", async (req, res) => {
-//   try {
-//     const { email, name, sub } = req.body; // sub = Google user ID
-
-//     if (!email || !name || !sub) {
-//       return res.status(400).json({ error: "Missing required Google data" });
-//     }
-
-//     // Check if the user already exists in the database
-//     const sqlCheck = "SELECT * FROM users WHERE email = ?";
-//     db.query(sqlCheck, [email], (err, results) => {
-//       if (err) {
-//         console.error("Database error:", err);
-//         return res.status(500).json({ error: "Database error" });
-//       }
-
-//       if (results.length > 0) {
-//         // User exists, generate token
-//         const user = results[0];
-//         const token = jwt.sign(
-//           { id: user.id, email: user.email, name: user.name },
-//           "your_secret_key",
-//           { expiresIn: "1h" }
-//         );
-//         return res.json({ message: "Login successful", token, user });
-//       } else {
-//         // New user, insert into database
-//         const sqlInsert =
-//           "INSERT INTO users (name, email, google_id) VALUES (?, ?, ?)";
-//         db.query(sqlInsert, [name, email, sub], (err, result) => {
-//           if (err) {
-//             console.error("Database insert error:", err);
-//             return res.status(500).json({ error: "Database insert error" });
-//           }
-
-//           const newUser = {
-//             id: result.insertId,
-//             name,
-//             email,
-//           };
-
-//           const token = jwt.sign(
-//             { id: newUser.id, email: newUser.email, name: newUser.name },
-//             "your_secret_key",
-//             { expiresIn: "1h" }
-//           );
-
-//           return res.status(201).json({
-//             message: "User registered successfully",
-//             token,
-//             user: newUser,
-//           });
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: "Google authentication failed" });
-//   }
-// });
-
 
 
 
@@ -692,8 +632,151 @@ app.delete("/api/subgodown/:uuid", (req, res) => {
 //////////////////////////////////////////
 //start of ownerpage
 
+// app.get("/api/owners", (req, res) => {
+//   const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number DESC";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching owners:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+
+// app.get("/api/owners/:uuid", (req, res) => {
+//   const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) {
+//       console.error("Error fetching owner:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     if (results.length === 0) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+//     res.json(results[0]);
+//   });
+// });
+
+// app.post("/api/owners", (req, res) => {
+//   const { ownerName, contact, address, emailID } = req.body;
+  
+//    // Log request body for debugging
+
+//   if (!ownerName) {
+//     return res.status(400).json({ error: "Owner Name is required" });
+//   }
+
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM owners";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("❌ Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error", details: err.message });
+//     }
+
+//     const nextOrder = result[0]?.next_order || 1;
+//     console.log("✅ Next order number:", nextOrder);
+
+//     const insertSql = `
+//       INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) 
+//       VALUES (?, ?, ?, ?, ?, ?)`;
+
+//     db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr, result) => {
+//       if (insertErr) {
+//         console.error("❌ Database Insertion Error:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed", details: insertErr.message });
+//       }
+//       res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+
+// app.put("/api/owners/:uuid", (req, res) => {
+//   const { ownerName, contact, address, emailID } = req.body;
+
+//   // `ownerName` is required, but other fields can be empty or missing
+//   if (!ownerName) {
+//     return res.status(400).json({ error: "Owner name is required" });
+//   }
+
+//   // Prepare fields for update (only update provided values)
+//   let updateFields = ["ownerName = ?"];
+//   let values = [ownerName];
+
+//   if (contact !== undefined) {
+//     updateFields.push("contact = ?");
+//     values.push(contact);
+//   }
+//   if (address !== undefined) {
+//     updateFields.push("address = ?");
+//     values.push(address);
+//   }
+//   if (emailID !== undefined) {
+//     updateFields.push("emailID = ?");
+//     values.push(emailID);
+//   }
+
+//   // Construct SQL query dynamically
+//   const sql = `UPDATE owners SET ${updateFields.join(", ")} WHERE uuid = ?`;
+//   values.push(req.params.uuid);
+
+//   db.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Error updating owner:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+//     res.json({ message: "Owner updated successfully" });
+//   });
+// });
+
+// app.delete("/api/owners/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   // Step 1: Delete the specific record
+//   const deleteSql = "DELETE FROM owners WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting owner:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+
+//     console.log(`✅ Deleted Owner with UUID: ${uuid}`);
+
+//     // Step 2: Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE owners SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting order numbers:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering" });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Owner deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
+
+// GET all owners (sorted by owner_id)
 app.get("/api/owners", (req, res) => {
-  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners ORDER BY order_number DESC";
+  const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners ORDER BY owner_id DESC";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching owners:", err);
@@ -703,9 +786,9 @@ app.get("/api/owners", (req, res) => {
   });
 });
 
-
+// GET single owner
 app.get("/api/owners/:uuid", (req, res) => {
-  const sql = "SELECT uuid, ownerName, contact, address, emailID, order_number FROM owners WHERE uuid = ?";
+  const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
     if (err) {
       console.error("Error fetching owner:", err);
@@ -718,71 +801,48 @@ app.get("/api/owners/:uuid", (req, res) => {
   });
 });
 
+// POST new owner
 app.post("/api/owners", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
-  
-   // Log request body for debugging
 
   if (!ownerName) {
     return res.status(400).json({ error: "Owner Name is required" });
   }
 
   const uuid = uuidv4();
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM owners";
+  const getMaxOrderSql = "SELECT COALESCE(MAX(owner_id), 0) + 1 AS next_owner_id FROM owners";
 
   db.query(getMaxOrderSql, (err, result) => {
     if (err) {
-      console.error("❌ Error getting next order number:", err);
+      console.error("❌ Error getting next owner_id:", err);
       return res.status(500).json({ error: "Database error", details: err.message });
     }
 
-    const nextOrder = result[0]?.next_order || 1;
-    console.log("✅ Next order number:", nextOrder);
+    const nextOwnerId = result[0]?.next_owner_id || 1;
+    console.log("✅ Next owner_id:", nextOwnerId);
 
     const insertSql = `
-      INSERT INTO owners (uuid, ownerName, contact, address, emailID, order_number) 
+      INSERT INTO owners (uuid, ownerName, contact, address, emailID, owner_id) 
       VALUES (?, ?, ?, ?, ?, ?)`;
 
-    db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOrder], (insertErr, result) => {
+    db.query(insertSql, [uuid, ownerName, contact || null, address || null, emailID || null, nextOwnerId], (insertErr, result) => {
       if (insertErr) {
         console.error("❌ Database Insertion Error:", insertErr);
         return res.status(500).json({ error: "Database insertion failed", details: insertErr.message });
       }
-      res.status(201).json({ message: "Owner added successfully", uuid, order_number: nextOrder });
+      res.status(201).json({ message: "Owner added successfully", uuid, owner_id: nextOwnerId });
     });
   });
 });
 
-
-
-// app.put("/api/owners/:uuid", (req, res) => {
-//   const { ownerName, contact, address, emailID } = req.body;
-//   if (!ownerName || !contact || !address || !emailID) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   const sql = "UPDATE owners SET ownerName = ?, contact = ?, address = ?, emailID = ? WHERE uuid = ?";
-
-//   db.query(sql, [ownerName, contact, address, emailID, req.params.uuid], (err, result) => {
-//     if (err) {
-//       console.error("Error updating owner:", err);
-//       return res.status(500).json({ error: "Database update error" });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "Owner not found" });
-//     }
-//     res.json({ message: "Owner updated successfully" });
-//   });
-// });
+// PUT update owner
 app.put("/api/owners/:uuid", (req, res) => {
   const { ownerName, contact, address, emailID } = req.body;
 
-  // `ownerName` is required, but other fields can be empty or missing
   if (!ownerName) {
     return res.status(400).json({ error: "Owner name is required" });
   }
 
-  // Prepare fields for update (only update provided values)
   let updateFields = ["ownerName = ?"];
   let values = [ownerName];
 
@@ -799,7 +859,6 @@ app.put("/api/owners/:uuid", (req, res) => {
     values.push(emailID);
   }
 
-  // Construct SQL query dynamically
   const sql = `UPDATE owners SET ${updateFields.join(", ")} WHERE uuid = ?`;
   values.push(req.params.uuid);
 
@@ -815,14 +874,10 @@ app.put("/api/owners/:uuid", (req, res) => {
   });
 });
 
-
-
-
-
+// DELETE owner and reset owner_id
 app.delete("/api/owners/:uuid", (req, res) => {
   const { uuid } = req.params;
 
-  // Step 1: Delete the specific record
   const deleteSql = "DELETE FROM owners WHERE uuid = ?";
   db.query(deleteSql, [uuid], (err, result) => {
     if (err) {
@@ -835,28 +890,29 @@ app.delete("/api/owners/:uuid", (req, res) => {
 
     console.log(`✅ Deleted Owner with UUID: ${uuid}`);
 
-    // Step 2: Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE owners SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+    // Reset owner_id (sequentially)
+    const resetSql1 = "SET @new_id = 0";
+    const resetSql2 = "UPDATE owners SET owner_id = (@new_id := @new_id + 1) ORDER BY owner_id";
 
     db.query(resetSql1, (resetErr1) => {
       if (resetErr1) {
-        console.error("Error resetting order numbers:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering" });
+        console.error("Error resetting owner_id:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset owner_id" });
       }
 
       db.query(resetSql2, (resetErr2) => {
         if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
+          console.error("Error resetting owner_id:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset owner_id" });
         }
 
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Owner deleted and order numbers reset successfully!" });
+        console.log("✅ Owner IDs reset successfully!");
+        res.json({ message: "Owner deleted and owner_id reset successfully!" });
       });
     });
   });
 });
+
 //endof ownerpage
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 

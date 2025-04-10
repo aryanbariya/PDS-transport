@@ -141,7 +141,7 @@ const OwnerNamePage = () => {
             <tbody>
               {owners.map((o) => (
                 <tr key={o.uuid} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{o.order_number}</td>
+                  <td className="border p-2">{o.owner_id}</td>
                   <td className="border p-2">{o.ownerName}</td>
                   {!isMobile && <td className="border p-2">{o.contact}</td>}
                   {!isMobile && <td className="border p-2">{o.address}</td>}
@@ -184,7 +184,7 @@ const OwnerNamePage = () => {
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-semibold mb-3">Owner Details</h2>
-            <p><strong>ID:</strong> {selectedOwner.order_number}</p>
+            <p><strong>ID:</strong> {selectedOwner.owner_id}</p>
             <p><strong>Name:</strong> {selectedOwner.ownerName}</p>
             <p><strong>Contact:</strong> {selectedOwner.contact}</p>
             <p><strong>Address:</strong> {selectedOwner.address}</p>
