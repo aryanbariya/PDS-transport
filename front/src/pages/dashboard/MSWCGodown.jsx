@@ -590,7 +590,7 @@ const MSWCGodownPage = () => {
               {godowns.length > 0 ? (
                 godowns.map((g) => (
                   <tr key={g.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{g.order_number}</td>
+                    <td className="border p-2">{g.mswc_id}</td>
                     <td className="border p-2">{g.godownName}</td>
                     <td className="border p-2">{g.godownUnder || "N/A"}</td>
                     <td className="border p-2">{g.status}</td>
