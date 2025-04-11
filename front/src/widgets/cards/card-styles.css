@@ -1,0 +1,150 @@
+/* Modern Card Styles */
+.modern-card {
+  position: relative;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Gradient backgrounds for cards */
+.gradient-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.gradient-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.gradient-indigo {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+}
+
+.gradient-cyan {
+  background: linear-gradient(135deg, #22d3ee 0%, #0284c7 100%);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+}
+
+.gradient-lime {
+  background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+/* Card hover effects */
+.card-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon container styles */
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  transition: transform 0.3s ease;
+}
+
+.card-hover-effect:hover .icon-container {
+  transform: scale(1.1);
+}
+
+/* Custom shadow effects */
+.custom-shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.custom-shadow:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Glassmorphism effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Helper for border animations */
+.border-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.border-animation::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
+  transform: translateX(-100%);
+  animation: slideBorder 2s infinite;
+}
+
+@keyframes slideBorder {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Title styles for cards */
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(55, 65, 81, 1);
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+/* Value styles for cards */
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Total count label styles */
+.count-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: rgba(107, 114, 128, 1);
+}
+
+/* Color variables for new colors */
+:root {
+  --lime-500: #84cc16;
+  --lime-600: #65a30d;
+  --pink-500: #ec4899;
+  --pink-600: #db2777;
+} 

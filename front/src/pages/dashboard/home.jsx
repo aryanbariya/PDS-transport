@@ -34,48 +34,60 @@ export function Home() {
   const data = StatisticsCardsData(); // Get updated data
 
   return (
-    
-    <div className="mt-8">
-      {data.length === 0 ?  (
+    <div className="mt-4">
+      {data.length === 0 ? (
         // 🚚 Truck Loader Animation While Fetching Data
         <div className="flex justify-center items-center h-64">
-        <Player
-          autoplay
-          loop
-          src={truckAnimation} // ✅ Path to JSON animation
-          style={{ height: "150px", width: "150px" }} // Adjust size
-        />
-      </div>
-
+          <Player
+            autoplay
+            loop
+            src={truckAnimation}
+            style={{ height: "150px", width: "150px" }}
+          />
+        </div>
       ) : (
-        <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-          
-          {data.map(({ icon, title, link, footer, ...rest }) => (
-
-            // <Link to={link} key={title}> {/* Wrap Card inside Link */}</Link>
-            <StatisticsCard
-            
+        <div className="mb-8 grid gap-y-8 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+          {data.map(({ icon, title, link, totalLabel, footer, ...rest }, index) => (
+            <div 
               key={title}
-              {...rest}
-              title={title}
-              value={rest.value ?? "Loading"}
-              icon={React.createElement(icon, {
-                className: "w-6 h-6 text-white",
-              })}
-            // footer={
-            //   <Typography className="font-normal text-blue-gray-600">
-            //     &nbsp;{footer.label} <br />
-            //     <strong className={footer.color}>{footer.value}</strong>
-            //   </Typography>
-            // }
-            />
-
+              className="animate-fade-in"
+              style={{
+                animationDelay: `${index * 0.1}s`,
+                opacity: 0, // Start invisible
+                animation: `fadeIn 0.5s ease-out ${index * 0.1}s forwards`
+              }}
+            >
+              <StatisticsCard
+                {...rest}
+                title={title}
+                value={rest.value ?? "Loading"}
+                totalLabel={totalLabel}
+                icon={React.createElement(icon, {
+                  className: "w-6 h-6 text-white",
+                })}
+                link={link}
+              />
+            </div>
           ))}
         </div>
-         )}
+      )}
+
+      {/* Add fade-in animation keyframes */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { 
+            opacity: 0; 
+            transform: translateY(10px);
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
-};
+}
 
 export default Home;
 

@@ -15,7 +15,7 @@ import {
   Avatar,
 } from "@material-tailwind/react"
 
-export function Dashboard() {
+export function Dashboard({ children }) {
   const [openSidenav, setOpenSidenav] = useState(false);
   const location = useLocation();
 
@@ -33,24 +33,28 @@ export function Dashboard() {
           <DashboardNavbar setOpenSidenav={setOpenSidenav} />
         </div>
 
-        {/* Scrollable Content */}
-        <div className="mt-20 p-4 flex-1 overflow-y-auto">
-          <Routes>
-            {routes.map(({ layout, pages }) =>
-              pages.map(({ path, element }) => (
-                <Route key={path} path={path} element={element} />
-              ))
-            )}
-            {routes.flatMap(({ layout, pages }) =>
-              pages.flatMap(({ subPages }) =>
-                subPages ? subPages.map(({ path, element }) => <Route key={path} path={path} element={element} />) : []
-              )
-            )}
-          </Routes>
+        {/* Scrollable Content with Proper Padding */}
+        <div className="mt-16 mb-16 p-4 flex-1 overflow-y-auto">
+          {children ? (
+            children
+          ) : (
+            <Routes>
+              {routes.map(({ layout, pages }) =>
+                pages.map(({ path, element }) => (
+                  <Route key={path} path={path} element={element} />
+                ))
+              )}
+              {routes.flatMap(({ layout, pages }) =>
+                pages.flatMap(({ subPages }) =>
+                  subPages ? subPages.map(({ path, element }) => <Route key={path} path={path} element={element} />) : []
+                )
+              )}
+            </Routes>
+          )}
         </div>
 
         {/* Fixed Footer */}
-        <div className="fixed bottom-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white shadow-md z-40">
+        <div className="fixed bottom-0 left-0 xl:left-[260px] w-full xl:w-[calc(100%-260px)] bg-white border-t border-gray-200 shadow-md z-40">
           <Footer />
         </div>
       </div>

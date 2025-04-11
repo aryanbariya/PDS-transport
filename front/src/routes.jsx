@@ -10,12 +10,13 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/solid";
 import { MdWarehouse } from "react-icons/md";
 import { GiSteeringWheel } from "react-icons/gi";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
-import { MdMiscellaneousServices, MdEditNote  } from "react-icons/md"
-import { TbReport } from "react-icons/tb";
+import { MdMiscellaneousServices, MdEditNote, MdLocalShipping } from "react-icons/md"
+import { TbReport, TbFileInvoice } from "react-icons/tb";
 import { FaClipboardCheck } from "react-icons/fa6";
 import { SignIn, SignUp } from "@/pages/auth";
 import Manage from "./pages/dashboard/Manage";
@@ -125,16 +126,16 @@ export const routes = [
         ],
       },
       {
-        icon: <MdEditNote {...icon} />,
-        name: "1stTapa",
-        path: "/firstTapa",
-        element: <FirstTapa />,
+        icon: <TbFileInvoice {...icon} />,
+        name: "DOCards",
+        path: "/DOCards",
+        element: <DOCards />,
       },
       {
-        icon: <TbReport {...icon} />,
-        name: "1stTapaReports",
-        path: "/firstTapareport",
-        element: <FirstTapaReport />,
+        icon: <MdLocalShipping {...icon} />,
+        name: "First Transport",
+        path: "/firstTransport",
+        element: <FirstTransport />,
       },
       {
         icon: <MdEditNote {...icon} />,
@@ -156,12 +157,6 @@ export const routes = [
       },
       {
         icon: <FaClipboardCheck {...icon} />,
-        name: "DOCards",
-        path: "/DOCards",
-        element: <DOCards />,
-      },
-      {
-        icon: <FaClipboardCheck {...icon} />,
         name: "DOGeneratePage",
         path: "/DOGeneratePage",
         element: <DOGeneratePage />,
@@ -171,12 +166,6 @@ export const routes = [
         name: "DOAllocationPage",
         path: "/DOAllocationPage",
         element: <DOAllocationPage />,
-      },
-      {
-        icon: <FaClipboardCheck {...icon} />,
-        name: "First Transport",
-        path: "/firstTransport",
-        element: <FirstTransport />,
       },
     ],
   },

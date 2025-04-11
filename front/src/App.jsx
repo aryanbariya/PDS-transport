@@ -16,6 +16,8 @@ import CategoryPage from "./pages/dashboard/CategoryPage";
 import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
 import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
 import FirstTransport from "@/pages/dashboard/FirstTransport";
+import FirstTapa from "./pages/dashboard/FirstTapa";
+import FirstTapaReport from "./pages/dashboard/FirstTapaReport";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -34,28 +36,35 @@ function App() {
       <Route path="/auth/*" element={<Auth />} />
       <Route path="/auth/sign-in" element={<SignIn />} />
 
-      {/* Private Dashboard Routes */}
+      {/* Dashboard Root Route */}
       <Route path="/dashboard/*" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/owners" element={<PrivateRoute><OwnerNamePage /></PrivateRoute>} />
-      <Route path="/employee" element={<PrivateRoute><EmployeePage /></PrivateRoute>} />
-      <Route path="/mswc" element={<PrivateRoute><MSWCGodownPage /></PrivateRoute>} />
-      <Route path="/godown" element={<PrivateRoute><SubGodownPage /></PrivateRoute>} />
-      <Route path="/driver" element={<PrivateRoute><DriverPage /></PrivateRoute>} />
-      <Route path="/truck" element={<PrivateRoute><TruckPage /></PrivateRoute>} />
-      <Route path="/scheme" element={<PrivateRoute><SchemePage /></PrivateRoute>} />
-      <Route path="/packaging" element={<PrivateRoute><PackagingPage /></PrivateRoute>} />
-      <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
-      <Route path="/HomePage/*" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-      <Route path="/grain/*" element={<PrivateRoute><GrainPage /></PrivateRoute>} />
-      <Route path="/category/*" element={<PrivateRoute><CategoryPage /></PrivateRoute>} />
+
+      {/* All Dashboard Protected Routes - Using Dashboard Layout */}
+      <Route path="/owners" element={<PrivateRoute><Dashboard><OwnerNamePage /></Dashboard></PrivateRoute>} />
+      <Route path="/employee" element={<PrivateRoute><Dashboard><EmployeePage /></Dashboard></PrivateRoute>} />
+      <Route path="/mswc" element={<PrivateRoute><Dashboard><MSWCGodownPage /></Dashboard></PrivateRoute>} />
+      <Route path="/godown" element={<PrivateRoute><Dashboard><SubGodownPage /></Dashboard></PrivateRoute>} />
+      <Route path="/driver" element={<PrivateRoute><Dashboard><DriverPage /></Dashboard></PrivateRoute>} />
+      <Route path="/truck" element={<PrivateRoute><Dashboard><TruckPage /></Dashboard></PrivateRoute>} />
+      <Route path="/scheme" element={<PrivateRoute><Dashboard><SchemePage /></Dashboard></PrivateRoute>} />
+      <Route path="/packaging" element={<PrivateRoute><Dashboard><PackagingPage /></Dashboard></PrivateRoute>} />
+      <Route path="/notifications" element={<PrivateRoute><Dashboard><Notifications /></Dashboard></PrivateRoute>} />
+      <Route path="/HomePage/*" element={<PrivateRoute><Dashboard><HomePage /></Dashboard></PrivateRoute>} />
+      <Route path="/grain/*" element={<PrivateRoute><Dashboard><GrainPage /></Dashboard></PrivateRoute>} />
+      <Route path="/category/*" element={<PrivateRoute><Dashboard><CategoryPage /></Dashboard></PrivateRoute>} />
 
       {/* First Transport Route */}
       <Route path="/firstTransport" element={<PrivateRoute><Dashboard><FirstTransport /></Dashboard></PrivateRoute>} />
+      <Route path="/firstTapa" element={<PrivateRoute><Dashboard><FirstTapa /></Dashboard></PrivateRoute>} />
+      <Route path="/firstTapareport" element={<PrivateRoute><Dashboard><FirstTapaReport /></Dashboard></PrivateRoute>} />
 
       {/* DO Related Routes */}
       <Route path="/DOGeneratePage" element={<PrivateRoute><Dashboard><DOGeneratePage /></Dashboard></PrivateRoute>} />
       <Route path="/DOAllocationPage" element={<PrivateRoute><Dashboard><DOAllocationPage /></Dashboard></PrivateRoute>} />
 
+      {/* Redirect to default dashboard */}
+      <Route path="/" element={<Navigate to="/dashboard/home" replace />} />
+      
       {/* Redirect to Sign-In by default if no valid route */}
       <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
     </Routes>
