@@ -170,7 +170,7 @@ const TruckPage = () => {
               {trucks.length > 0 ? (
                 trucks.map((truck) => (
                   <tr key={truck.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{truck.order_number}</td>
+                    <td className="border p-2">{truck.truck_id}</td>
                     <td className="border p-2">{truck.truck_name}</td>
                     <td className="border p-2">{truck.truck_status}</td>
                     <td className="border p-2">{truck.empty_weight}</td>
