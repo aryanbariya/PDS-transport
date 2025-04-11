@@ -28,8 +28,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   const [categoryList, setCategoryList] = useState([]);
   const [categorySearch, setCategorySearch] = useState("");
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const categoryDropdownRef = useRef(null);
-  const dropdownRef = useRef(null);
+
 
   useEffect(() => {
     const fetchGodowns = async () => {
@@ -78,6 +77,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
         contact: editData.contact || "",
       });
       setSearch(editData.subGodown || "");
+      setCategorySearch(editData.category|| "");
     }
   }, [editData]);
 
@@ -104,6 +104,17 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     setSearch(subGodown);
     setShowDropdown(false);
   };
+
+  const handleSelectCategory = (category)=>{
+    setFormData({ ...formData, category });
+    setCategorySearch(category);
+    setShowCategoryDropdown(false);
+  };
+
+
+
+
+  
 
   const validateForm = () => {
     let newErrors = {};
@@ -258,11 +269,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
             {/* Section: Basic Information */}
             <div className="md:col-span-1 bg-gray-50 p-4 rounded-lg">
               <h3 className="font-medium text-gray-700 mb-3 border-b pb-2">Basic Information</h3>
-              {renderDropdown("category", "Category", categoryList, categorySearch, setCategorySearch, showCategoryDropdown, setShowCategoryDropdown, (value) => {
-                setFormData({ ...formData, category: value });
-                setCategorySearch(value);
-                setShowCategoryDropdown(false);
-              })}
+              {renderDropdown("category", "Category", categoryList, categorySearch, setCategorySearch, showCategoryDropdown, setShowCategoryDropdown, handleSelectCategory)}
               {renderInputField("fullName", "Full Name")}
               {renderInputField("contact", "Contact Number")}
               {renderInputField("address", "Address")}

@@ -1154,8 +1154,193 @@ app.delete("/api/drivers/:uuid", (req, res) => {
 
 
 // Get all trucks ordered by order_number
+// app.get("/api/own", (req, res) => {
+//   const sql = "SELECT uuid, ownerName, order_number FROM owners ORDER BY owner_id";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching owners:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+
+// app.get("/api/truck/active", (req, res) => {
+//   const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number  FROM truck WHERE truck_status = 'Active' ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching active drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// // Get only "Inactive" drivers
+// app.get("/api/truck/inactive", (req, res) => {
+//     const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number  FROM truck WHERE truck_status = 'Inactive' ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching inactive drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+
+
+// app.get("/api/truck", (req, res) => {
+//   const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// // Get a specific truck by UUID
+// app.get("/api/truck/:uuid", (req, res) => {
+//   const sql = "SELECT * FROM truck WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Truck not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // Add a new truck
+// app.post("/api/truck", (req, res) => {
+//   const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+//   if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+//     return res.status(400).json({ error: "All required fields must be filled" });
+//   }
+
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM truck";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) return res.status(500).json({ error: "Database error" });
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null, permit_validity_date || null, direct_sale, nextOrder], (insertErr) => {
+//       if (insertErr) return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
+//       res.json({ message: "Truck added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+// Update an existing truck
+// app.put("/api/truck/:uuid", (req, res) => {
+//   const { truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, truck_status = "Active", tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+
+//   // Ensure required fields are present
+//   if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
+//     return res.status(400).json({ error: "Required fields: truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id" });
+//   }
+
+//   // Prepare dynamic update query
+//   let updates = [];
+//   let values = [];
+
+//   if (truck_name) {
+//     updates.push("truck_name = ?");
+//     values.push(truck_name);
+//   }
+//   if (empty_weight) {
+//     updates.push("empty_weight = ?");
+//     values.push(empty_weight);
+//   }
+//   if (company) {
+//     updates.push("company = ?");
+//     values.push(company);
+//   }
+//   if (gvw) {
+//     updates.push("gvw = ?");
+//     values.push(gvw);
+//   }
+//   if (reg_date) {
+//     updates.push("reg_date = ?");
+//     values.push(reg_date);
+//   }
+//   if (truck_owner_name) {
+//     updates.push("truck_owner_name = ?");
+//     values.push(truck_owner_name);
+//   }
+//   if (owner_id) {
+//     updates.push("owner_id = ?");
+//     values.push(owner_id);
+//   }
+//   if (truck_status) {
+//     updates.push("truck_status = ?");
+//     values.push(truck_status);
+//   }
+//   if (tax_validity_date) {
+//     updates.push("tax_validity = ?");
+//     values.push(tax_validity_date);
+//   }
+//   if (insurance_validity_date) {
+//     updates.push("insurance_validity = ?");
+//     values.push(insurance_validity_date);
+//   }
+//   if (fitness_validity_date) {
+//     updates.push("fitness_validity = ?");
+//     values.push(fitness_validity_date);
+//   }
+//   if (permit_validity_date) {
+//     updates.push("permit_validity = ?");
+//     values.push(permit_validity_date);
+//   }
+//   if (direct_sale !== undefined) {
+//     updates.push("direct_sale = ?");
+//     values.push(direct_sale);
+//   }
+
+//   // Ensure at least one additional field is updated along with the required ones
+//   if (updates.length < 7) {
+//     return res.status(400).json({ error: "At least one additional field must be updated along with required fields" });
+//   }
+
+//   // Construct SQL query
+//   const sql = `UPDATE truck SET ${updates.join(", ")} WHERE uuid = ?`;
+//   values.push(req.params.uuid);
+
+//   db.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Error updating truck:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Truck not found" });
+//     }
+//     res.json({ message: "Truck updated successfully" });
+//   });
+// });
+
+
+// // Delete a truck and reset order numbers
+
+// app.delete("/api/truck/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+//   const updateSql = "UPDATE truck SET truck_status = 'Inactive' WHERE uuid = ?";
+
+//   db.query(updateSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating truck status:", err);
+//       return res.status(500).json({ error: "Failed to update truck status" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "truck not found" });
+//     }
+//     res.json({ message: "truck status updated to Inactive successfully!" });
+//   });
+// });
+
+// Get all trucks ordered by truck_id
 app.get("/api/own", (req, res) => {
-  const sql = "SELECT uuid, ownerName, order_number FROM owners ORDER BY order_number";
+  const sql = "SELECT uuid, ownerName, truck_id FROM owners ORDER BY owner_id";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching owners:", err);
@@ -1165,9 +1350,8 @@ app.get("/api/own", (req, res) => {
   });
 });
 
-
 app.get("/api/truck/active", (req, res) => {
-  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number  FROM truck WHERE truck_status = 'Active' ORDER BY order_number";
+  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Active' ORDER BY truck_id";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching active drivers:", err);
@@ -1179,7 +1363,7 @@ app.get("/api/truck/active", (req, res) => {
 
 // Get only "Inactive" drivers
 app.get("/api/truck/inactive", (req, res) => {
-    const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number  FROM truck WHERE truck_status = 'Inactive' ORDER BY order_number";
+  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Inactive' ORDER BY truck_id";
   db.query(sql, (err, results) => {
     if (err) {
       console.error("Error fetching inactive drivers:", err);
@@ -1189,10 +1373,8 @@ app.get("/api/truck/inactive", (req, res) => {
   });
 });
 
-
-
 app.get("/api/truck", (req, res) => {
-  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number FROM truck ORDER BY order_number";
+  const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck ORDER BY truck_id";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -1217,17 +1399,17 @@ app.post("/api/truck", (req, res) => {
   }
 
   const uuid = uuidv4();
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM truck";
+  const getMaxOrderSql = "SELECT COALESCE(MAX(truck_id), 0) + 1 AS next_order FROM truck";
 
   db.query(getMaxOrderSql, (err, result) => {
     if (err) return res.status(500).json({ error: "Database error" });
 
     const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, order_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const insertSql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     db.query(insertSql, [uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null, permit_validity_date || null, direct_sale, nextOrder], (insertErr) => {
       if (insertErr) return res.status(500).json({ error: "Database error", details: insertErr.sqlMessage });
-      res.json({ message: "Truck added successfully", uuid, order_number: nextOrder });
+      res.json({ message: "Truck added successfully", uuid, truck_id: nextOrder });
     });
   });
 });
@@ -1236,74 +1418,31 @@ app.post("/api/truck", (req, res) => {
 app.put("/api/truck/:uuid", (req, res) => {
   const { truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, truck_status = "Active", tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
 
-  // Ensure required fields are present
   if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
     return res.status(400).json({ error: "Required fields: truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id" });
   }
 
-  // Prepare dynamic update query
   let updates = [];
   let values = [];
 
-  if (truck_name) {
-    updates.push("truck_name = ?");
-    values.push(truck_name);
-  }
-  if (empty_weight) {
-    updates.push("empty_weight = ?");
-    values.push(empty_weight);
-  }
-  if (company) {
-    updates.push("company = ?");
-    values.push(company);
-  }
-  if (gvw) {
-    updates.push("gvw = ?");
-    values.push(gvw);
-  }
-  if (reg_date) {
-    updates.push("reg_date = ?");
-    values.push(reg_date);
-  }
-  if (truck_owner_name) {
-    updates.push("truck_owner_name = ?");
-    values.push(truck_owner_name);
-  }
-  if (owner_id) {
-    updates.push("owner_id = ?");
-    values.push(owner_id);
-  }
-  if (truck_status) {
-    updates.push("truck_status = ?");
-    values.push(truck_status);
-  }
-  if (tax_validity_date) {
-    updates.push("tax_validity = ?");
-    values.push(tax_validity_date);
-  }
-  if (insurance_validity_date) {
-    updates.push("insurance_validity = ?");
-    values.push(insurance_validity_date);
-  }
-  if (fitness_validity_date) {
-    updates.push("fitness_validity = ?");
-    values.push(fitness_validity_date);
-  }
-  if (permit_validity_date) {
-    updates.push("permit_validity = ?");
-    values.push(permit_validity_date);
-  }
-  if (direct_sale !== undefined) {
-    updates.push("direct_sale = ?");
-    values.push(direct_sale);
-  }
+  if (truck_name) updates.push("truck_name = ?"), values.push(truck_name);
+  if (empty_weight) updates.push("empty_weight = ?"), values.push(empty_weight);
+  if (company) updates.push("company = ?"), values.push(company);
+  if (gvw) updates.push("gvw = ?"), values.push(gvw);
+  if (reg_date) updates.push("reg_date = ?"), values.push(reg_date);
+  if (truck_owner_name) updates.push("truck_owner_name = ?"), values.push(truck_owner_name);
+  if (owner_id) updates.push("owner_id = ?"), values.push(owner_id);
+  if (truck_status) updates.push("truck_status = ?"), values.push(truck_status);
+  if (tax_validity_date) updates.push("tax_validity = ?"), values.push(tax_validity_date);
+  if (insurance_validity_date) updates.push("insurance_validity = ?"), values.push(insurance_validity_date);
+  if (fitness_validity_date) updates.push("fitness_validity = ?"), values.push(fitness_validity_date);
+  if (permit_validity_date) updates.push("permit_validity = ?"), values.push(permit_validity_date);
+  if (direct_sale !== undefined) updates.push("direct_sale = ?"), values.push(direct_sale);
 
-  // Ensure at least one additional field is updated along with the required ones
   if (updates.length < 7) {
     return res.status(400).json({ error: "At least one additional field must be updated along with required fields" });
   }
 
-  // Construct SQL query
   const sql = `UPDATE truck SET ${updates.join(", ")} WHERE uuid = ?`;
   values.push(req.params.uuid);
 
@@ -1319,9 +1458,7 @@ app.put("/api/truck/:uuid", (req, res) => {
   });
 });
 
-
-// Delete a truck and reset order numbers
-
+// Delete a truck and reset status
 app.delete("/api/truck/:uuid", (req, res) => {
   const { uuid } = req.params;
   const updateSql = "UPDATE truck SET truck_status = 'Inactive' WHERE uuid = ?";
@@ -1332,11 +1469,17 @@ app.delete("/api/truck/:uuid", (req, res) => {
       return res.status(500).json({ error: "Failed to update truck status" });
     }
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "truck not found" });
+      return res.status(404).json({ message: "Truck not found" });
     }
-    res.json({ message: "truck status updated to Inactive successfully!" });
+    res.json({ message: "Truck status updated to Inactive successfully!" });
   });
 });
+
+
+
+
+
+
 // app.delete("/api/truck/:uuid", (req, res) => {
 //   const deleteSql = "DELETE FROM truck WHERE uuid = ?";
 //   db.query(deleteSql, [req.params.uuid], (err, result) => {
