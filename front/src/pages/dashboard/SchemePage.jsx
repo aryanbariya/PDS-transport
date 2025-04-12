@@ -122,7 +122,7 @@ const SchemePage = () => {
               {schemes.length > 0 ? (
                 schemes.map((scheme) => (
                   <tr key={scheme.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{scheme.order_number}</td>
+                    <td className="border p-2">{scheme.scheme_id}</td>
                     <td className="border p-2">{scheme.scheme_name}</td>
                     <td className="border p-2">{scheme.scheme_status}</td>
                     <td className="border p-2">

@@ -137,7 +137,7 @@ const GrainPage = () => {
               {filteredGrains.length > 0 ? (
                 filteredGrains.map((grain) => (
                   <tr key={grain.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{grain.order_number}</td>
+                    <td className="border p-2">{grain.grain_id}</td>
                     <td className="border p-2">{grain.grainName}</td>
                     <td className="border p-2">{grain.godownName}</td>
                     <td className="border p-2 flex justify-start space-x-2">

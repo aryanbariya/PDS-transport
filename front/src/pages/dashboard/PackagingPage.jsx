@@ -123,7 +123,7 @@ const PackagingPage = () => {
               {packagingList.length > 0 ? (
                 packagingList.map((p) => (
                   <tr key={p.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{p.order_number}</td>
+                    <td className="border p-2">{p.pack_id}</td>
                     <td className="border p-2">{p.material_name}</td>
                     <td className="border p-2">{p.weight}</td>
                     <td className="border p-2">{p.status}</td>
