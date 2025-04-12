@@ -686,9 +686,10 @@ app.delete("/api/owners/:uuid", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///start of grain page
 
-// Get all grains
+// // Get all grains
+
 app.get("/api/grains", (req, res) => {
-  const sql = "SELECT * FROM grains ORDER BY order_number";
+  const sql = "SELECT * FROM grains ORDER BY grain_id";
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -726,23 +727,23 @@ app.post("/api/grains", (req, res) => {
   }
 
   const uuid = uuidv4();
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM grains";
+  const getMaxOrderSql = "SELECT COALESCE(MAX(grain_id), 0) + 1 AS next_id FROM grains";
 
   db.query(getMaxOrderSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
+      console.error("Error getting next grain ID:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
-    const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO grains (uuid, grainName, godownName, order_number) VALUES (?, ?, ?, ?)";
+    const nextGrainId = result[0].next_id;
+    const insertSql = "INSERT INTO grains (uuid, grainName, godownName, grain_id) VALUES (?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, grainName, godownName, nextOrder], (insertErr) => {
+    db.query(insertSql, [uuid, grainName, godownName, nextGrainId], (insertErr) => {
       if (insertErr) {
         console.error("Error inserting grain:", insertErr);
         return res.status(500).json({ error: "Database insertion failed" });
       }
-      res.status(201).json({ message: "Grain added successfully", uuid, order_number: nextOrder });
+      res.status(201).json({ message: "Grain added successfully", uuid, grain_id: nextGrainId });
     });
   });
 });
@@ -784,27 +785,147 @@ app.delete("/api/grains/:uuid", (req, res) => {
 
     console.log(`✅ Deleted Grain with UUID: ${uuid}`);
 
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE grains SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+    const resetSql1 = "SET @new_id = 0";
+    const resetSql2 = "UPDATE grains SET grain_id = (@new_id := @new_id + 1) ORDER BY grain_id";
 
     db.query(resetSql1, (resetErr1) => {
       if (resetErr1) {
-        console.error("Error resetting order numbers:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering" });
+        console.error("Error resetting grain IDs:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset grain IDs" });
       }
 
       db.query(resetSql2, (resetErr2) => {
         if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
+          console.error("Error resetting grain IDs:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset grain IDs" });
         }
 
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Grain deleted and order numbers reset successfully!" });
+        console.log("✅ Grain IDs reset successfully!");
+        res.json({ message: "Grain deleted and grain IDs reset successfully!" });
       });
     });
   });
 });
+
+
+// app.get("/api/grains", (req, res) => {
+//   const sql = "SELECT * FROM grains ORDER BY order_number";
+
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching grains:", err);
+//       return res.status(500).json({ error: "Database query failed" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// // Get a specific grain by UUID
+// app.get("/api/grains/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+//   const sql = "SELECT * FROM grains WHERE uuid = ?";
+
+//   db.query(sql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error fetching grain:", err);
+//       return res.status(500).json({ error: "Database query failed" });
+//     }
+//     if (result.length === 0) {
+//       return res.status(404).json({ message: "Grain not found" });
+//     }
+//     res.json(result[0]);
+//   });
+// });
+
+// app.post("/api/grains", (req, res) => {
+//   console.log("Incoming Request Body:", req.body); // Debugging log
+
+//   const { grainName, godownName } = req.body;
+
+//   if (!grainName || !godownName) {
+//     return res.status(400).json({ error: "Grain name and one Godown selection are required" });
+//   }
+
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM grains";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO grains (uuid, grainName, godownName, order_number) VALUES (?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, grainName, godownName, nextOrder], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting grain:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({ message: "Grain added successfully", uuid, order_number: nextOrder });
+//     });
+//   });
+// });
+
+// app.put("/api/grains/:uuid", (req, res) => {
+//   const { grainName, mswcGodown, subGodown } = req.body;
+//   if (!grainName || (!mswcGodown && !subGodown)) {
+//     return res.status(400).json({ error: "Grain name and one Godown selection are required" });
+//   }
+
+//   const godownName = mswcGodown || subGodown;
+
+//   const sql = "UPDATE grains SET grainName = ?, godownName = ? WHERE uuid = ?";
+
+//   db.query(sql, [grainName, godownName, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating grain:", err);
+//       return res.status(500).json({ error: "Database update error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Grain not found" });
+//     }
+//     res.json({ message: "Grain updated successfully" });
+//   });
+// });
+
+// app.delete("/api/grains/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   const deleteSql = "DELETE FROM grains WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting grain:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Grain not found" });
+//     }
+
+//     console.log(`✅ Deleted Grain with UUID: ${uuid}`);
+
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE grains SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting order numbers:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering" });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Grain deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
 ///end of grain
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1516,9 +1637,11 @@ app.delete("/api/truck/:uuid", (req, res) => {
 
 
 
-// ✅ Fetch all packaging records (Ordered by order_number)
+// // ✅ Fetch all packaging records (Ordered by order_number)
+
+// ✅ Get all packaging materials (ordered by pack_id)
 app.get("/api/packaging", (req, res) => {
-  const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging ORDER BY order_number";
+  const sql = "SELECT uuid, pack_id, material_name, weight, status FROM packaging ORDER BY pack_id";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
@@ -1527,7 +1650,7 @@ app.get("/api/packaging", (req, res) => {
 
 // ✅ Get a specific packaging material by uuid
 app.get("/api/packaging/:uuid", (req, res) => {
-  const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging WHERE uuid = ?";
+  const sql = "SELECT uuid, pack_id, material_name, weight, status FROM packaging WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Packaging material not found" });
@@ -1543,18 +1666,18 @@ app.post("/api/packaging", (req, res) => {
   }
 
   const uuid = uuidv4();
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM packaging";
+  const getMaxPackIdSql = "SELECT COALESCE(MAX(pack_id), 0) + 1 AS next_pack_id FROM packaging";
 
-  db.query(getMaxOrderSql, (err, result) => {
+  db.query(getMaxPackIdSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
+      console.error("Error getting next pack_id:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
-    const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO packaging (uuid, material_name, weight, status, order_number) VALUES (?, ?, ?, ?, ?)";
+    const nextPackId = result[0].next_pack_id;
+    const insertSql = "INSERT INTO packaging (uuid, material_name, weight, status, pack_id) VALUES (?, ?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, material_name, weight, status, nextOrder], (insertErr, insertResult) => {
+    db.query(insertSql, [uuid, material_name, weight, status, nextPackId], (insertErr, insertResult) => {
       if (insertErr) {
         console.error("Error inserting packaging material:", insertErr);
         return res.status(500).json({ error: "Database insertion failed" });
@@ -1562,7 +1685,7 @@ app.post("/api/packaging", (req, res) => {
       res.status(201).json({
         message: "Packaging material added successfully",
         uuid,
-        order_number: nextOrder,
+        pack_id: nextPackId,
       });
     });
   });
@@ -1589,7 +1712,7 @@ app.put("/api/packaging/:uuid", (req, res) => {
   });
 });
 
-// ✅ Delete a packaging material and reset order numbers
+// ✅ Delete a packaging material and reset pack_id numbers
 app.delete("/api/packaging/:uuid", (req, res) => {
   const { uuid } = req.params;
 
@@ -1605,28 +1728,140 @@ app.delete("/api/packaging/:uuid", (req, res) => {
 
     console.log(`✅ Deleted Packaging Material with UUID: ${uuid}`);
 
-    // Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE packaging SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+    // Reset pack_id numbers sequentially
+    const resetSql1 = "SET @new_pack_id = 0";
+    const resetSql2 = "UPDATE packaging SET pack_id = (@new_pack_id := @new_pack_id + 1) ORDER BY pack_id";
 
     db.query(resetSql1, (resetErr1) => {
       if (resetErr1) {
-        console.error("Error resetting order numbers:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering" });
+        console.error("Error resetting pack_id:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset pack_id numbering" });
       }
 
       db.query(resetSql2, (resetErr2) => {
         if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
+          console.error("Error resetting pack_id:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset pack_id" });
         }
 
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Packaging material deleted and order numbers reset successfully!" });
+        console.log("✅ Pack IDs reset successfully!");
+        res.json({ message: "Packaging material deleted and pack_id reset successfully!" });
       });
     });
   });
 });
+
+
+// app.get("/api/packaging", (req, res) => {
+//   const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging ORDER BY order_number";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// // ✅ Get a specific packaging material by uuid
+// app.get("/api/packaging/:uuid", (req, res) => {
+//   const sql = "SELECT uuid, order_number, material_name, weight, status FROM packaging WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Packaging material not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // ✅ Add a new packaging material
+// app.post("/api/packaging", (req, res) => {
+//   const { material_name, weight, status = "Start" } = req.body;
+//   if (!material_name || !weight) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const uuid = uuidv4();
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM packaging";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO packaging (uuid, material_name, weight, status, order_number) VALUES (?, ?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, material_name, weight, status, nextOrder], (insertErr, insertResult) => {
+//       if (insertErr) {
+//         console.error("Error inserting packaging material:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({
+//         message: "Packaging material added successfully",
+//         uuid,
+//         order_number: nextOrder,
+//       });
+//     });
+//   });
+// });
+
+// // ✅ Update an existing packaging material
+// app.put("/api/packaging/:uuid", (req, res) => {
+//   const { material_name, weight, status } = req.body;
+//   if (!material_name || !weight || !status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = "UPDATE packaging SET material_name = ?, weight = ?, status = ? WHERE uuid = ?";
+
+//   db.query(sql, [material_name, weight, status, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging material not found" });
+//     }
+//     res.json({ message: "Packaging material updated successfully" });
+//   });
+// });
+
+// // ✅ Delete a packaging material and reset order numbers
+// app.delete("/api/packaging/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   const deleteSql = "DELETE FROM packaging WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting packaging material:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Packaging material not found" });
+//     }
+
+//     console.log(`✅ Deleted Packaging Material with UUID: ${uuid}`);
+
+//     // Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE packaging SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting order numbers:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering" });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Packaging material deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
 
 
 
@@ -1713,45 +1948,160 @@ app.delete("/api/categories/:category_id", (req, res) => {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // **Start Schemes**
 
+// // Get all schemes
+// app.get("/api/scheme", (req, res) => {
+//   const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+
+// // Get a specific scheme by scheme_id
+// app.get("/api/scheme/:uuid", (req, res) => {
+//   const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
+//   db.query(sql, [req.params.scheme_id], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// app.post("/api/scheme", (req, res) => {
+//   const uuid = uuidv4(); // Generate a unique UUID
+//   const { scheme_name, scheme_status } = req.body;
+//   if (!scheme_name || !scheme_status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, order_number) VALUES (?, ?, ?, ?)";
+
+//     db.query(insertSql, [uuid, scheme_name, scheme_status, nextOrder], (insertErr, insertResult) => {
+//       if (insertErr) {
+//         console.error("Error inserting scheme:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({
+//         message: "Scheme added successfully",
+//         uuid,
+//         order_number: nextOrder
+//       });
+//     });
+//   });
+// });
+
+
+// app.put("/api/scheme/:uuid", (req, res) => {
+//   const { scheme_name, scheme_status } = req.body;
+//   if (!scheme_name || !scheme_status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const sql = "UPDATE scheme SET scheme_name = ?, scheme_status = ? WHERE uuid = ?";
+
+//   db.query(sql, [scheme_name, scheme_status, req.params.uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Scheme not found" });
+//     }
+//     res.json({ message: "Scheme updated successfully" });
+//   });
+// });
+
+
+
+
+// app.delete("/api/scheme/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+
+//   // Step 1: Delete the specific scheme
+//   const deleteSql = "DELETE FROM scheme WHERE uuid = ?";
+//   db.query(deleteSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting scheme:", err);
+//       return res.status(500).json({ error: "Database deletion failed" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Scheme not found" });
+//     }
+
+//     console.log(`✅ Deleted Scheme with UUID: ${uuid}`);
+
+//     // Step 2: Reset order numbers sequentially
+//     const resetSql1 = "SET @new_order = 0";
+//     const resetSql2 = "UPDATE scheme SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+
+//     db.query(resetSql1, (resetErr1) => {
+//       if (resetErr1) {
+//         console.error("Error resetting order numbers:", resetErr1);
+//         return res.status(500).json({ error: "Failed to reset order numbering" });
+//       }
+
+//       db.query(resetSql2, (resetErr2) => {
+//         if (resetErr2) {
+//           console.error("Error resetting order numbers:", resetErr2);
+//           return res.status(500).json({ error: "Failed to reset order numbers" });
+//         }
+
+//         console.log("✅ Order numbers reset successfully!");
+//         res.json({ message: "Scheme deleted and order numbers reset successfully!" });
+//       });
+//     });
+//   });
+// });
+
 // Get all schemes
 app.get("/api/scheme", (req, res) => {
-  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
+  const sql = "SELECT uuid, scheme_id, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
-
 // Get a specific scheme by scheme_id
 app.get("/api/scheme/:uuid", (req, res) => {
-  const sql = "SELECT uuid, order_number, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
-  db.query(sql, [req.params.scheme_id], (err, results) => {
+  const sql = "SELECT uuid, scheme_id, scheme_name, scheme_status FROM scheme WHERE uuid = ?";
+  db.query(sql, [req.params.uuid], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     if (results.length === 0) return res.status(404).json({ message: "Scheme not found" });
     res.json(results[0]);
   });
 });
 
+// Create new scheme
 app.post("/api/scheme", (req, res) => {
-  const uuid = uuidv4(); // Generate a unique UUID
+  const uuid = uuidv4();
   const { scheme_name, scheme_status } = req.body;
   if (!scheme_name || !scheme_status) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  const getMaxOrderSql = "SELECT COALESCE(MAX(order_number), 0) + 1 AS next_order FROM scheme";
+  const getMaxSchemeIdSql = "SELECT COALESCE(MAX(scheme_id), 0) + 1 AS next_scheme_id FROM scheme";
 
-  db.query(getMaxOrderSql, (err, result) => {
+  db.query(getMaxSchemeIdSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
+      console.error("Error getting next scheme ID:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
-    const nextOrder = result[0].next_order;
-    const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, order_number) VALUES (?, ?, ?, ?)";
+    const nextSchemeId = result[0].next_scheme_id;
+    const insertSql = "INSERT INTO scheme (uuid, scheme_name, scheme_status, scheme_id) VALUES (?, ?, ?, ?)";
 
-    db.query(insertSql, [uuid, scheme_name, scheme_status, nextOrder], (insertErr, insertResult) => {
+    db.query(insertSql, [uuid, scheme_name, scheme_status, nextSchemeId], (insertErr, insertResult) => {
       if (insertErr) {
         console.error("Error inserting scheme:", insertErr);
         return res.status(500).json({ error: "Database insertion failed" });
@@ -1759,13 +2109,13 @@ app.post("/api/scheme", (req, res) => {
       res.status(201).json({
         message: "Scheme added successfully",
         uuid,
-        order_number: nextOrder
+        scheme_id: nextSchemeId
       });
     });
   });
 });
 
-
+// Update scheme
 app.put("/api/scheme/:uuid", (req, res) => {
   const { scheme_name, scheme_status } = req.body;
   if (!scheme_name || !scheme_status) {
@@ -1786,13 +2136,10 @@ app.put("/api/scheme/:uuid", (req, res) => {
   });
 });
 
-
-
-
+// Delete scheme
 app.delete("/api/scheme/:uuid", (req, res) => {
   const { uuid } = req.params;
 
-  // Step 1: Delete the specific scheme
   const deleteSql = "DELETE FROM scheme WHERE uuid = ?";
   db.query(deleteSql, [uuid], (err, result) => {
     if (err) {
@@ -1805,24 +2152,23 @@ app.delete("/api/scheme/:uuid", (req, res) => {
 
     console.log(`✅ Deleted Scheme with UUID: ${uuid}`);
 
-    // Step 2: Reset order numbers sequentially
-    const resetSql1 = "SET @new_order = 0";
-    const resetSql2 = "UPDATE scheme SET order_number = (@new_order := @new_order + 1) ORDER BY order_number";
+    const resetSql1 = "SET @new_scheme_id = 0";
+    const resetSql2 = "UPDATE scheme SET scheme_id = (@new_scheme_id := @new_scheme_id + 1) ORDER BY scheme_id";
 
     db.query(resetSql1, (resetErr1) => {
       if (resetErr1) {
-        console.error("Error resetting order numbers:", resetErr1);
-        return res.status(500).json({ error: "Failed to reset order numbering" });
+        console.error("Error resetting scheme IDs:", resetErr1);
+        return res.status(500).json({ error: "Failed to reset scheme IDs" });
       }
 
       db.query(resetSql2, (resetErr2) => {
         if (resetErr2) {
-          console.error("Error resetting order numbers:", resetErr2);
-          return res.status(500).json({ error: "Failed to reset order numbers" });
+          console.error("Error resetting scheme IDs:", resetErr2);
+          return res.status(500).json({ error: "Failed to reset scheme IDs" });
         }
 
-        console.log("✅ Order numbers reset successfully!");
-        res.json({ message: "Scheme deleted and order numbers reset successfully!" });
+        console.log("✅ Scheme IDs reset successfully!");
+        res.json({ message: "Scheme deleted and scheme IDs reset successfully!" });
       });
     });
   });
