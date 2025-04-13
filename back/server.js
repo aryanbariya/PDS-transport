@@ -2247,13 +2247,44 @@ app.get("/api/tapa/inactive", (req, res) => {
 });
 
 // Get all transport records
+// app.get("/api/transport", (req, res) => {
+//   const sql = "SELECT * FROM transport ORDER BY trans_id DESC";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
 app.get("/api/transport", (req, res) => {
-  const sql = "SELECT * FROM transport ORDER BY trans_id DESC";
+  const sql = `
+    SELECT 
+      t.*,
+      bd.name AS baseDepoName,
+      g.name AS godownName,
+      tr.truck_number AS truckName,
+      o.name AS ownerName,
+      d.name AS driverName,
+      s.scheme_name AS schemeName,
+      p.packaging_name AS packagingName
+    FROM transport t
+    LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswcc_id
+    LEFT JOIN sub_godowns g ON t.godown = g.subgodown_id
+    LEFT JOIN truck tr ON t.truck = tr.truck_id
+    LEFT JOIN owners o ON t.owner = o.owner_id
+    LEFT JOIN drivers d ON t.driver = d.driver_id
+    LEFT JOIN scheme s ON t.scheme = s.scheme_id
+    LEFT JOIN packaging p ON t.packaging = p.pack_id
+    ORDER BY t.trans_id DESC
+  `;
+
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
+
+
+
 
 // Get single transport record by UUID
 app.get("/api/transport/:uuid", (req, res) => {
