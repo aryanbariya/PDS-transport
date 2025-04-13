@@ -267,7 +267,7 @@ const TransportPage = () => {
               {transportData.length > 0 ? (
                 transportData.map((tp) => (
                   <tr key={tp.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{tp.orderNumber}</td>
+                    <td className="border p-2">{tp.trans_id}</td>
                     <td className="border p-2">
                       <button
                         onClick={() => generatePDF(tp)}
@@ -283,7 +283,7 @@ const TransportPage = () => {
                     <td className="border p-2">{tp.doNo}</td>
                     <td className="border p-2">{formatDate(tp.quota)}</td>
                     <td className="border p-2">{tp.scheme}</td>
-                    <td className="border p-2">{tp.bardanWeight}</td>
+                    <td className="border p-2">{tp.noOfBags}</td>
                     <td className="border p-2">{tp.packaging}</td>
                     <td className="border p-2">{tp.grossWeight}</td>
                     <td className="border p-2">{tp.emptyWeight}</td>
