@@ -2222,107 +2222,40 @@ app.get("/tapa/owner", (req, res) => {
   });
 });
 
-app.get("/tapa/truck", (req, res) => {
-  const query = "SELECT truck_name, empty_weight FROM truck WHERE truck_status = 'Active'"; // Fetch only godownname
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching godown names:", err);
-      return res.status(500).json({ error: "Database query error" });
-    }
-
-    res.json(results);
-  });
-});
-app.get("/tapa/driver", (req, res) => {
-  const query = "SELECT driver_name FROM drivers "; // Fetch only godownname
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching godown names:", err);
-      return res.status(500).json({ error: "Database query error" });
-    }
-
-    res.json(results);
-  });
-});
-app.get("/tapa/scheme", (req, res) => {
-  const query = "SELECT scheme_name FROM scheme "; // Fetch only godownname
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching godown names:", err);
-      return res.status(500).json({ error: "Database query error" });
-    }
-
-    res.json(results);
-  });
-});
-app.get("/tapa/pkg", (req, res) => {
-  const query = "SELECT material_name, weight FROM packaging "; // Fetch only godownname
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching godown names:", err);
-      return res.status(500).json({ error: "Database query error" });
-    }
-
-    res.json(results);
-  });
-});
-
-
+// Get all active transport records
 app.get("/api/tapa/active", (req, res) => {
-  const sql = "SELECT * FROM transport WHERE status = 'Active' ORDER BY orderNumber";
+  const sql = "SELECT * FROM transport WHERE status = 'Active' ORDER BY trans_id";
   db.query(sql, (err, results) => {
     if (err) {
-      console.error("Error fetching active drivers:", err);
+      console.error("Error fetching active transport:", err);
       return res.status(500).json({ error: "Database fetch error" });
     }
     res.json(results);
   });
 });
 
-// Get only "Inactive" drivers
+// Get all inactive transport records
 app.get("/api/tapa/inactive", (req, res) => {
-    const sql = "SELECT * FROM transport WHERE status = 'Inactive' ORDER BY orderNumber";
+  const sql = "SELECT * FROM transport WHERE status = 'Inactive' ORDER BY trans_id";
   db.query(sql, (err, results) => {
     if (err) {
-      console.error("Error fetching inactive drivers:", err);
+      console.error("Error fetching inactive transport:", err);
       return res.status(500).json({ error: "Database fetch error" });
     }
     res.json(results);
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Get all transport records
 app.get("/api/transport", (req, res) => {
-  const sql = "SELECT * FROM transport ORDER BY orderNumber DESC";
+  const sql = "SELECT * FROM transport ORDER BY trans_id DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
-// Get a specific transport record by uuid
+// Get single transport record by UUID
 app.get("/api/transport/:uuid", (req, res) => {
   const sql = "SELECT * FROM transport WHERE uuid = ?";
   db.query(sql, [req.params.uuid], (err, results) => {
@@ -2332,9 +2265,9 @@ app.get("/api/transport/:uuid", (req, res) => {
   });
 });
 
-// Add a new transport record
+// Add new transport record
 app.post("/api/transport", (req, res) => {
-  const uuid = uuidv4(); // Generate a unique UUID
+  const uuid = uuidv4();
   const {
     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
@@ -2347,23 +2280,23 @@ app.post("/api/transport", (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  const getMaxOrderSql = "SELECT COALESCE(MAX(orderNumber), 0) + 1 AS next_order FROM transport";
+  const getMaxTransIdSql = "SELECT COALESCE(MAX(trans_id), 0) + 1 AS next_trans_id FROM transport";
 
-  db.query(getMaxOrderSql, (err, result) => {
+  db.query(getMaxTransIdSql, (err, result) => {
     if (err) {
-      console.error("Error getting next order number:", err);
+      console.error("Error getting next trans_id:", err);
       return res.status(500).json({ error: "Database error" });
     }
 
-    const nextOrder = result[0].next_order;
+    const nextTransId = result[0].next_trans_id;
     const insertSql = `INSERT INTO transport 
-      (uuid, orderNumber, baseDepo, doNo, godown, truck, owner, driver, emptyWeight, 
+      (uuid, trans_id, baseDepo, doNo, godown, truck, owner, driver, emptyWeight, 
       grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, 
       netWeight, dispatchDate, quota, tpNo, allocation, status) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     db.query(insertSql, [
-      uuid, nextOrder, baseDepo, doNo, godown, truck, owner, driver, emptyWeight,
+      uuid, nextTransId, baseDepo, doNo, godown, truck, owner, driver, emptyWeight,
       grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight,
       netWeight, dispatchDate, quota, tpNo, allocation, status
     ], (insertErr) => {
@@ -2374,22 +2307,26 @@ app.post("/api/transport", (req, res) => {
       res.status(201).json({
         message: "Transport record added successfully",
         uuid,
-        orderNumber: nextOrder
+        trans_id: nextTransId
       });
     });
   });
 });
 
-// // Update a transport record
+// Update transport record
 app.put("/api/transport/:uuid", (req, res) => {
-  const { baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight, dispatchDate, quota, tpNo, allocation, status = "Active" } = req.body;
+  const {
+    baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+    scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+    dispatchDate, quota, tpNo, allocation, status = "Active"
+  } = req.body;
 
-  // Ensure required fields are present
-  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight || !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight || !dispatchDate || !quota || !tpNo || !allocation) {
+  if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
+      !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+      !dispatchDate || !quota || !tpNo || !allocation) {
     return res.status(400).json({ error: "Required fields are missing" });
   }
 
-  // Prepare dynamic update query
   let updates = [];
   let values = [];
 
@@ -2413,12 +2350,10 @@ app.put("/api/transport/:uuid", (req, res) => {
   if (allocation) updates.push("allocation = ?"), values.push(allocation);
   if (status) updates.push("status = ?"), values.push(status);
 
-  // Ensure at least one additional field is updated
   if (updates.length < 5) {
     return res.status(400).json({ error: "At least one additional field must be updated along with required fields" });
   }
 
-  // Construct SQL query
   const sql = `UPDATE transport SET ${updates.join(", ")} WHERE uuid = ?`;
   values.push(req.params.uuid);
 
@@ -2433,21 +2368,233 @@ app.put("/api/transport/:uuid", (req, res) => {
     res.json({ message: "Transport record updated successfully" });
   });
 });
+
+// Soft delete a transport record
 app.delete("/api/transport/:uuid", (req, res) => {
   const { uuid } = req.params;
   const updateSql = "UPDATE transport SET status = 'Inactive' WHERE uuid = ?";
 
   db.query(updateSql, [uuid], (err, result) => {
     if (err) {
-      console.error("Error updating truck status:", err);
-      return res.status(500).json({ error: "Failed to update truck status" });
+      console.error("Error updating transport status:", err);
+      return res.status(500).json({ error: "Failed to update transport status" });
     }
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "truck not found" });
+      return res.status(404).json({ message: "Transport not found" });
     }
-    res.json({ message: "truck status updated to Inactive successfully!" });
+    res.json({ message: "Transport status updated to Inactive successfully!" });
   });
 });
+
+// app.get("/tapa/truck", (req, res) => {
+//   const query = "SELECT truck_name, empty_weight FROM truck WHERE truck_status = 'Active'"; // Fetch only godownname
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching godown names:", err);
+//       return res.status(500).json({ error: "Database query error" });
+//     }
+
+//     res.json(results);
+//   });
+// });
+// app.get("/tapa/driver", (req, res) => {
+//   const query = "SELECT driver_name FROM drivers "; // Fetch only godownname
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching godown names:", err);
+//       return res.status(500).json({ error: "Database query error" });
+//     }
+
+//     res.json(results);
+//   });
+// });
+// app.get("/tapa/scheme", (req, res) => {
+//   const query = "SELECT scheme_name FROM scheme "; // Fetch only godownname
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching godown names:", err);
+//       return res.status(500).json({ error: "Database query error" });
+//     }
+
+//     res.json(results);
+//   });
+// });
+// app.get("/tapa/pkg", (req, res) => {
+//   const query = "SELECT material_name, weight FROM packaging "; // Fetch only godownname
+
+//   db.query(query, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching godown names:", err);
+//       return res.status(500).json({ error: "Database query error" });
+//     }
+
+//     res.json(results);
+//   });
+// });
+
+
+// app.get("/api/tapa/active", (req, res) => {
+//   const sql = "SELECT * FROM transport WHERE status = 'Active' ORDER BY orderNumber";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching active drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// // Get only "Inactive" drivers
+// app.get("/api/tapa/inactive", (req, res) => {
+//     const sql = "SELECT * FROM transport WHERE status = 'Inactive' ORDER BY orderNumber";
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Error fetching inactive drivers:", err);
+//       return res.status(500).json({ error: "Database fetch error" });
+//     }
+//     res.json(results);
+//   });
+// });
+
+
+// // Get all transport records
+// app.get("/api/transport", (req, res) => {
+//   const sql = "SELECT * FROM transport ORDER BY orderNumber DESC";
+//   db.query(sql, (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     res.json(results);
+//   });
+// });
+
+// // Get a specific transport record by uuid
+// app.get("/api/transport/:uuid", (req, res) => {
+//   const sql = "SELECT * FROM transport WHERE uuid = ?";
+//   db.query(sql, [req.params.uuid], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Record not found" });
+//     res.json(results[0]);
+//   });
+// });
+
+// // Add a new transport record
+// app.post("/api/transport", (req, res) => {
+//   const uuid = uuidv4(); // Generate a unique UUID
+//   const {
+//     baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight,
+//     scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight,
+//     dispatchDate, quota, tpNo, allocation, status = "Active"
+//   } = req.body;
+
+//   if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
+//       !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+//       !dispatchDate || !quota || !tpNo || !allocation || !status) {
+//     return res.status(400).json({ error: "All fields are required" });
+//   }
+
+//   const getMaxOrderSql = "SELECT COALESCE(MAX(orderNumber), 0) + 1 AS next_order FROM transport";
+
+//   db.query(getMaxOrderSql, (err, result) => {
+//     if (err) {
+//       console.error("Error getting next order number:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+
+//     const nextOrder = result[0].next_order;
+//     const insertSql = `INSERT INTO transport 
+//       (uuid, orderNumber, baseDepo, doNo, godown, truck, owner, driver, emptyWeight, 
+//       grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, 
+//       netWeight, dispatchDate, quota, tpNo, allocation, status) 
+//       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+//     db.query(insertSql, [
+//       uuid, nextOrder, baseDepo, doNo, godown, truck, owner, driver, emptyWeight,
+//       grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight,
+//       netWeight, dispatchDate, quota, tpNo, allocation, status
+//     ], (insertErr) => {
+//       if (insertErr) {
+//         console.error("Error inserting transport record:", insertErr);
+//         return res.status(500).json({ error: "Database insertion failed" });
+//       }
+//       res.status(201).json({
+//         message: "Transport record added successfully",
+//         uuid,
+//         orderNumber: nextOrder
+//       });
+//     });
+//   });
+// });
+
+// // // Update a transport record
+// app.put("/api/transport/:uuid", (req, res) => {
+//   const { baseDepo, doNo, godown, truck, owner, driver, emptyWeight, grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight, netWeight, dispatchDate, quota, tpNo, allocation, status = "Active" } = req.body;
+
+//   // Ensure required fields are present
+//   if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight || !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight || !dispatchDate || !quota || !tpNo || !allocation) {
+//     return res.status(400).json({ error: "Required fields are missing" });
+//   }
+
+//   // Prepare dynamic update query
+//   let updates = [];
+//   let values = [];
+
+//   if (baseDepo) updates.push("baseDepo = ?"), values.push(baseDepo);
+//   if (doNo) updates.push("doNo = ?"), values.push(doNo);
+//   if (godown) updates.push("godown = ?"), values.push(godown);
+//   if (truck) updates.push("truck = ?"), values.push(truck);
+//   if (owner) updates.push("owner = ?"), values.push(owner);
+//   if (driver) updates.push("driver = ?"), values.push(driver);
+//   if (emptyWeight) updates.push("emptyWeight = ?"), values.push(emptyWeight);
+//   if (grossWeight) updates.push("grossWeight = ?"), values.push(grossWeight);
+//   if (scheme) updates.push("scheme = ?"), values.push(scheme);
+//   if (packaging) updates.push("packaging = ?"), values.push(packaging);
+//   if (noOfBags) updates.push("noOfBags = ?"), values.push(noOfBags);
+//   if (bardanWeight) updates.push("bardanWeight = ?"), values.push(bardanWeight);
+//   if (loadedNetWeight) updates.push("loadedNetWeight = ?"), values.push(loadedNetWeight);
+//   if (netWeight) updates.push("netWeight = ?"), values.push(netWeight);
+//   if (dispatchDate) updates.push("dispatchDate = ?"), values.push(dispatchDate);
+//   if (quota) updates.push("quota = ?"), values.push(quota);
+//   if (tpNo) updates.push("tpNo = ?"), values.push(tpNo);
+//   if (allocation) updates.push("allocation = ?"), values.push(allocation);
+//   if (status) updates.push("status = ?"), values.push(status);
+
+//   // Ensure at least one additional field is updated
+//   if (updates.length < 5) {
+//     return res.status(400).json({ error: "At least one additional field must be updated along with required fields" });
+//   }
+
+//   // Construct SQL query
+//   const sql = `UPDATE transport SET ${updates.join(", ")} WHERE uuid = ?`;
+//   values.push(req.params.uuid);
+
+//   db.query(sql, values, (err, result) => {
+//     if (err) {
+//       console.error("Error updating transport record:", err);
+//       return res.status(500).json({ error: "Database error" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "Record not found" });
+//     }
+//     res.json({ message: "Transport record updated successfully" });
+//   });
+// });
+// app.delete("/api/transport/:uuid", (req, res) => {
+//   const { uuid } = req.params;
+//   const updateSql = "UPDATE transport SET status = 'Inactive' WHERE uuid = ?";
+
+//   db.query(updateSql, [uuid], (err, result) => {
+//     if (err) {
+//       console.error("Error updating truck status:", err);
+//       return res.status(500).json({ error: "Failed to update truck status" });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "truck not found" });
+//     }
+//     res.json({ message: "truck status updated to Inactive successfully!" });
+//   });
+// });
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ////Do
 // Get all records from 'do' table
