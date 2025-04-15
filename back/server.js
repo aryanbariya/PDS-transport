@@ -2268,7 +2268,7 @@ app.get("/api/transport", (req, res) => {
       p.material_name AS packagingName
     FROM transport t
     LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswc_id
-    LEFT JOIN sub_godowns g ON t.godown = g.subgodown_id
+    LEFT JOIN sub_godown g ON t.godown = g.subgodown_id
     LEFT JOIN truck tr ON t.truck = tr.truck_id
     LEFT JOIN owners o ON t.owner = o.owner_id
     LEFT JOIN drivers d ON t.driver = d.driver_id
