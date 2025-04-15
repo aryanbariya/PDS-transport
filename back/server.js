@@ -2279,6 +2279,7 @@ app.get("/api/transport", (req, res) => {
 
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
+    console.error("SQL Error:", err);
     res.json(results);
   });
 });
