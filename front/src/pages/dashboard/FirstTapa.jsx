@@ -278,13 +278,13 @@ const TransportPage = () => {
                     </td>
                     <td className="border p-2">{tp.tpNo}</td>
                     <td className="border p-2">{formatDate(tp.dispatchDate)}</td>
-                    <td className="border p-2">{tp.baseDepo}</td>
-                    <td className="border p-2">{tp.truck}</td>
+                    <td className="border p-2">{tp.baseDepoName}</td>
+                    <td className="border p-2">{tp.truckName}</td>
                     <td className="border p-2">{tp.doNo}</td>
                     <td className="border p-2">{formatDate(tp.quota)}</td>
-                    <td className="border p-2">{tp.scheme}</td>
+                    <td className="border p-2">{tp.schemeName}</td>
                     <td className="border p-2">{tp.noOfBags}</td>
-                    <td className="border p-2">{tp.packaging}</td>
+                    <td className="border p-2">{tp.packagingName}</td>
                     <td className="border p-2">{tp.grossWeight}</td>
                     <td className="border p-2">{tp.emptyWeight}</td>
                     <td className="border p-2 flex justify-center space-x-2">
