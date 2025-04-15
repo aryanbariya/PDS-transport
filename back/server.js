@@ -2259,15 +2259,15 @@ app.get("/api/transport", (req, res) => {
   const sql = `
     SELECT 
       t.*,
-      bd.name AS baseDepoName,
-      g.name AS godownName,
-      tr.truck_number AS truckName,
-      o.name AS ownerName,
-      d.name AS driverName,
+      bd.godownName AS baseDepoName,
+      g.subGodown AS godownName,
+      tr.truck_name AS truckName,
+      o.ownerName AS ownerName,
+      d.driver_name AS driverName,
       s.scheme_name AS schemeName,
-      p.packaging_name AS packagingName
+      p.material_name AS packagingName
     FROM transport t
-    LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswcc_id
+    LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswc_id
     LEFT JOIN sub_godowns g ON t.godown = g.subgodown_id
     LEFT JOIN truck tr ON t.truck = tr.truck_id
     LEFT JOIN owners o ON t.owner = o.owner_id
