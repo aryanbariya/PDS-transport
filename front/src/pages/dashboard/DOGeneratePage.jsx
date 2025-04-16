@@ -82,7 +82,7 @@ const DOGeneratePage = () => {
   };
 
   const getGrainName = (grainId) => {
-    const grain = grains.find(g => g.order_number === grainId);
+    const grain = grains.find(g => g.grain_id === grainId);
     return grain ? grain.grainName : "Unknown Grain";
   };
 

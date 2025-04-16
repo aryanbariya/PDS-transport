@@ -2650,6 +2650,82 @@ app.get("/api/do/:do_no", (req, res) => {
 
 
 
+// app.post("/api/do", (req, res) => {
+//   const {
+//     doNo,
+//     baseDepot,
+//     doDate,
+//     doExpiryDate,
+//     scheme,
+//     grain,
+//     quantity,
+//     quintal,
+//     total_amount,
+//     expire_date,
+//     entries // <-- Entries from secondForm
+//   } = req.body;
+
+//   // 1. First insert into DO table
+//   const insertDoSql = `
+//     INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal, total_amount, expire_date)
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   `;
+
+//   db.query(
+//     insertDoSql,
+//     [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity, quintal, total_amount, expire_date],
+//     (err, result) => {
+//       if (err) {
+//         console.error("❌ Error inserting DO:", err);
+//         return res.status(500).json({ error: "Failed to insert DO" });
+//       }
+
+//       const insertedDoId = result.insertId;
+
+//       // 2. If no entries are provided, return success just for DO
+//       if (!entries || entries.length === 0) {
+//         return res.json({
+//           message: "✅ DO inserted (no entries)",
+//           do_id: insertedDoId
+//         });
+//       }
+
+//       // 3. Prepare entries for bulk insertion
+//       const insertEntriesSql = `
+//         INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
+//         VALUES ?
+//       `;
+
+//       const entryValues = entries.map(entry => [
+//         doNo,
+//         entry.godown,
+//         entry.vahtuk,
+//         entry.quantity
+//       ]);
+
+//       // 4. Insert entries
+//       db.query(insertEntriesSql, [entryValues], (entryErr, entryResult) => {
+//         if (entryErr) {
+//           console.error("❌ Error inserting DO entries:", entryErr);
+//           return res.status(500).json({
+//             error: "DO inserted but failed to insert entries",
+//             do_id: insertedDoId
+//           });
+//         }
+
+//         // 5. Return success response
+//         res.json({
+//           message: "✅ DO and entries inserted successfully",
+//           do_id: insertedDoId,
+//           entries_inserted: entryResult.affectedRows
+//         });
+//       });
+//     }
+//   );
+// });
+
+
+
 app.post("/api/do", (req, res) => {
   const {
     doNo,
@@ -2662,10 +2738,10 @@ app.post("/api/do", (req, res) => {
     quintal,
     total_amount,
     expire_date,
-    entries // <-- Entries from secondForm
+    entries // <-- This is now an object with comma-separated strings
   } = req.body;
 
-  // 1. First insert into DO table
+  // 1. Insert into DO table
   const insertDoSql = `
     INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal, total_amount, expire_date)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -2682,28 +2758,36 @@ app.post("/api/do", (req, res) => {
 
       const insertedDoId = result.insertId;
 
-      // 2. If no entries are provided, return success just for DO
-      if (!entries || entries.length === 0) {
+      // 2. No entries? Just return DO success
+      if (!entries || !entries.godown) {
         return res.json({
           message: "✅ DO inserted (no entries)",
           do_id: insertedDoId
         });
       }
 
-      // 3. Prepare entries for bulk insertion
+      // 3. Split comma-separated strings
+      const godowns = entries.godown.split("|");
+      const vahtuks = entries.vahtuk.split("|");
+      const quantities = entries.quantity.split("|");
+
+      if (godowns.length !== vahtuks.length || vahtuks.length !== quantities.length) {
+        return res.status(400).json({ error: "Mismatched entry lengths" });
+      }
+
+      const entryValues = godowns.map((_, i) => [
+        doNo,
+        godowns[i].trim(),
+        vahtuks[i].trim(),
+        parseFloat(quantities[i])
+      ]);
+
+      // 4. Insert do_entries
       const insertEntriesSql = `
         INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
         VALUES ?
       `;
 
-      const entryValues = entries.map(entry => [
-        doNo,
-        entry.godown,
-        entry.vahtuk,
-        entry.quantity
-      ]);
-
-      // 4. Insert entries
       db.query(insertEntriesSql, [entryValues], (entryErr, entryResult) => {
         if (entryErr) {
           console.error("❌ Error inserting DO entries:", entryErr);
@@ -2713,7 +2797,6 @@ app.post("/api/do", (req, res) => {
           });
         }
 
-        // 5. Return success response
         res.json({
           message: "✅ DO and entries inserted successfully",
           do_id: insertedDoId,
@@ -2723,6 +2806,7 @@ app.post("/api/do", (req, res) => {
     }
   );
 });
+
 
 // Assuming you're using Express and connected to a MySQL or MongoDB DB
 app.put("/api/do/:stock_id", (req, res) => {

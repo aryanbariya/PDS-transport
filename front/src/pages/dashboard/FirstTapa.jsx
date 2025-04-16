@@ -136,13 +136,13 @@ const TransportPage = () => {
           const details = [
             ["TP No", transport.tpNo || "N/A"],
             ["Dispatch Date", transport.dispatchDate ? formatDate(transport.dispatchDate) : "N/A"],
-            ["Base Depo", transport.baseDepo || "N/A"],
-            ["Truck No", transport.truck || "N/A"],
+            ["Base Depo", transport.baseDepoName || "N/A"],
+            ["Truck No", transport.truckName || "N/A"],
             ["D.O Number", transport.doNo || "N/A"],
             ["Quota", transport.quota ? formatDate(transport.quota) : "N/A"],
-            ["Scheme", transport.scheme || "N/A"],
+            ["Scheme", transport.schemeName || "N/A"],
             ["No of Bags", transport.bardanWeight || "N/A"],
-            ["Packaging", transport.packaging || "N/A"],
+            ["Packaging", transport.packagingName || "N/A"],
             ["Gross Weight", transport.grossWeight || "N/A"],
             ["Tare Weight", transport.emptyWeight || "N/A"]
           ];
