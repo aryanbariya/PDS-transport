@@ -7,6 +7,7 @@ import { Player } from "@lottiefiles/react-lottie-player";
 import loadingAnimation from "@/util/Animation.json";
 import DOGenerateForm from "./DOGenerateForm";
 import Navigation from "@/util/libs/navigation";
+import {formatDate} from "@/util/libs/formatDate"
 import Swal from "sweetalert2";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -19,10 +20,13 @@ const DOAllocationPage = () => {
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const tableRef = useRef(null);
+  const [godowns, setgodown] = useState([]);
+  const [doop, setdoop] = useState([]);
 
   useEffect(() => {
     fetchOrders();
     fetchSubGodowns();
+    fetchData();
   }, []);
   useEffect(() => {
     if (orders.length > 0 && subGodowns.length > 0 && tableRef.current) {
@@ -30,19 +34,30 @@ const DOAllocationPage = () => {
     }
   }, [orders, subGodowns]);
 
-  // Fetch Orders Data
-  // const fetchOrders = async () => {
-  //   try {
-  //     const response = await fetch(`${URL}/api/alloc`);
-  //     if (!response.ok) throw new Error("Failed to fetch data");
-  //     const data = await response.json();
-  //     setOrders(data || []);
-  //     setLoading(false);
-  //   } catch (err) {
-  //     setError(err.message);
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchData = async () => {
+    try {
+      const [doopRes, godownRes] = await Promise.all([
+        fetch(`${URL}/api/do`),
+        fetch(`${URL}/api/mswcgodown`),
+
+      ]);
+
+      if (!doopRes.ok) throw new Error("Failed to fetch orders");
+      if (!godownRes.ok) throw new Error("Failed to fetch grains");
+
+
+      const doopData = await doopRes.json();
+      const godownData = await godownRes.json();
+
+
+      setdoop(doopData);
+      setgodown(godownData);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
   const fetchOrders = async () => {
     try {
       const response = await fetch(`${URL}/api/alloc`);
@@ -87,6 +102,21 @@ const DOAllocationPage = () => {
       console.error("Error fetching subgodowns:", err);
     }
   };
+
+  const getGroupUnder = (godId) => {
+    const group = doop.find(j => String(j.do_no) === String(godId));
+    if (!group) return "Unknown";
+    const down = godowns.find(g => String(g.mswc_id) === String(group.godown_id));
+    return down ? down.godownUnder : "Unknown";
+  };
+  const getcota = (Id) => {
+    const nope = doop.find(j => String(j.do_no) === String(Id));
+    return nope ? nope.cota : "Unknown";
+
+  };
+
+
+
 
 
 
@@ -133,7 +163,7 @@ const DOAllocationPage = () => {
                 orders.map((entry, index) => (
                   <tr key={entry.do_id} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{entry.do_id}</td>
+                    <td className="border p-2">{entry.do_id + ' - ' + getGroupUnder(entry.do_id) + '-' + formatDate(getcota(entry.do_id))}</td>
                     {
                       subGodowns.map((name) => {
                         const godownIndex = entry.godown.findIndex(g => g.trim().toLowerCase() === name.trim().toLowerCase());

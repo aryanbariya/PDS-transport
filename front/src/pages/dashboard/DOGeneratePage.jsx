@@ -103,6 +103,11 @@ const DOGeneratePage = () => {
     const godown = godowns.find(g => String(g.mswc_id) === String(godownId));
     return godown ? godown.godownName : "Unknown Godown";
   };
+  const getGroupUnder = (godownId) => {
+    const group = godowns.find(j => String(j.mswc_id) === String(godownId));
+    return group ? group.godownUnder : "Unknown";
+  };
+  
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -158,7 +163,7 @@ const DOGeneratePage = () => {
       )}
 
       {error && <p className="text-red-500">{error}</p>}
-
+      
       {!loading && (
         <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
           <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
@@ -177,7 +182,7 @@ const DOGeneratePage = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.stock_id} className="hover:bg-gray-100">
-                  <td className="border p-2 text-left">{order.do_no}</td>
+                  <td className="border p-2 text-left">{order.do_no + ' - ' + getGroupUnder(order.godown_id)}</td>
                   <td className="border p-2 text-left">{getGodownName(order.godown_id)}</td>
                   <td className="border p-2 text-left">{formatDate(order.do_date)}</td>
                   <td className="border p-2 text-left">{formatDate(order.cota)}</td>
