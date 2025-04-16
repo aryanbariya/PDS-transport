@@ -47,6 +47,10 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
         grain: editData.grain_id || "",
         quantity: editData.quantity || "",
       });
+      setSecondForm((prev) => ({
+        ...prev,
+        entries: editData.entries || [],
+      }));
     }
   }, [editData]);
 
