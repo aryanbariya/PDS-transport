@@ -2631,7 +2631,7 @@ app.delete("/api/transport/:uuid", (req, res) => {
 ////Do
 // Get all records from 'do' table
 app.get("/api/do", (req, res) => {
-  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY stock_id DESC";
+  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
