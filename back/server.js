@@ -2805,7 +2805,8 @@ app.get("/api/do/:do_no", (req, res) => {
 // });
 
 app.post("/api/do", (req, res) => {
-  console.log("📥 POST /api/do hit"); // <--- Confirm request hit
+  console.log("📥 POST /api/do hit");
+
   const {
     doNo,
     baseDepot,
@@ -2817,10 +2818,12 @@ app.post("/api/do", (req, res) => {
     quintal,
     total_amount,
     expire_date,
-    entries // <-- Now using pipe-separated strings
+    entries // Array of entry objects
   } = req.body;
-  console.log("🧾 Request body:", req.body); // See what's being sent
-  // 1. Insert into DO table
+
+  console.log("🧾 Request body:", req.body);
+
+  // Step 1: Insert into main DO table
   const insertDoSql = `
     INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal, total_amount, expire_date)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -2828,71 +2831,71 @@ app.post("/api/do", (req, res) => {
 
   db.query(
     insertDoSql,
-    [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity, quintal, total_amount, expire_date],
+    [
+      doNo,
+      baseDepot,
+      doDate,
+      doExpiryDate,
+      scheme,
+      grain,
+      quantity,
+      quintal,
+      total_amount,
+      expire_date
+    ],
     (err) => {
       if (err) {
         console.error("❌ Error inserting DO:", err);
         return res.status(500).json({ error: "Failed to insert DO" });
       }
 
-      // 2. Handle empty entries (if entries are not provided)
-      if (!entries || !entries.godown || !entries.vahtuk || !entries.quantity) {
+      // Step 2: If no entries, stop here
+      if (!entries || !Array.isArray(entries) || entries.length === 0) {
         return res.json({
           message: "✅ DO inserted (no entries)",
-          do_id: doNo // Do is inserted without entries
+          do_id: doNo
         });
       }
 
-      // 3. Split strings using pipe `|`
-      const godowns = entries.godown.split("|");
-      const vahtuks = entries.vahtuk.split("|");
-      const quantities = entries.quantity.split("|");
+      // Step 3: Convert arrays to pipe-separated strings
+      const godownStr = entries.map(e => e.godown.trim()).join("|");
+      const vahtukStr = entries.map(e => e.vahtuk.trim()).join("|");
+      const quantityStr = entries.map(e => e.quantity).join("|");
 
-      if (godowns.length !== vahtuks.length || vahtuks.length !== quantities.length) {
-        return res.status(400).json({ error: "Mismatched entry lengths" });
-      }
+      console.log("🪝 Pipe-separated strings:");
+      console.log("godown:", godownStr);
+      console.log("vahtuk:", vahtukStr);
+      console.log("quantity:", quantityStr);
 
-      // Debugging the splits to check if they match
-      console.log("Godowns:", godowns);
-      console.log("Vahtuks:", vahtuks);
-      console.log("Quantities:", quantities);
-
-      // 4. Prepare entries for insertion into `do_entries`
-      const entryValues = godowns.map((_, i) => [
-        doNo, // doNo is passed as the foreign key
-        godowns[i].trim(),
-        vahtuks[i].trim(),
-        parseFloat(quantities[i]) // Make sure quantities are valid numbers
-      ]);
-
-      console.log("Entry Values to Insert:", entryValues); // Debugging values before insertion
-      console.log("📦 Entries object:", entries);
-
-      // 5. Insert entries into do_entries table
+      // Step 4: Insert into do_entries as a single row
       const insertEntriesSql = `
         INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
-        VALUES ?
+        VALUES (?, ?, ?, ?)
       `;
 
-      db.query(insertEntriesSql, [entryValues], (entryErr, entryResult) => {
-        if (entryErr) {
-          console.error("❌ Error inserting DO entries:", entryErr);
-          return res.status(500).json({
-            error: "DO inserted but failed to insert entries",
+      db.query(
+        insertEntriesSql,
+        [doNo, godownStr, vahtukStr, quantityStr],
+        (entryErr, entryResult) => {
+          if (entryErr) {
+            console.error("❌ Error inserting DO entries:", entryErr);
+            return res.status(500).json({
+              error: "DO inserted but failed to insert entries",
+              do_id: doNo
+            });
+          }
+
+          // Step 5: Success response
+          res.json({
+            message: "✅ DO and pipe-joined entries inserted successfully",
             do_id: doNo
           });
         }
-
-        // Return success with the inserted entries count
-        res.json({
-          message: "✅ DO and entries inserted successfully",
-          do_id: doNo,
-          entries_inserted: entryResult.affectedRows
-        });
-      });
+      );
     }
   );
 });
+
 
 
 // Assuming you're using Express and connected to a MySQL or MongoDB DB
