@@ -40,7 +40,7 @@ const DOGeneratePage = () => {
       const [ordersRes, grainsRes, godownRes, schemeRes ] = await Promise.all([
         fetch(`${URL}/api/do`),
         fetch(`${URL}/api/grains`),
-        fetch(`${URL}/api/mswcgodown`),
+        fetch(`${URL}/api/msw`),
         fetch(`${URL}/api/scheme`)
       ]);
 
@@ -63,6 +63,7 @@ const DOGeneratePage = () => {
       setError(err.message);
       setLoading(false);
     }
+  
   };
 
   const handleDelete = async (uuid) => {
@@ -107,7 +108,7 @@ const DOGeneratePage = () => {
     const group = godowns.find(j => String(j.mswc_id) === String(godownId));
     return group ? group.godownUnder : "Unknown";
   };
-  
+  console.log("order",orders);
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">

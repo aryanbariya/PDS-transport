@@ -2639,6 +2639,19 @@ app.get("/api/do", (req, res) => {
 });
 
 // Get a specific record from 'do' table by do_no
+
+
+
+app.get("/api/msw", (req, res) => {
+  const sql = "SELECT uuid, godownName, godownUnder, mswc_id, status FROM mswc_godowns ";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching godowns:", err);
+      return res.status(500).json({ error: "Database fetch error" });
+    }
+    res.json(results);
+  });
+});
 app.get("/api/do/:do_no", (req, res) => {
   const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do WHERE do_no = ?";
   db.query(sql, [req.params.do_no], (err, results) => {
