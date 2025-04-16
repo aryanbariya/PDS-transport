@@ -2805,6 +2805,7 @@ app.get("/api/do/:do_no", (req, res) => {
 // });
 
 app.post("/api/do", (req, res) => {
+  console.log("📥 POST /api/do hit"); // <--- Confirm request hit
   const {
     doNo,
     baseDepot,
@@ -2818,7 +2819,7 @@ app.post("/api/do", (req, res) => {
     expire_date,
     entries // <-- Now using pipe-separated strings
   } = req.body;
-
+  console.log("🧾 Request body:", req.body); // See what's being sent
   // 1. Insert into DO table
   const insertDoSql = `
     INSERT INTO do (do_no, godown_id, do_date, cota, scheme_id, grain_id, quantity, quintal, total_amount, expire_date)
@@ -2865,6 +2866,7 @@ app.post("/api/do", (req, res) => {
       ]);
 
       console.log("Entry Values to Insert:", entryValues); // Debugging values before insertion
+      console.log("📦 Entries object:", entries);
 
       // 5. Insert entries into do_entries table
       const insertEntriesSql = `
