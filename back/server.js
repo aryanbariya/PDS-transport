@@ -2912,150 +2912,55 @@ app.post("/api/do", (req, res) => {
 
 
 // Assuming you're using Express and connected to a MySQL or MongoDB DB
-
 app.put("/api/do/:stock_id", (req, res) => {
-  console.log("📥 PUT /api/do/:doNo hit");
-
-  const doNo = req.params.doNo;
+  const { stock_id } = req.params;
   const {
+    doNo,
+    baseDepot,
+    doDate,
+    doExpiryDate,
+    scheme,
+    grain,
+    quantity
+  } = req.body;
+
+  const updateQuery = `
+    UPDATE do 
+    SET 
+      do_no = ?, 
+      godown_id = ?, 
+      do_date = ?, 
+      cota = ?, 
+      scheme_id = ?, 
+      grain_id = ?, 
+      quantity = ?
+    WHERE stock_id = ?
+  `;
+
+  const values = [
+    doNo,
     baseDepot,
     doDate,
     doExpiryDate,
     scheme,
     grain,
     quantity,
-    quintal,
-    total_amount,
-    expire_date,
-    entries // Array of entry objects
-  } = req.body;
+    stock_id
+  ];
 
-  console.log("🧾 Request body:", req.body);
-
-  // Step 1: Update the main DO table
-  const updateDoSql = `
-    UPDATE do
-    SET godown_id = ?, do_date = ?, cota = ?, scheme_id = ?, grain_id = ?, quantity = ?, quintal = ?, total_amount = ?, expire_date = ?
-    WHERE do_no = ?
-  `;
-
-  db.query(
-    updateDoSql,
-    [
-      baseDepot,
-      doDate,
-      doExpiryDate,
-      scheme,
-      grain,
-      quantity,
-      quintal,
-      total_amount,
-      expire_date,
-      doNo
-    ],
-    (err) => {
-      if (err) {
-        console.error("❌ Error updating DO:", err);
-        return res.status(500).json({ error: "Failed to update DO" });
-      }
-
-      // Step 2: If no entries to update, return success
-      if (!entries || !Array.isArray(entries) || entries.length === 0) {
-        return res.json({
-          message: "✅ DO updated (no entries to update)",
-          do_id: doNo
-        });
-      }
-
-      // Step 3: Convert arrays to pipe-separated strings for entries
-      const godownStr = entries.map(e => e.godown.trim()).join("|");
-      const vahtukStr = entries.map(e => e.vahtuk.trim()).join("|");
-      const quantityStr = entries.map(e => e.quantity).join("|");
-
-      console.log("🪝 Pipe-separated strings for entries:");
-      console.log("godown:", godownStr);
-      console.log("vahtuk:", vahtukStr);
-      console.log("quantity:", quantityStr);
-
-      // Step 4: Update the entries in do_entries table (assuming entries are linked by do_id)
-      const updateEntriesSql = `
-        UPDATE do_entries
-        SET godown = ?, vahtuk = ?, quantity = ?
-        WHERE do_id = ?
-      `;
-
-      db.query(
-        updateEntriesSql,
-        [godownStr, vahtukStr, quantityStr, doNo],
-        (entryErr, entryResult) => {
-          if (entryErr) {
-            console.error("❌ Error updating DO entries:", entryErr);
-            return res.status(500).json({
-              error: "DO updated but failed to update entries",
-              do_id: doNo
-            });
-          }
-
-          // Step 5: Success response
-          res.json({
-            message: "✅ DO and entries updated successfully",
-            do_id: doNo
-          });
-        }
-      );
+  db.query(updateQuery, values, (err, result) => {
+    if (err) {
+      console.error("Error updating DO:", err);
+      return res.status(500).json({ message: "Server error while updating DO" });
     }
-  );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "DO not found" });
+    }
+
+    res.json({ message: "DO updated successfully" });
+  });
 });
-
-// app.put("/api/do/:stock_id", (req, res) => {
-//   const { stock_id } = req.params;
-//   const {
-//     doNo,
-//     baseDepot,
-//     doDate,
-//     doExpiryDate,
-//     scheme,
-//     grain,
-//     quantity
-//   } = req.body;
-
-//   const updateQuery = `
-//     UPDATE do 
-//     SET 
-//       do_no = ?, 
-//       godown_id = ?, 
-//       do_date = ?, 
-//       cota = ?, 
-//       scheme_id = ?, 
-//       grain_id = ?, 
-//       quantity = ?
-//     WHERE stock_id = ?
-//   `;
-
-//   const values = [
-//     doNo,
-//     baseDepot,
-//     doDate,
-//     doExpiryDate,
-//     scheme,
-//     grain,
-//     quantity,
-//     stock_id
-//   ];
-
-//   db.query(updateQuery, values, (err, result) => {
-//     if (err) {
-//       console.error("Error updating DO:", err);
-//       return res.status(500).json({ message: "Server error while updating DO" });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ message: "DO not found" });
-//     }
-
-//     res.json({ message: "DO updated successfully" });
-//   });
-// });
 
 
 

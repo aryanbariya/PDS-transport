@@ -31,9 +31,13 @@ const DOGeneratePage = () => {
 
   useEffect(() => {
     if (orders.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable();
+      $(tableRef.current).DataTable({
+        destroy: true, // Important to prevent duplicate init
+        order: []      // This disables default sorting and keeps backend order
+      });
     }
   }, [orders]);
+  
 
   const fetchData = async () => {
     try {
