@@ -31,12 +31,36 @@ const DOAllocationPage = () => {
   }, [orders, subGodowns]);
 
   // Fetch Orders Data
+  // const fetchOrders = async () => {
+  //   try {
+  //     const response = await fetch(`${URL}/api/alloc`);
+  //     if (!response.ok) throw new Error("Failed to fetch data");
+  //     const data = await response.json();
+  //     setOrders(data || []);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     setError(err.message);
+  //     setLoading(false);
+  //   }
+  // };
   const fetchOrders = async () => {
     try {
       const response = await fetch(`${URL}/api/alloc`);
       if (!response.ok) throw new Error("Failed to fetch data");
+
       const data = await response.json();
-      setOrders(data || []);
+
+      // Transform pipeline strings into arrays
+      const transformedData = data.map((entry) => {
+        return {
+          ...entry,
+          godown: entry.godown.split("|"),
+          vahtuk: entry.vahtuk.split("|"),
+          quantity: entry.quantity.split("|")
+        };
+      });
+
+      setOrders(transformedData || []);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -104,39 +128,25 @@ const DOAllocationPage = () => {
                 ))}
               </tr>
             </thead>
-            {/* <tbody>
-              {orders.map((order, index) => (
-                <tr key={order.uuid} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{order.do_id}</td>
-                  {subGodowns.map((name) => (
-                    <td key={name} className="border p-2">
-                      {order.subgodown_id === name ? "✔️" : ""}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody> */}
             <tbody>
               {
-                // Group orders by do_id
-                Object.entries(
-                  orders.reduce((acc, order) => {
-                    if (!acc[order.do_id]) acc[order.do_id] = [];
-                    acc[order.do_id].push(order);
-                    return acc;
-                  }, {})
-                ).map(([doId, entries], index) => (
-                  <tr key={doId} className="text-start hover:bg-gray-100">
+                orders.map((entry, index) => (
+                  <tr key={entry.do_id} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{doId}</td>
+                    <td className="border p-2">{entry.do_id}</td>
                     {
                       subGodowns.map((name) => {
-                        const match = entries.find((entry) => entry.godown === name);
+                        const godownIndex = entry.godown.findIndex(g => g.trim().toLowerCase() === name.trim().toLowerCase());
                         return (
                           <td key={name} className="border p-2">
-                            {match ? match.quantity : ""}<br/>
-                            {match ? match.vahtuk : ""}
+                            {
+                              godownIndex !== -1 ? (
+                                <>
+                                  {entry.quantity[godownIndex]}<br />
+                                  {entry.vahtuk[godownIndex]}
+                                </>
+                              ) : ""
+                            }
                           </td>
                         );
                       })
@@ -145,7 +155,6 @@ const DOAllocationPage = () => {
                 ))
               }
             </tbody>
-
           </table>
         </div>
       )}
