@@ -815,7 +815,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
               >
                 <option value="">Select Base Depot</option>
                 {godowns.map((godown) => (
-                  <option key={godown.uuid} value={godown.godownName}>
+                  <option key={godown.mswc_id} value={godown.mswc_id}>
                     {godown.godownName}
                   </option>
                 ))}
@@ -869,7 +869,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
               >
                 <option value="">Select Scheme</option>
                 {schemes.map((scheme) => (
-                  <option key={scheme.uuid} value={scheme.scheme_name}>
+                  <option key={scheme.scheme_id} value={scheme.scheme_id}>
                     {scheme.scheme_name}
                   </option>
                 ))}
@@ -891,7 +891,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
               >
                 <option value="">Select Grain</option>
                 {grains.map((grain) => (
-                  <option key={grain.uuid} value={grain.order_number}>
+                  <option key={grain.grain_id} value={grain.grain_id}>
                     {grain.grainName}
                   </option>
                 ))}

@@ -16,6 +16,8 @@ const URL = import.meta.env.VITE_API_BACK_URL;
 
 const DOGeneratePage = () => {
   const [orders, setOrders] = useState([]);
+  const [godowns, setgodown] = useState([]);
+  const [schemes, setSchemes] = useState([]);
   const [grains, setGrains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,19 +37,27 @@ const DOGeneratePage = () => {
 
   const fetchData = async () => {
     try {
-      const [ordersRes, grainsRes] = await Promise.all([
+      const [ordersRes, grainsRes, godownRes, schemeRes ] = await Promise.all([
         fetch(`${URL}/api/do`),
-        fetch(`${URL}/api/grains`)
+        fetch(`${URL}/api/grains`),
+        fetch(`${URL}/api/mswcgodown`),
+        fetch(`${URL}/api/scheme`)
       ]);
 
       if (!ordersRes.ok) throw new Error("Failed to fetch orders");
       if (!grainsRes.ok) throw new Error("Failed to fetch grains");
+      if (!godownRes.ok) throw new Error("Failed to fetch grains");
+      if (!schemeRes.ok) throw new Error("Failed to fetch grains");
 
       const ordersData = await ordersRes.json();
       const grainsData = await grainsRes.json();
+      const godownData = await godownRes.json();
+      const schemesData = await schemeRes.json();
 
       setOrders(ordersData);
       setGrains(grainsData);
+      setgodown(godownData);
+      setSchemes(schemesData);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -84,6 +94,14 @@ const DOGeneratePage = () => {
   const getGrainName = (grainId) => {
     const grain = grains.find(g => g.grain_id === grainId);
     return grain ? grain.grainName : "Unknown Grain";
+  };
+  const getSchemeName = (schemeId) => {
+    const scheme = schemes.find(s => String(s.scheme_id) === String(schemeId));
+    return scheme ? scheme.scheme_name : "Unknown Scheme";
+  }
+  const getGodownName = (godownId) => {
+    const godown = godowns.find(g => String(g.mswc_id) === String(godownId));
+    return godown ? godown.godownName : "Unknown Godown";
   };
 
   return (
@@ -160,10 +178,10 @@ const DOGeneratePage = () => {
               {orders.map((order) => (
                 <tr key={order.stock_id} className="hover:bg-gray-100">
                   <td className="border p-2 text-left">{order.do_no}</td>
-                  <td className="border p-2 text-left">{order.godown_id}</td>
+                  <td className="border p-2 text-left">{getGodownName(order.godown_id)}</td>
                   <td className="border p-2 text-left">{formatDate(order.do_date)}</td>
                   <td className="border p-2 text-left">{formatDate(order.cota)}</td>
-                  <td className="border p-2 text-left">{order.scheme_id}</td>
+                  <td className="border p-2 text-left">{getSchemeName(order.scheme_id)}</td>
                   <td className="border p-2 text-left">{getGrainName(order.grain_id)}</td>
                   <td className="border p-2 text-left">{order.quantity}</td>
                   <td className="border p-2 text-left">
