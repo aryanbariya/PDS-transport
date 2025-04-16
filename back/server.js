@@ -2725,7 +2725,6 @@ app.get("/api/do/:do_no", (req, res) => {
 // });
 
 
-
 app.post("/api/do", (req, res) => {
   const {
     doNo,
@@ -2738,7 +2737,7 @@ app.post("/api/do", (req, res) => {
     quintal,
     total_amount,
     expire_date,
-    entries // <-- This is now an object with comma-separated strings
+    entries // <-- Now using pipe-separated strings
   } = req.body;
 
   // 1. Insert into DO table
@@ -2750,23 +2749,21 @@ app.post("/api/do", (req, res) => {
   db.query(
     insertDoSql,
     [doNo, baseDepot, doDate, doExpiryDate, scheme, grain, quantity, quintal, total_amount, expire_date],
-    (err, result) => {
+    (err) => {
       if (err) {
         console.error("❌ Error inserting DO:", err);
         return res.status(500).json({ error: "Failed to insert DO" });
       }
 
-      const insertedDoId = result.insertId;
-
-      // 2. No entries? Just return DO success
-      if (!entries || !entries.godown) {
+      // 2. Handle empty entries
+      if (!entries || !entries.godown || !entries.vahtuk || !entries.quantity) {
         return res.json({
           message: "✅ DO inserted (no entries)",
-          do_id: insertedDoId
+          do_id: doNo
         });
       }
 
-      // 3. Split comma-separated strings
+      // 3. Split strings using pipe `|`
       const godowns = entries.godown.split("|");
       const vahtuks = entries.vahtuk.split("|");
       const quantities = entries.quantity.split("|");
@@ -2776,13 +2773,13 @@ app.post("/api/do", (req, res) => {
       }
 
       const entryValues = godowns.map((_, i) => [
-        doNo,
+        doNo, // use string-based doNo as do_id
         godowns[i].trim(),
         vahtuks[i].trim(),
         parseFloat(quantities[i])
       ]);
 
-      // 4. Insert do_entries
+      // 4. Insert into do_entries
       const insertEntriesSql = `
         INSERT INTO do_entries (do_id, godown, vahtuk, quantity)
         VALUES ?
@@ -2793,13 +2790,13 @@ app.post("/api/do", (req, res) => {
           console.error("❌ Error inserting DO entries:", entryErr);
           return res.status(500).json({
             error: "DO inserted but failed to insert entries",
-            do_id: insertedDoId
+            do_id: doNo
           });
         }
 
         res.json({
           message: "✅ DO and entries inserted successfully",
-          do_id: insertedDoId,
+          do_id: doNo,
           entries_inserted: entryResult.affectedRows
         });
       });
