@@ -183,7 +183,7 @@ const DOGeneratePage = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.stock_id} className="hover:bg-gray-100">
-                  <td className="border p-2 text-left">{order.do_no + ' - ' + getGroupUnder(order.godown_id)}</td>
+                  <td className="border p-2 text-left">{`${order.do_no} - ${getGroupUnder(order.godown_id)}`}</td>
                   <td className="border p-2 text-left">{getGodownName(order.godown_id)}</td>
                   <td className="border p-2 text-left">{formatDate(order.do_date)}</td>
                   <td className="border p-2 text-left">{formatDate(order.cota)}</td>
