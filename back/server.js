@@ -2954,6 +2954,57 @@ app.post("/api/do", (req, res) => {
 
 
 // Assuming you're using Express and connected to a MySQL or MongoDB DB
+// app.put("/api/do/:stock_id", (req, res) => {
+//   const { stock_id } = req.params;
+//   const {
+//     doNo,
+//     baseDepot,
+//     doDate,
+//     doExpiryDate,
+//     scheme,
+//     grain,
+//     quantity
+//   } = req.body;
+
+//   const updateQuery = `
+//     UPDATE do 
+//     SET 
+//       do_no = ?, 
+//       godown_id = ?, 
+//       do_date = ?, 
+//       cota = ?, 
+//       scheme_id = ?, 
+//       grain_id = ?, 
+//       quantity = ?
+//     WHERE stock_id = ?
+//   `;
+
+//   const values = [
+//     doNo,
+//     baseDepot,
+//     doDate,
+//     doExpiryDate,
+//     scheme,
+//     grain,
+//     quantity,
+//     stock_id
+//   ];
+
+//   db.query(updateQuery, values, (err, result) => {
+//     if (err) {
+//       console.error("Error updating DO:", err);
+//       return res.status(500).json({ message: "Server error while updating DO" });
+//     }
+
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ message: "DO not found" });
+//     }
+
+//     res.json({ message: "DO updated successfully" });
+//   });
+// });
+
+
 app.put("/api/do/:stock_id", (req, res) => {
   const { stock_id } = req.params;
   const {
@@ -2963,10 +3014,12 @@ app.put("/api/do/:stock_id", (req, res) => {
     doExpiryDate,
     scheme,
     grain,
-    quantity
+    quantity,
+    entries // Second form entries: array of objects
   } = req.body;
 
-  const updateQuery = `
+  // Step 1: Update DO table
+  const updateDOQuery = `
     UPDATE do 
     SET 
       do_no = ?, 
@@ -2979,7 +3032,7 @@ app.put("/api/do/:stock_id", (req, res) => {
     WHERE stock_id = ?
   `;
 
-  const values = [
+  const doValues = [
     doNo,
     baseDepot,
     doDate,
@@ -2990,9 +3043,9 @@ app.put("/api/do/:stock_id", (req, res) => {
     stock_id
   ];
 
-  db.query(updateQuery, values, (err, result) => {
+  db.query(updateDOQuery, doValues, (err, result) => {
     if (err) {
-      console.error("Error updating DO:", err);
+      console.error("❌ Error updating DO:", err);
       return res.status(500).json({ message: "Server error while updating DO" });
     }
 
@@ -3000,7 +3053,32 @@ app.put("/api/do/:stock_id", (req, res) => {
       return res.status(404).json({ message: "DO not found" });
     }
 
-    res.json({ message: "DO updated successfully" });
+    // Step 2: Convert entries array to pipe-separated strings
+    const godownStr = entries.map(e => e.godown.trim()).join("|");
+    const vahtukStr = entries.map(e => e.vahtuk.trim()).join("|");
+    const quantityStr = entries.map(e => e.quantity).join("|");
+
+    // Step 3: Update entries table (assuming do_id = doNo)
+    const updateEntriesQuery = `
+      UPDATE do_entries
+      SET godown = ?, vahtuk = ?, quantity = ?
+      WHERE do_id = ?
+    `;
+
+    const entryValues = [godownStr, vahtukStr, quantityStr, doNo];
+
+    db.query(updateEntriesQuery, entryValues, (entryErr, entryResult) => {
+      if (entryErr) {
+        console.error("❌ Error updating DO entries:", entryErr);
+        return res.status(500).json({
+          message: "DO updated, but failed to update entries"
+        });
+      }
+
+      res.json({
+        message: "✅ DO and DO entries updated successfully"
+      });
+    });
   });
 });
 
