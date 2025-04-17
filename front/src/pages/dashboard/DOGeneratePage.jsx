@@ -70,6 +70,27 @@ const DOGeneratePage = () => {
   
   };
 
+  const handleEdit = async (doNo) => {
+    try {
+      const response = await fetch(`${URL}/api/do/${doNo}`);
+      if (!response.ok) throw new Error("Failed to fetch DO data");
+  
+      const data = await response.json();
+      setEditData(data); // Includes both the main DO data and the entries array
+      setShowForm(true);
+    } catch (err) {
+      console.error("Error fetching DO data:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Failed to load DO data for editing.",
+      });
+    }
+  };
+
+ 
+
+
   const handleDelete = async (uuid) => {
     Swal.fire({
       title: "Are you sure?",
@@ -197,9 +218,8 @@ const DOGeneratePage = () => {
                   <td className="border p-2 text-left">
                     <div className="flex justify-start space-x-2">
                       <Button
-                        onClick={() => {setEditData(order)
-                        setShowForm(true)}
-                        }
+                        onClick={() => handleEdit(order.do_no)}
+                        
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                       >
                         Edit

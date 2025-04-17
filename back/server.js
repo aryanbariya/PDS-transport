@@ -2660,35 +2660,48 @@ app.get("/api/msw", (req, res) => {
 //     res.json(results[0]);
 //   });
 // });
-app.get("/api/do/:do_no", (req, res) => {
-  const sqlDo = `
-    SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date 
-    FROM do 
-    WHERE do_no = ?
-  `;
 
-  const sqlEntries = `
-    SELECT godown, vahtuk, quantity 
-    FROM do_entries 
-    WHERE do_id = ?
-  `;
+app.get("/api/do/:doNo", (req, res) => {
+  const doNo = req.params.doNo;
 
-  db.query(sqlDo, [req.params.do_no], (err, doResults) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (doResults.length === 0) return res.status(404).json({ message: "DO not found" });
+  const doSql = `SELECT * FROM do WHERE do_no = ?`;
+  const entriesSql = `SELECT * FROM do_entries WHERE do_id = ?`;
+
+  db.query(doSql, [doNo], (err, doResults) => {
+    if (err || doResults.length === 0) {
+      return res.status(404).json({ error: "DO not found" });
+    }
 
     const doData = doResults[0];
 
-    db.query(sqlEntries, [req.params.do_no], (entryErr, entryResults) => {
-      if (entryErr) return res.status(500).json({ error: entryErr.message });
+    db.query(entriesSql, [doNo], (entryErr, entryResults) => {
+      if (entryErr) {
+        return res.status(500).json({ error: "Failed to fetch entries" });
+      }
+
+      const entryRow = entryResults[0];
+
+      let entries = [];
+      if (entryRow) {
+        const godowns = entryRow.godown.split("|");
+        const vahtuks = entryRow.vahtuk.split("|");
+        const quantities = entryRow.quantity.split("|");
+
+        entries = godowns.map((g, i) => ({
+          godown: g,
+          vahtuk: vahtuks[i],
+          quantity: quantities[i],
+        }));
+      }
 
       res.json({
         ...doData,
-        entries: entryResults,
+        entries, // this will be consumed in frontend secondForm.entries
       });
     });
   });
 });
+
 
 
 
