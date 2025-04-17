@@ -38,6 +38,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     fetchGrains();
     fetchsubGodowns();
     if (editData) {
+      console.log("editData", editData);
       setFormData({
         doNo: editData.do_no || "",
         baseDepot: editData.godown_id || "",

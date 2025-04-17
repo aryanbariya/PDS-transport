@@ -2652,12 +2652,41 @@ app.get("/api/msw", (req, res) => {
     res.json(results);
   });
 });
+// app.get("/api/do/:do_no", (req, res) => {
+//   const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do WHERE do_no = ?";
+//   db.query(sql, [req.params.do_no], (err, results) => {
+//     if (err) return res.status(500).json({ error: err.message });
+//     if (results.length === 0) return res.status(404).json({ message: "Record not found" });
+//     res.json(results[0]);
+//   });
+// });
 app.get("/api/do/:do_no", (req, res) => {
-  const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do WHERE do_no = ?";
-  db.query(sql, [req.params.do_no], (err, results) => {
+  const sqlDo = `
+    SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date 
+    FROM do 
+    WHERE do_no = ?
+  `;
+
+  const sqlEntries = `
+    SELECT godown, vahtuk, quantity 
+    FROM do_entries 
+    WHERE do_id = ?
+  `;
+
+  db.query(sqlDo, [req.params.do_no], (err, doResults) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (results.length === 0) return res.status(404).json({ message: "Record not found" });
-    res.json(results[0]);
+    if (doResults.length === 0) return res.status(404).json({ message: "DO not found" });
+
+    const doData = doResults[0];
+
+    db.query(sqlEntries, [req.params.do_no], (entryErr, entryResults) => {
+      if (entryErr) return res.status(500).json({ error: entryErr.message });
+
+      res.json({
+        ...doData,
+        entries: entryResults,
+      });
+    });
   });
 });
 
