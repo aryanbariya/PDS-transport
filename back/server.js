@@ -32,6 +32,7 @@ const schemeRoutes = require("./routes/schemeRoutes");
 const subGodownRoutes = require("./routes/subGodownRoutes");
 const transportRoutes = require("./routes/transportRoutes");
 const truckRoutes = require("./routes/truckRoutes");
+const firstreportRoutes = require("./routes/fristreportRoutes");
 
 // Use Routes
 app.use("/auth", authRoutes);
@@ -49,6 +50,7 @@ app.use("/api/subgodowns", subGodownRoutes);
 app.use("/api/transports", transportRoutes);
 app.use("/api/trucks", truckRoutes);
 app.use("/api/alloc",allocRoutes );
+app.use('/api', firstreportRoutes);
 
 // Server Listening
 const PORT = process.env.PORT || 5000; 
