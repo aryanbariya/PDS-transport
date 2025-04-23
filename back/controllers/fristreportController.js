@@ -1,4 +1,4 @@
-getFirstReportData
+
 
 const firstreportModel = require('../models/fristreport');
 
