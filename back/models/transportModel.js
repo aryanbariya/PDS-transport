@@ -29,6 +29,7 @@ class Transport {
       const sql = `
         SELECT 
           t.*,
+          f.do_no AS donumber,
           bd.godownName AS baseDepoName,
           g.subGodown AS godownName,
           tr.truck_name AS truckName,
@@ -37,6 +38,7 @@ class Transport {
           s.scheme_name AS schemeName,
           p.material_name AS packagingName
         FROM transport t
+        LEFT JOIN do f ON t.doNo = f.stock_id
         LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswc_id
         LEFT JOIN sub_godown g ON t.godown = g.subgodown_id
         LEFT JOIN truck tr ON t.truck = tr.truck_id
