@@ -231,7 +231,7 @@ const DOGeneratePage = () => {
                         Delete
                       </Button>
                     </div>
-                    <Button variant="text" className="text-light-blue-500" >Allocation</Button>
+                    <button variant="text"  className="text-light-blue-500" >Allocation</button>
                   </td>
                 </tr>
               ))}
