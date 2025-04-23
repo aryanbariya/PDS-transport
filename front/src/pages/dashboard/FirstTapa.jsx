@@ -111,7 +111,7 @@ const TransportPage = () => {
     fetchTransportData();
   };
 
-  const generatePDF = (transport) => {
+const generatePDF = (transport) => {
     Swal.fire({
       title: "Download PDF",
       text: "Do you want to download the transport details as PDF?",
@@ -199,7 +199,7 @@ const TransportPage = () => {
         }
       }
     });
-  };
+  };  
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -269,12 +269,12 @@ const TransportPage = () => {
                   <tr key={tp.uuid} className="text-start hover:bg-gray-100">
                     <td className="border p-2">{tp.trans_id}</td>
                     <td className="border p-2">
-                      <button
+                      <Button
                         onClick={() => generatePDF(tp)}
                         className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                       >
                         View
-                      </button>
+                      </Button>
                     </td>
                     <td className="border p-2">{tp.tpNo}</td>
                     <td className="border p-2">{formatDate(tp.dispatchDate)}</td>
