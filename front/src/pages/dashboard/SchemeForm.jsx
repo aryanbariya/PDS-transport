@@ -39,8 +39,8 @@ const SchemeForm = ({ onClose, onSave, editData }) => {
 
     const method = editData ? "PUT" : "POST";
     const url = editData
-      ? `${URL}/api/scheme/${editData.uuid}`
-      : `${URL}/api/scheme`;
+      ? `${URL}/api/schemes/${editData.uuid}`
+      : `${URL}/api/schemes`;
 
     try {
       const response = await fetch(url, {

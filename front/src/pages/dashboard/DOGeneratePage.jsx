@@ -44,14 +44,14 @@ const DOGeneratePage = () => {
       const [ordersRes, grainsRes, godownRes, schemeRes ] = await Promise.all([
         fetch(`${URL}/api/do`),
         fetch(`${URL}/api/grains`),
-        fetch(`${URL}/api/msw`),
-        fetch(`${URL}/api/scheme`)
+        fetch(`${URL}/api/mswc`),
+        fetch(`${URL}/api/schemes`)
       ]);
 
       if (!ordersRes.ok) throw new Error("Failed to fetch orders");
       if (!grainsRes.ok) throw new Error("Failed to fetch grains");
-      if (!godownRes.ok) throw new Error("Failed to fetch grains");
-      if (!schemeRes.ok) throw new Error("Failed to fetch grains");
+      if (!godownRes.ok) throw new Error("Failed to fetch mswc");
+      if (!schemeRes.ok) throw new Error("Failed to fetch scheme");
 
       const ordersData = await ordersRes.json();
       const grainsData = await grainsRes.json();
@@ -62,6 +62,7 @@ const DOGeneratePage = () => {
       setGrains(grainsData);
       setgodown(godownData);
       setSchemes(schemesData);
+     
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -69,6 +70,7 @@ const DOGeneratePage = () => {
     }
   
   };
+  console.log("gogo",godowns);
 
   const handleEdit = async (doNo) => {
     try {
@@ -231,7 +233,7 @@ const DOGeneratePage = () => {
                         Delete
                       </Button>
                     </div>
-                    <button variant="text"  className="text-light-blue-500" >Allocation</button>
+                    <Button variant="text"  className="text-light-blue-500" >Allocation</Button>
                   </td>
                 </tr>
               ))}

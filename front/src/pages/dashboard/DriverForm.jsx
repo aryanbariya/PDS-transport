@@ -48,15 +48,20 @@ const DriverForm = ({ onClose, onSave, editData }) => {
   
     if (!formData.driver_name.trim()) newErrors.driver_name = "Driver Name is required";
     if (!formData.contact.trim()) newErrors.contact = "Contact is required";
+    if (!formData.aadhar_card_no.trim()) newErrors.aadhar_card_no = "Aadhar card No is required";
     if (formData.contact && !/^\d{10}$/.test(formData.contact)) {
       newErrors.contact = "Contact must be exactly 10 digits";
     }
     if (formData.aadhar_card_no && !/^\d{12}$/.test(formData.aadhar_card_no)) {
       newErrors.aadhar_card_no = "Aadhar Number must be 12 digits";
     }
-    if (formData.driving_license_no && !/^[A-Z]{2}\d{2}\d{4}\d{7}$/.test(formData.driving_license_no)) {
+    if (
+      formData.driving_license_no &&
+      !/^[A-Z]{2}[0-9]{2}[0-9]{4}[0-9]{6,7}$/.test(formData.driving_license_no)
+    ) {
       newErrors.driving_license_no = "Invalid Driving License format";
     }
+    
   
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

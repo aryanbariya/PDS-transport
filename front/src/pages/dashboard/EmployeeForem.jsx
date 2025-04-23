@@ -33,7 +33,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch(`${URL}/api/dropsubgodown`);
+        const response = await fetch(`${URL}/api/employees/subgodowns`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
         const data = await response.json();
         setGodownList(data || []);
@@ -45,7 +45,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
 
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${URL}/api/dropcategory`);
+        const response = await fetch(`${URL}/api/employees/categories`);
         if (!response.ok) throw new Error("Failed to fetch categories");
         const data = await response.json();
         setCategoryList(data || []);

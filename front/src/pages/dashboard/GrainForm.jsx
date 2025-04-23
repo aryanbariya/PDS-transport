@@ -20,13 +20,13 @@ const GrainForm = ({ onClose, onSave, editData }) => {
         }
 
         // ✅ Fetch MSWC Godowns
-        fetch(`${URL}/api/mswcgodown`)
+        fetch(`${URL}/api/mswc/active`)
             .then((res) => res.json())
             .then((data) => setMswcGodowns(data))
             .catch((err) => console.error("Error fetching MSWC Godowns:", err));
 
         // ✅ Fetch Sub-Godowns
-        fetch(`${URL}/api/subgodown`)
+        fetch(`${URL}/api/subgodowns/active`)
             .then((res) => res.json())
             .then((data) => setSubGodowns(data))
             .catch((err) => console.error("Error fetching Sub-Godowns:", err));
@@ -213,10 +213,10 @@ const GrainForm = ({ onClose, onSave, editData }) => {
                     )}
 
                     {selectedDropdown === "Sub" && (
-                        <select name="godownName" value={formData.godownName} onChange={handleSubSelect} required>
+                        <select name="godownName" value={formData.subGodown} onChange={handleSubSelect} required>
                             <option value="">Select Sub-Godown</option>
                             {subGodowns.map((g) => (
-                                <option key={g.uuid} value={g.subGodownName}>{g.subGodownName}</option>
+                                <option key={g.uuid} value={g.subGodown}>{g.subGodown}</option>
                             ))}
                         </select>
                     )}

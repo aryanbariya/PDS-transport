@@ -25,9 +25,9 @@ const TruckPage = () => {
   const fetchTrucks = async () => {
     try {
       setLoading(true);
-      let endpoint = `${URL}/api/truck`;
-      if (filter === "active") endpoint = `${URL}/api/truck/active`;
-      if (filter === "inactive") endpoint = `${URL}/api/truck/inactive`;
+      let endpoint = `${URL}/api/trucks`;
+      if (filter === "active") endpoint = `${URL}/api/trucks/active`;
+      if (filter === "inactive") endpoint = `${URL}/api/trucks/inactive`;
 
       const response = await fetch(endpoint);
       if (!response.ok) throw new Error("Failed to fetch data");
@@ -94,7 +94,7 @@ const TruckPage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${URL}/api/truck/${uuid}`, {
+          const response = await fetch(`${URL}/api/trucks/${uuid}`, {
             method: "DELETE"
           });
           if (response.ok) {

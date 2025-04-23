@@ -29,7 +29,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchOwners = async () => {
       try {
-        const response = await fetch(`${URL}/api/owners`);
+        const response = await fetch(`${URL}/api/trucks/truckowner`);
         if (!response.ok) throw new Error("Failed to fetch owners");
         const data = await response.json();
         setOwners(data || []);
@@ -186,7 +186,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
     setIsLoading(true);
     try {
       const method = editData ? "PUT" : "POST";
-      const url = editData ? `${URL}/api/truck/${editData.uuid}` : `${URL}/api/truck`;
+      const url = editData ? `${URL}/api/trucks/${editData.uuid}` : `${URL}/api/trucks`;
 
       const response = await fetch(url, {
         method,

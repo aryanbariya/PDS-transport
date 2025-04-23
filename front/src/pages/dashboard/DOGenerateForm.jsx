@@ -59,7 +59,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const fetchGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/mswcgodown`);
+      const response = await fetch(`${URL}/api/mswc`);
       if (!response.ok) throw new Error("Failed to fetch godowns");
       const data = await response.json();
       setGodowns(data || []);
@@ -69,7 +69,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   };
   const fetchsubGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/subgodown`);
+      const response = await fetch(`${URL}/api/subgodowns`);
       if (!response.ok) throw new Error("Failed to fetch godowns");
       const data = await response.json();
       setsubGodowns(data || []);
@@ -80,7 +80,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const fetchSchemes = async () => {
     try {
-      const response = await fetch(`${URL}/api/scheme`);
+      const response = await fetch(`${URL}/api/schemes`);
       if (!response.ok) throw new Error("Failed to fetch schemes");
       const data = await response.json();
       setSchemes(data || []);

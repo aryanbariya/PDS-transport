@@ -16,7 +16,7 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch(`${URL}/api/godowns`);
+        const response = await fetch(`${URL}/api/subgodowns/godowns`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
 
         const data = await response.json();
@@ -70,8 +70,8 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
     try {
       const response = await fetch(
         editData
-          ? `${URL}/api/subgodown/${editData.uuid}`
-          : `${URL}/api/subgodown`,
+          ? `${URL}/api/subgodowns/${editData.uuid}`
+          : `${URL}/api/subgodowns`,
         {
           method: editData ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },

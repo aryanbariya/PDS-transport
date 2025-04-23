@@ -38,7 +38,7 @@ const DOAllocationPage = () => {
     try {
       const [doopRes, godownRes] = await Promise.all([
         fetch(`${URL}/api/do`),
-        fetch(`${URL}/api/mswcgodown`),
+        fetch(`${URL}/api/mswc`),
 
       ]);
 
@@ -86,7 +86,7 @@ const DOAllocationPage = () => {
   // Fetch SubGodown Data
   const fetchSubGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/dropsubgodown`);
+      const response = await fetch(`${URL}/api/subgodowns`);
       if (!response.ok) throw new Error("Failed to fetch subgodowns");
 
       const data = await response.json();

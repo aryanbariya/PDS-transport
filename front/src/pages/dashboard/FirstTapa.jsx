@@ -27,7 +27,7 @@ const TransportPage = () => {
   const fetchTransportData = async () => {
     try {
       setLoading(true);
-      let endpoint = `${URL}/api/transport`;
+      let endpoint = `${URL}/api/transports`;
       if (filter === "active") endpoint = `${URL}/api/tapa/active`;
       if (filter === "inactive") endpoint = `${URL}/api/tapa/inactive`;
 
@@ -291,7 +291,7 @@ const TransportPage = () => {
                       <Button onClick={() => handleEdit(tp)} className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700">
                         Edit
                       </Button>
-                      <Button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
+                      <Button onClick={() => handleDelete(tp.uuid)} className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700">
                         Delete
                       </Button>
                     </td>

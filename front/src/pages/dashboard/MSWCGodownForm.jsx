@@ -72,8 +72,8 @@ const MSWCGodownForm = ({ onClose, onSave, editData }) => {
     setLoading(true);
     try {
       const endpoint = editData
-        ? `${URL}/api/mswcgodown/${editData.uuid}`
-        : `${URL}/api/mswcgodown`;
+        ? `${URL}/api/mswc/${editData.uuid}`
+        : `${URL}/api/mswc`;
       const method = editData ? "PUT" : "POST";
 
       console.log("Submitting to:", endpoint, "with method:", method);

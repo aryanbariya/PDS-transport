@@ -31,7 +31,7 @@ const SchemePage = () => {
   const fetchSchemes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${URL}/api/scheme`);
+      const response = await fetch(`${URL}/api/schemes`);
       if (!response.ok) throw new Error("Failed to fetch scheme");
       const data = await response.json();
       setSchemes(data);
@@ -54,7 +54,7 @@ const SchemePage = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`${URL}/api/scheme/${uuid}`, {
+          const response = await fetch(`${URL}/api/schemes/${uuid}`, {
             method: "DELETE",
           });
           if (response.ok) {
