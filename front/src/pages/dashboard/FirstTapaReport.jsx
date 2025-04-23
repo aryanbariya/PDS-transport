@@ -131,7 +131,7 @@ const [expandedRow, setExpandedRow] = useState(null);
             </thead>
             <tbody>
               {data.length > 0 ? (
-                data.map((tp) => {
+                data.map((tp, index) => {
                   const godowns = tp.godown?.split("|") || [];
                   const vahtuks = tp.vahtuk?.split("|") || [];
                   const quantities = tp.quantity?.split("|") || [];
@@ -139,7 +139,7 @@ const [expandedRow, setExpandedRow] = useState(null);
                   return (
                     <React.Fragment key={tp.trans_id}>
                       <tr className="text-start hover:bg-gray-100">
-                        <td className="border p-2">{tp.trans_id}</td>
+                        <td className="border p-2">{index + 1}</td>
                         <td className="border p-2">
                           <button
                             onClick={() => generatePDF(tp)}

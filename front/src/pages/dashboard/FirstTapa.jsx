@@ -280,7 +280,7 @@ const TransportPage = () => {
                     <td className="border p-2">{formatDate(tp.dispatchDate)}</td>
                     <td className="border p-2">{tp.baseDepoName}</td>
                     <td className="border p-2">{tp.truckName}</td>
-                    <td className="border p-2">{tp.doNo}</td>
+                    <td className="border p-2">{tp.donumber}</td>
                     <td className="border p-2">{formatDate(tp.quota)}</td>
                     <td className="border p-2">{tp.schemeName}</td>
                     <td className="border p-2">{tp.noOfBags}</td>
