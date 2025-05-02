@@ -200,7 +200,7 @@ export function SignIn() {
     }
 
     try {
-      const response = await axios.post(`${URL}/signin`, { email, password });
+      const response = await axios.post(`${URL}/auth/signin`, { email, password });
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token); // Store token
