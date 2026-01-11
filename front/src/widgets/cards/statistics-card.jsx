@@ -109,21 +109,6 @@ export function StatisticsCard({
               >
                 {title}
               </Typography>
-              
-              {totalLabel && (
-                <Typography 
-                  variant="small" 
-                  className="font-normal mt-1 text-gray-600 text-xs flex items-center"
-                >
-                  <span className="flex items-center gap-1">
-                    <span 
-                      className="w-2 h-2 rounded-full inline-block" 
-                      style={{backgroundColor: `var(--${color}-500)`}}
-                    ></span>
-                    {totalLabel}
-                  </span>
-                </Typography>
-              )}
             </div>
           </CardBody>
         </div>

@@ -40,7 +40,7 @@ const DOCards = () => {
                        hover:shadow-lg hover:shadow-purple-100/40 hover:transform hover:scale-[1.02]"
             >
               {/* Background gradient with reduced opacity */}
-              <div className="absolute inset-0 opacity-10 bg-gradient-to-r from-purple-500 to-indigo-600"></div>
+              <div className="absolute inset-0 opacity-10 bg-gradient-to-r from-amber-500 to-yellow-600"></div>
               
               {/* Glass effect overlay */}
               <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-[2px]"></div>
@@ -49,7 +49,7 @@ const DOCards = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`
                     w-14 h-14 grid place-items-center rounded-lg shadow-lg
-                    bg-gradient-to-tr from-purple-600 to-indigo-400
+                    bg-gradient-to-tr from-amber-600 to-amber-400
                     transition-transform duration-300 ${hoveredCard === "generate" ? 'transform -translate-y-1' : ''}
                   `}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
@@ -57,7 +57,7 @@ const DOCards = () => {
                     </svg>
                   </div>
                   <div>
-                    <h2 className={`text-xl font-bold ${hoveredCard === "generate" ? 'text-purple-600' : 'text-gray-800'} transition-colors duration-300`}>
+                    <h2 className={`text-xl font-bold ${hoveredCard === "generate" ? 'text-amber-600' : 'text-gray-800'} transition-colors duration-300`}>
                       DO Generate
                     </h2>
                     <p className="text-gray-600 mt-1">Create new Delivery Order</p>
@@ -66,7 +66,7 @@ const DOCards = () => {
                 
                 {/* Animated border on hover */}
                 <div 
-                  className={`h-1 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full transition-all duration-300 ${
+                  className={`h-1 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full transition-all duration-300 ${
                     hoveredCard === "generate" ? 'w-full opacity-100' : 'w-0 opacity-0'
                   }`}
                 ></div>

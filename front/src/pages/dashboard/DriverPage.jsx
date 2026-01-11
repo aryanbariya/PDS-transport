@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import DataTable from "datatables.net-dt";
+import React, { useState, useEffect } from "react";
 import { Player } from "@lottiefiles/react-lottie-player";
 import Navigation from "@/util/libs/navigation";
 import truckLoader from "@/util/Animation.json";
 import DriverForm from "./DriverForm";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
+import DataTable from "@/components/common/DataTable";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -18,17 +15,8 @@ const DriverPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
-  const tableRef = useRef(null);
 
-  // useEffect(() => {
-  //   fetchDrivers();
-  // }, []);
 
-  // useEffect(() => {
-  //   if (drivers.length > 0 && tableRef.current) {
-  //     $(tableRef.current).DataTable();
-  //   }
-  // }, [drivers]);
 
   const fetchDrivers = async () => {
     try {
@@ -43,14 +31,6 @@ const DriverPage = () => {
       const data = await response.json();
       setDrivers(data || []);
 
-      setTimeout(() => {
-        if (tableRef.current) {
-          $(tableRef.current).DataTable().destroy(); // Destroy existing DataTable
-          $(tableRef.current).DataTable({
-            responsive: true,
-          });
-        }
-      }, 0);
 
       setLoading(false);
     } catch (err) {
@@ -63,19 +43,6 @@ const DriverPage = () => {
     fetchDrivers();
   }, [filter]);
 
-  // Reinitialize DataTable when godowns data changes
-  useEffect(() => {
-    if (tableRef.current && drivers.length > 0) {
-      const dataTable = new DataTable(tableRef.current, {
-        destroy: true,
-        responsive: true,
-      });
-
-      return () => {
-        dataTable.destroy();
-      };
-    }
-  }, [drivers]);
 
 
   const handleSave = () => {
@@ -90,31 +57,19 @@ const DriverPage = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (uuid) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, deactive it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(`${URL}/api/drivers/${uuid}`, { method: "DELETE" });
-          if (response.ok) {
-            Swal.fire("Deactivated!", "Driver deactivated successfully!", "success");
-            fetchDrivers();
-          } else {
-            Swal.fire("Error", "Failed to deactivate driver.", "error");
-          }
-        } catch (error) {
-          console.error("Error deactivating driver:", error);
-          Swal.fire("Error", "Error deactivating data.", "error");
-        }
+  const handleDeactivate = async (uuid) => {
+    try {
+      const response = await fetch(`${URL}/api/drivers/${uuid}`, { method: "DELETE" });
+      if (response.ok) {
+        Swal.fire("Deactivated!", "Driver deactivated successfully!", "success");
+        fetchDrivers();
+      } else {
+        Swal.fire("Error", "Failed to deactivate driver.", "error");
       }
-    });
+    } catch (error) {
+      console.error("Error deactivating driver:", error);
+      Swal.fire("Error", "Error deactivating data.", "error");
+    }
   };
 
   return (
@@ -153,61 +108,55 @@ const DriverPage = () => {
       {loading && <div className="flex justify-center items-center h-64">
         <Player autoplay loop src={truckLoader} className="w-48 h-48" />
       </div>}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && (
-        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">ID</th>
-                <th className="border p-2">Driver Name</th>
-                <th className="border p-2">Aadhar Card No.</th>
-                <th className="border p-2">Contact</th>
-                <th className="border p-2">Driving License No.</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {drivers.length > 0 ? (
-                drivers.map((driver) => (
-                  <tr key={driver.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{driver.driver_id}</td>
-                    <td className="border p-2">{driver.driver_name}</td>
-                    <td className="border p-2">{driver.aadhar_card_no}</td>
-                    <td className="border p-2">{driver.contact}</td>
-                    <td className="border p-2">{driver.driving_license_no}</td>
-                    <td className="border p-2">{driver.status}</td>
-                    <td className="border p-2">
-                      <div className="flex justify-start space-x-2">
-                        <button
-                          onClick={() => handleEdit(driver)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(driver.uuid)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                        >
-                          Dactivate
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center p-4">No records found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>)}
+      
+      <DataTable
+        data={drivers}
+        columns={[
+          {
+            key: "driver_id",
+            header: "ID",
+            render: (driver) => driver.driver_id
+          },
+          {
+            key: "driver_name",
+            header: "Driver Name",
+            render: (driver) => driver.driver_name
+          },
+          {
+            key: "aadhar_card_no",
+            header: "Aadhar Card No.",
+            render: (driver) => driver.aadhar_card_no
+          },
+          {
+            key: "contact",
+            header: "Contact",
+            render: (driver) => driver.contact
+          },
+          {
+            key: "driving_license_no",
+            header: "Driving License No.",
+            render: (driver) => driver.driving_license_no
+          },
+          {
+            key: "status",
+            header: "Status",
+            render: (driver) => driver.status
+          }
+        ]}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDeactivate={handleDeactivate}
+        actionType="deactivate"
+        actionButtonText="Deactivate"
+        emptyMessage="No records found"
+        actionColumnClassName="border p-2 flex justify-start space-x-2"
+      />
 
     </div>
   );
 };
 
 export default DriverPage;
+
 

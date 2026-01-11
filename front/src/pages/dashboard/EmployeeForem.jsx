@@ -77,7 +77,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
         contact: editData.contact || "",
       });
       setSearch(editData.subGodown || "");
-      setCategorySearch(editData.category|| "");
+      setCategorySearch(editData.category || "");
     }
   }, [editData]);
 
@@ -105,7 +105,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
     setShowDropdown(false);
   };
 
-  const handleSelectCategory = (category)=>{
+  const handleSelectCategory = (category) => {
     setFormData({ ...formData, category });
     setCategorySearch(category);
     setShowCategoryDropdown(false);
@@ -114,7 +114,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
 
 
 
-  
+
 
   const validateForm = () => {
     let newErrors = {};
@@ -183,14 +183,14 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
   };
 
   const renderInputField = (field, label, type = "text") => {
-  return (
+    return (
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
-          {["category", "fullName", "username", "password", "subGodown", "contact"].includes(field) && 
+          {["category", "fullName", "username", "password", "subGodown", "contact"].includes(field) &&
             <span className="text-red-500 ml-1">*</span>}
         </label>
-              <input
+        <input
           type={type}
           name={field}
           value={formData[field]}
@@ -199,7 +199,7 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
           placeholder={`Enter ${label}`}
         />
         {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
-                      </div>
+      </div>
     );
   };
 
@@ -210,18 +210,18 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
           {label}
           <span className="text-red-500 ml-1">*</span>
         </label>
-              <input
-                type="text"
+        <input
+          type="text"
           value={searchValue}
-                onClick={() => setShowDropdown(true)}
-                onChange={(e) => {
+          onClick={() => setShowDropdown(true)}
+          onChange={(e) => {
             setSearchValue(e.target.value);
-                  setShowDropdown(true);
-                }}
+            setShowDropdown(true);
+          }}
           className={`p-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
           placeholder={`Search ${label}`}
-              />
-              {showDropdown && (
+        />
+        {showDropdown && (
           <div className="absolute z-10 bg-white border rounded-md w-full max-h-40 overflow-auto shadow-lg mt-1">
             {options
               .filter((option) =>
@@ -230,16 +230,16 @@ const EmployeeForm = ({ onClose, onSave, editData }) => {
                   .includes(searchValue.toLowerCase())
               )
               .map((option, index) => (
-                      <div
-                        key={index}
+                <div
+                  key={index}
                   onClick={() => handleSelect(option[field === "category" ? "category_name" : "subGodown"])}
-                        className="p-2 hover:bg-gray-200 cursor-pointer"
-                      >
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                >
                   {option[field === "category" ? "category_name" : "subGodown"]}
-                      </div>
-                    ))}
                 </div>
-              )}
+              ))}
+          </div>
+        )}
         {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
       </div>
     );
