@@ -31,7 +31,6 @@ const rowCountRoutes = require("./routes/rowCountRoutes");
 const schemeRoutes = require("./routes/schemeRoutes");
 const subGodownRoutes = require("./routes/subGodownRoutes");
 const transportRoutes = require("./routes/transportRoutes");
-const transportEntriesRoutes = require("./routes/transportEntriesRoutes");
 const truckRoutes = require("./routes/truckRoutes");
 const firstreportRoutes = require("./routes/fristreportRoutes");
 
@@ -49,7 +48,6 @@ app.use("/api/getRowCounts", rowCountRoutes);
 app.use("/api/schemes", schemeRoutes);
 app.use("/api/subgodowns", subGodownRoutes);
 app.use("/api/transports", transportRoutes);
-app.use("/api/transports-entries", transportEntriesRoutes);
 app.use("/api/trucks", truckRoutes);
 app.use("/api/alloc", allocRoutes);
 app.use('/api', firstreportRoutes);
