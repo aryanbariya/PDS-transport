@@ -1,24 +1,46 @@
 const db = require("../config/db");
 
 class SubGodown {
-  // Get all active sub-godowns
-  static getActive() {
+  // Get paginated active sub-godowns
+  static getActive(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, parentGodown, subGodown, subgodown_id, status FROM sub_godown WHERE status = 'Active' ORDER BY subgodown_id";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, parentGodown, subGodown, subgodown_id, status FROM sub_godown WHERE status = 'Active' ORDER BY subgodown_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
       });
     });
   }
 
-  // Get all inactive sub-godowns
-  static getInactive() {
+  // Get total active sub-godowns count
+  static getActiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, parentGodown, subGodown, subgodown_id, status FROM sub_godown WHERE status = 'Inactive' ORDER BY subgodown_id";
+      const sql = "SELECT COUNT(*) as total FROM sub_godown WHERE status = 'Active'";
       db.query(sql, (err, results) => {
         if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Get paginated inactive sub-godowns
+  static getInactive(limit = 10, offset = 0) {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT uuid, parentGodown, subGodown, subgodown_id, status FROM sub_godown WHERE status = 'Inactive' ORDER BY subgodown_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
+        if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total inactive sub-godowns count
+  static getInactiveCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM sub_godown WHERE status = 'Inactive'";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }
@@ -34,13 +56,24 @@ class SubGodown {
     });
   }
 
-  // Get all sub-godowns
-  static getAll() {
+  // Get paginated sub-godowns
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, parentGodown, subGodown, status, subgodown_id FROM sub_godown ORDER BY subgodown_id";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, parentGodown, subGodown, status, subgodown_id FROM sub_godown ORDER BY subgodown_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total sub-godowns count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM sub_godown";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

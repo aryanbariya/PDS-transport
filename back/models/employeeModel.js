@@ -23,13 +23,24 @@ class Employee {
     });
   }
 
-  // Get all employees
-  static getAll() {
+  // Get paginated employees
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, contact, order_number FROM employee ORDER BY order_number";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, category, fullName, username, address, aadharNo, panNo, bankName, accountNumber, ifscCode, branchName, subGodown, contact, order_number FROM employee ORDER BY order_number ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total employees count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM employee";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }
@@ -68,29 +79,29 @@ class Employee {
   }
 
   // Update an employee
-// Employee.js (model)
-static update(uuid, updates) {
-  return new Promise((resolve, reject) => {
-    // Only include keys with defined (non-null) values
-    const fields = Object.keys(updates).filter(key => updates[key] !== undefined && updates[key] !== null);
+  // Employee.js (model)
+  static update(uuid, updates) {
+    return new Promise((resolve, reject) => {
+      // Only include keys with defined (non-null) values
+      const fields = Object.keys(updates).filter(key => updates[key] !== undefined && updates[key] !== null);
 
-    // If no fields to update, reject
-    if (fields.length === 0) {
-      return reject(new Error("No valid fields to update"));
-    }
+      // If no fields to update, reject
+      if (fields.length === 0) {
+        return reject(new Error("No valid fields to update"));
+      }
 
-    // Build SQL SET clause dynamically: e.g., "fullName = ?, address = ?"
-    const setClause = fields.map(field => `${field} = ?`).join(", ");
-    const sql = `UPDATE employee SET ${setClause} WHERE uuid = ?`;
+      // Build SQL SET clause dynamically: e.g., "fullName = ?, address = ?"
+      const setClause = fields.map(field => `${field} = ?`).join(", ");
+      const sql = `UPDATE employee SET ${setClause} WHERE uuid = ?`;
 
-    const values = fields.map(field => updates[field]);
+      const values = fields.map(field => updates[field]);
 
-    db.query(sql, [...values, uuid], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+      db.query(sql, [...values, uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
     });
-  });
-}
+  }
 
 
 

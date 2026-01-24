@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get Active MSWC Godowns**
 exports.getActiveGodowns = async (req, res) => {
   try {
-    const godowns = await MSWC.getActive();
-    res.json(godowns);
+    if (req.query.nopagination === "true") {
+      const godowns = await MSWC.getActive(99999, 0); // High limit for no pagination
+      return res.json(godowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [godowns, total] = await Promise.all([
+      MSWC.getActive(limit, offset),
+      MSWC.getActiveCount()
+    ]);
+
+    res.json({
+      data: godowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching active godowns:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -16,8 +37,29 @@ exports.getActiveGodowns = async (req, res) => {
 // **Get Inactive MSWC Godowns**
 exports.getInactiveGodowns = async (req, res) => {
   try {
-    const godowns = await MSWC.getInactive();
-    res.json(godowns);
+    if (req.query.nopagination === "true") {
+      const godowns = await MSWC.getInactive(99999, 0);
+      return res.json(godowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [godowns, total] = await Promise.all([
+      MSWC.getInactive(limit, offset),
+      MSWC.getInactiveCount()
+    ]);
+
+    res.json({
+      data: godowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching inactive godowns:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -27,8 +69,29 @@ exports.getInactiveGodowns = async (req, res) => {
 // **Get All MSWC Godowns**
 exports.getAllGodowns = async (req, res) => {
   try {
-    const godowns = await MSWC.getAll();
-    res.json(godowns);
+    if (req.query.nopagination === "true") {
+      const godowns = await MSWC.getAll(99999, 0);
+      return res.json(godowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [godowns, total] = await Promise.all([
+      MSWC.getAll(limit, offset),
+      MSWC.getCount()
+    ]);
+
+    res.json({
+      data: godowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching godowns:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -86,7 +149,7 @@ exports.updateGodown = async (req, res) => {
     const result = await MSWC.update(req.params.uuid, { godownName, godownUnder, status: updatedStatus });
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
-    updateTableStats('mswc_godowns');
+      updateTableStats('mswc_godowns');
     }
     res.json({ message: "Godown updated successfully" });
   } catch (error) {

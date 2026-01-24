@@ -29,7 +29,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchOwners = async () => {
       try {
-        const response = await fetch(`${URL}/api/trucks/truckowner`);
+        const response = await fetch(`${URL}/api/trucks/truckowner?nopagination=true`);
         if (!response.ok) throw new Error("Failed to fetch owners");
         const data = await response.json();
         setOwners(data || []);
@@ -93,11 +93,11 @@ const TruckForm = ({ onClose, onSave, editData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-  
+
     if (name === "truck_name") {
       updatedValue = value.toUpperCase();
     }
-  
+
     // if (name === "truck_owner_name") {
     //   // Reset owner_id when user types anything manually
     //   setFormData(prev => ({
@@ -114,18 +114,18 @@ const TruckForm = ({ onClose, onSave, editData }) => {
         owner_id: matchedOwner ? matchedOwner.owner_id : "" // Only set if exact match
       }));
     }
-     else {
+    else {
       setFormData(prev => ({
         ...prev,
         [name]: updatedValue
       }));
     }
-  
+
     if (errors[name]) {
       setErrors(prevErrors => ({ ...prevErrors, [name]: "" }));
     }
   };
-  
+
 
 
 
@@ -173,7 +173,7 @@ const TruckForm = ({ onClose, onSave, editData }) => {
       console.log("Validation failed: owner_id or truck_owner_name missing", formData);
       newErrors.truck_owner_name = "Truck Owner selection is required";
     }
-    
+
 
     setErrors(newErrors); // <--- this was missing in your current version
     return Object.keys(newErrors).length === 0; // <--- you forgot to return this

@@ -15,21 +15,31 @@ const MSWCGodownPage = () => {
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   // Fetch godown data based on filter
-  const fetchGodowns = async () => {
+  const fetchGodowns = async (page = 1) => {
     try {
       setLoading(true);
       let endpoint = `${URL}/api/mswc`;
       if (filter === "active") endpoint = `${URL}/api/mswc/active`;
       if (filter === "inactive") endpoint = `${URL}/api/mswc/inactive`;
 
-      const response = await fetch(endpoint);
+      const response = await fetch(`${endpoint}?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
 
-      const data = await response.json();
-      setGodowns(data || []);
-
+      const result = await response.json();
+      setGodowns(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
 
       setLoading(false);
     } catch (err) {
@@ -38,10 +48,10 @@ const MSWCGodownPage = () => {
     }
   };
 
-  // Fetch data when filter changes
+  // Fetch data when filter or page changes
   useEffect(() => {
-    fetchGodowns();
-  }, [filter]);
+    fetchGodowns(pagination.page);
+  }, [filter, pagination.page]);
 
 
   // Handle delete (deactivate godown)
@@ -114,9 +124,11 @@ const MSWCGodownPage = () => {
           <Player autoplay loop src={truckLoader} className="w-48 h-48" />
         </div>
       )}
-      
+
       <DataTable
         data={godowns}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
         columns={[
           {
             key: "mswc_id",

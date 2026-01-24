@@ -192,7 +192,7 @@
 
 //             <div className="mt-4 flex justify-start space-x-2">
 //               <button
-              
+
 //                 onClick={() => handleEdit(selectedOwner)}
 //                 className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
 //               >
@@ -216,17 +216,10 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@material-tailwind/react";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import "datatables.net-buttons-dt/css/buttons.dataTables.min.css";
-import "datatables.net-buttons-dt";
-import { Player } from "@lottiefiles/react-lottie-player";
-import truckLoader from "@/util/Animation.json";
 import OwnerNameForm from "./OwnerNameForm";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
+import DataTable from "@/components/common/DataTable";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -236,24 +229,34 @@ const OwnerNamePage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
   const tableRef = useRef(null);
 
   useEffect(() => {
-    fetchOwners();
-  }, []);
+    fetchOwners(pagination.page);
+  }, [pagination.page]);
 
-  useEffect(() => {
-    if (owners.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable();
-    }
-  }, [owners]);
+  // Removed jQuery logic
 
-  const fetchOwners = async () => {
+  const fetchOwners = async (page = 1) => {
+    setLoading(true);
     try {
-      const response = await fetch(`${URL}/api/owners`);
+      const response = await fetch(`${URL}/api/owners?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
-      const data = await response.json();
-      setOwners(data || []);
+      const result = await response.json();
+
+      setOwners(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -315,58 +318,46 @@ const OwnerNamePage = () => {
         </div>
       )}
 
-      {/* Loader */}
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Player autoplay loop src={truckLoader} className="w-48 h-48" />
-        </div>
-      )}
-
-      {/* Error */}
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
-      {/* Owner Table */}
-      {!loading && (
-        <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200 text-start">
-                <th className="border p-2">ID</th>
-                <th className="border p-2">Owner Name</th>
-                <th className="border p-2">Contact</th>
-                <th className="border p-2">Address</th>
-                <th className="border p-2">Email</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {owners.map((o) => (
-                <tr key={o.uuid} className="text-start hover:bg-gray-100">
-                  <td className="border p-2">{o.owner_id}</td>
-                  <td className="border p-2">{o.ownerName}</td>
-                  <td className="border p-2">{o.contact}</td>
-                  <td className="border p-2">{o.address}</td>
-                  <td className="border p-2">{o.emailID}</td>
-                  <td className="border p-2 flex justify-center space-x-2">
-                    <Button
-                      onClick={() => handleEdit(o)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                    >
-                      Edit
-                    </Button>
-                    <button
-                      onClick={() => handleDelete(o.uuid)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        data={owners}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
+        columns={[
+          {
+            key: "owner_id",
+            header: "ID",
+            render: (o) => o.owner_id
+          },
+          {
+            key: "ownerName",
+            header: "Owner Name",
+            render: (o) => o.ownerName
+          },
+          {
+            key: "contact",
+            header: "Contact",
+            render: (o) => o.contact
+          },
+          {
+            key: "address",
+            header: "Address",
+            render: (o) => o.address
+          },
+          {
+            key: "emailID",
+            header: "Email",
+            render: (o) => o.emailID
+          }
+        ]}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        actionType="delete"
+        emptyMessage="No owners found"
+      />
     </div>
   );
 };

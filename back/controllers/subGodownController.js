@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get Active Sub-Godowns**
 exports.getActiveSubGodowns = async (req, res) => {
   try {
-    const subGodowns = await SubGodown.getActive();
-    res.json(subGodowns);
+    if (req.query.nopagination === "true") {
+      const subGodowns = await SubGodown.getActive(99999, 0);
+      return res.json(subGodowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [subGodowns, total] = await Promise.all([
+      SubGodown.getActive(limit, offset),
+      SubGodown.getActiveCount()
+    ]);
+
+    res.json({
+      data: subGodowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching active godowns:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -16,8 +37,29 @@ exports.getActiveSubGodowns = async (req, res) => {
 // **Get Inactive Sub-Godowns**
 exports.getInactiveSubGodowns = async (req, res) => {
   try {
-    const subGodowns = await SubGodown.getInactive();
-    res.json(subGodowns);
+    if (req.query.nopagination === "true") {
+      const subGodowns = await SubGodown.getInactive(99999, 0);
+      return res.json(subGodowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [subGodowns, total] = await Promise.all([
+      SubGodown.getInactive(limit, offset),
+      SubGodown.getInactiveCount()
+    ]);
+
+    res.json({
+      data: subGodowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching inactive godowns:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -38,8 +80,29 @@ exports.getAllGodowns = async (req, res) => {
 // **Get All Sub-Godowns**
 exports.getAllSubGodowns = async (req, res) => {
   try {
-    const subGodowns = await SubGodown.getAll();
-    res.json(subGodowns);
+    if (req.query.nopagination === "true") {
+      const subGodowns = await SubGodown.getAll(99999, 0);
+      return res.json(subGodowns);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [subGodowns, total] = await Promise.all([
+      SubGodown.getAll(limit, offset),
+      SubGodown.getCount()
+    ]);
+
+    res.json({
+      data: subGodowns,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching sub-godowns:", error);
     res.status(500).json({ error: "Database fetch error" });

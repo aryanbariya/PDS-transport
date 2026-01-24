@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@material-tailwind/react";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import { Player } from "@lottiefiles/react-lottie-player";
-import loadingAnimation from "@/util/Animation.json";
 import DOGenerateForm from "./DOGenerateForm";
 import Navigation from "@/util/libs/navigation";
-import {formatDate} from "@/util/libs/formatDate"
+import { formatDate } from "@/util/libs/formatDate"
 import Swal from "sweetalert2";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
@@ -19,54 +13,54 @@ const DOAllocationPage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const tableRef = useRef(null);
   const [godowns, setgodown] = useState([]);
   const [doop, setdoop] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   useEffect(() => {
-    fetchOrders();
     fetchSubGodowns();
     fetchData();
   }, []);
+
   useEffect(() => {
-    if (orders.length > 0 && subGodowns.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable();
-    }
-  }, [orders, subGodowns]);
+    fetchOrders(pagination.page);
+  }, [pagination.page]);
 
   const fetchData = async () => {
     try {
       const [doopRes, godownRes] = await Promise.all([
-        fetch(`${URL}/api/do`),
-        fetch(`${URL}/api/mswc`),
-
+        fetch(`${URL}/api/do?nopagination=true`),
+        fetch(`${URL}/api/mswc?nopagination=true`)
       ]);
 
       if (!doopRes.ok) throw new Error("Failed to fetch orders");
-      if (!godownRes.ok) throw new Error("Failed to fetch grains");
-
+      if (!godownRes.ok) throw new Error("Failed to fetch mswc godowns");
 
       const doopData = await doopRes.json();
       const godownData = await godownRes.json();
 
-
       setdoop(doopData);
       setgodown(godownData);
-      setLoading(false);
     } catch (err) {
-      setError(err.message);
-      setLoading(false);
+      console.error("Error fetching lookup data:", err);
     }
   };
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch(`${URL}/api/alloc`);
-      if (!response.ok) throw new Error("Failed to fetch data");
 
-      const data = await response.json();
+  const fetchOrders = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${URL}/api/alloc?page=${page}&limit=${pagination.limit}`);
+      if (!response.ok) throw new Error("Failed to fetch allocations");
+
+      const result = await response.json();
 
       // Transform pipeline strings into arrays
-      const transformedData = data.map((entry) => {
+      const transformedData = (result.data || []).map((entry) => {
         return {
           ...entry,
           godown: entry.godown.split("|"),
@@ -75,7 +69,13 @@ const DOAllocationPage = () => {
         };
       });
 
-      setOrders(transformedData || []);
+      setOrders(transformedData);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -86,16 +86,13 @@ const DOAllocationPage = () => {
   // Fetch SubGodown Data
   const fetchSubGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/subgodowns`);
+      const response = await fetch(`${URL}/api/subgodowns?nopagination=true`);
       if (!response.ok) throw new Error("Failed to fetch subgodowns");
 
       const data = await response.json();
-      console.log("Fetched SubGodowns:", data); // Debugging
-
       if (Array.isArray(data)) {
-        setSubGodowns(data.map((sg) => sg.subGodown)); // Fix: Use correct key
+        setSubGodowns(data.map((sg) => sg.subGodown));
       } else {
-        console.error("Unexpected subgodown data format:", data);
         setSubGodowns([]);
       }
     } catch (err) {
@@ -138,54 +135,78 @@ const DOAllocationPage = () => {
         </div>
       )}
 
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Player autoplay loop src={loadingAnimation} className="w-48 h-48" />
-        </div>
-      )}
-
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && (
-        <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200 text-start">
-                <th className="border p-2">Sr. No.</th>
-                <th className="border p-2">D.O. No.</th>
-                {subGodowns.map((name) => (
-                  <th key={name} className="border p-2">{name}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {
-                orders.map((entry, index) => (
-                  <tr key={entry.do_id} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{entry.do_id + ' - ' + getGroupUnder(entry.do_id) + '-' + formatDate(getcota(entry.do_id))}</td>
-                    {
-                      subGodowns.map((name) => {
-                        const godownIndex = entry.godown.findIndex(g => g.trim().toLowerCase() === name.trim().toLowerCase());
-                        return (
-                          <td key={name} className="border p-2">
-                            {
-                              godownIndex !== -1 ? (
-                                <>
-                                  {entry.quantity[godownIndex]}<br />
-                                  {entry.vahtuk[godownIndex]}
-                                </>
-                              ) : ""
-                            }
-                          </td>
-                        );
-                      })
-                    }
+        <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1 flex flex-col">
+          <div className="overflow-auto flex-1">
+            <table className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
+              <thead className="sticky top-0 z-10 bg-white">
+                <tr className="bg-gray-200 text-start">
+                  <th className="border p-2">Sr. No.</th>
+                  <th className="border p-2">D.O. No.</th>
+                  {subGodowns.map((name) => (
+                    <th key={name} className="border p-2">{name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {orders.length > 0 ? (
+                  orders.map((entry, index) => (
+                    <tr key={entry.do_id} className="text-start hover:bg-gray-100">
+                      <td className="border p-2">{(pagination.page - 1) * pagination.limit + index + 1}</td>
+                      <td className="border p-2">{entry.do_id + ' - ' + getGroupUnder(entry.do_id) + '-' + formatDate(getcota(entry.do_id))}</td>
+                      {
+                        subGodowns.map((name) => {
+                          const godownIndex = entry.godown.findIndex(g => g.trim().toLowerCase() === name.trim().toLowerCase());
+                          return (
+                            <td key={name} className="border p-2">
+                              {
+                                godownIndex !== -1 ? (
+                                  <>
+                                    {entry.quantity[godownIndex]}<br />
+                                    {entry.vahtuk[godownIndex]}
+                                  </>
+                                ) : ""
+                              }
+                            </td>
+                          );
+                        })
+                      }
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={subGodowns.length + 2} className="text-center p-4">No allocations found</td>
                   </tr>
-                ))
-              }
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center mt-4 border-t pt-4">
+            <div className="text-sm text-gray-700">
+              Showing <span className="font-semibold">{(pagination.page - 1) * pagination.limit + 1}</span> to <span className="font-semibold">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of <span className="font-semibold">{pagination.total}</span> entries
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                disabled={pagination.page === 1}
+                onClick={() => setPagination(prev => ({ ...prev, page: parseInt(prev.page) - 1 }))}
+                className={`px-3 py-1 rounded-md border ${pagination.page === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
+                Previous
+              </button>
+              <span className="text-sm font-medium">Page {pagination.page} of {pagination.totalPages}</span>
+              <button
+                disabled={pagination.page === pagination.totalPages}
+                onClick={() => setPagination(prev => ({ ...prev, page: parseInt(prev.page) + 1 }))}
+                className={`px-3 py-1 rounded-md border ${pagination.page === pagination.totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

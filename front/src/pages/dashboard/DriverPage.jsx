@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Player } from "@lottiefiles/react-lottie-player";
 import Navigation from "@/util/libs/navigation";
-import truckLoader from "@/util/Animation.json";
 import DriverForm from "./DriverForm";
 import Swal from "sweetalert2";
 import DataTable from "@/components/common/DataTable";
@@ -15,22 +13,32 @@ const DriverPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
 
 
-  const fetchDrivers = async () => {
+  const fetchDrivers = async (page = 1) => {
     try {
       setLoading(true);
       let endpoint = `${URL}/api/drivers`;
       if (filter === "active") endpoint = `${URL}/api/drivers/active`;
       if (filter === "inactive") endpoint = `${URL}/api/drivers/inactive`;
 
-      const response = await fetch(endpoint);
+      const response = await fetch(`${endpoint}?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
 
-      const data = await response.json();
-      setDrivers(data || []);
-
+      const result = await response.json();
+      setDrivers(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
 
       setLoading(false);
     } catch (err) {
@@ -40,8 +48,8 @@ const DriverPage = () => {
   };
 
   useEffect(() => {
-    fetchDrivers();
-  }, [filter]);
+    fetchDrivers(pagination.page);
+  }, [filter, pagination.page]);
 
 
 
@@ -105,12 +113,11 @@ const DriverPage = () => {
         </select>
       </div>
 
-      {loading && <div className="flex justify-center items-center h-64">
-        <Player autoplay loop src={truckLoader} className="w-48 h-48" />
-      </div>}
-      
+
       <DataTable
         data={drivers}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
         columns={[
           {
             key: "driver_id",

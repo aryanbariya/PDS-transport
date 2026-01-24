@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
 class Category {
-  // Get all categories
-  static getAll() {
+  // Get paginated categories
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT * FROM categories";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT * FROM categories ORDER BY category_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total categories count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM categories";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

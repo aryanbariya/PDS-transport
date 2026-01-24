@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Player } from "@lottiefiles/react-lottie-player";
-import truckLoader from "@/util/Animation.json";
 import EmployeeForm from "./EmployeeForem";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
@@ -16,17 +14,31 @@ const EmployeePage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    fetchEmployees(pagination.page);
+  }, [pagination.page]);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = async (page = 1) => {
+    setLoading(true);
     try {
-      const response = await fetch(`${URL}/api/employees`);
+      const response = await fetch(`${URL}/api/employees?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
-      const data = await response.json();
-      setEmployees(data || []);
+      const result = await response.json();
+
+      setEmployees(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -35,20 +47,20 @@ const EmployeePage = () => {
   };
 
   const handleDelete = async (uuid) => {
-        try {
-          const response = await fetch(`${URL}/api/employees/${uuid}`, {
-            method: "DELETE",
-          });
-          if (response.ok) {
-            Swal.fire("Deleted!", "Employee deleted successfully!", "success");
-            fetchEmployees();
-          } else {
-            Swal.fire("Error", "Failed to delete Employee.", "error");
-          }
-        } catch (err) {
-          console.error("Error deleting employee:", err);
-          Swal.fire("Error", "Error deleting data.", "error");
-        }
+    try {
+      const response = await fetch(`${URL}/api/employees/${uuid}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        Swal.fire("Deleted!", "Employee deleted successfully!", "success");
+        fetchEmployees();
+      } else {
+        Swal.fire("Error", "Failed to delete Employee.", "error");
+      }
+    } catch (err) {
+      console.error("Error deleting employee:", err);
+      Swal.fire("Error", "Error deleting data.", "error");
+    }
   };
 
   const handleEdit = (emp) => {
@@ -76,12 +88,12 @@ const EmployeePage = () => {
       if (result.isConfirmed) {
         try {
           const doc = new jsPDF();
-          
+
           // Add title with larger font and centered
           doc.setFontSize(20);
           doc.setTextColor(0, 0, 0); // Black color
           doc.text("Employee Details", 105, 20, { align: 'center' });
-          
+
           // Add employee details with improved formatting
           doc.setFontSize(14);
           const details = [
@@ -104,7 +116,7 @@ const EmployeePage = () => {
             head: [['Field', 'Value']],
             body: details,
             theme: 'grid',
-            headStyles: { 
+            headStyles: {
               fillColor: [42, 48, 66],
               textColor: [255, 255, 255],
               fontSize: 14,
@@ -132,7 +144,7 @@ const EmployeePage = () => {
 
           // Save the PDF
           doc.save(`Employee_${employee.fullName || 'Details'}.pdf`);
-          
+
           // Show success message
           Swal.fire({
             icon: "success",
@@ -156,7 +168,7 @@ const EmployeePage = () => {
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => {
@@ -173,14 +185,11 @@ const EmployeePage = () => {
         </div>
       )}
 
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Player autoplay loop src={truckLoader} className="w-48 h-48" />
-        </div>
-      )}
-      
+
       <DataTable
         data={employees}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
         columns={[
           {
             key: "order_number",
@@ -192,7 +201,7 @@ const EmployeePage = () => {
             header: "Category",
             render: (emp) => (
               <div>
-                      <div className="font-normal">{emp.category}</div>
+                <div className="font-normal">{emp.category}</div>
                 <div className="text-xs md:text-sm font-semibold">
                   <span className="font-normal">Godown:</span>{emp.subGodown}
                 </div>
@@ -250,7 +259,7 @@ const EmployeePage = () => {
                 <div className="font-semibold">
                   <span className="font-normal">Branch:</span>{emp.branchName || "N/A"}
                 </div>
-        </div>
+              </div>
             )
           }
         ]}

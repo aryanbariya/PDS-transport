@@ -9,6 +9,8 @@ const DataTable = ({
   columns = [],
   loading = false,
   error = null,
+  pagination = null, // { page, limit, total, totalPages }
+  onPageChange,
   onEdit,
   onDelete,
   onDeactivate,
@@ -23,15 +25,22 @@ const DataTable = ({
   actionColumnClassName = "border p-2 flex justify-start gap-2 text-xs md:text-base"
 }) => {
   const tableRef = useRef(null);
+  const dtInstance = useRef(null);
 
   useEffect(() => {
-    if (data.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable({
+    // Only use jQuery DataTables for client-side mode (no server-side pagination)
+    // This prevents the "removeChild" error caused by jQuery and React fighting over DOM nodes
+    if (!pagination && data.length > 0 && tableRef.current) {
+      if (dtInstance.current) {
+        dtInstance.current.destroy();
+      }
+
+      dtInstance.current = $(tableRef.current).DataTable({
         destroy: true,
         responsive: true,
         pageLength: 10,
         lengthMenu: [10, 25, 50, 100],
-        order: [[0, 'asc']],
+        order: [],
         language: {
           search: "Search:",
           lengthMenu: "Show _MENU_ entries",
@@ -45,15 +54,21 @@ const DataTable = ({
         }
       });
     }
-  }, [data]);
 
+    return () => {
+      if (dtInstance.current) {
+        dtInstance.current.destroy();
+        dtInstance.current = null;
+      }
+    };
+  }, [data, pagination]);
+
+  // ... (same handleAction and render functions as before)
   const handleAction = async (uuid, item) => {
     const isDelete = actionType === "delete";
     const actionText = actionButtonText || (isDelete ? "delete" : "deactivate");
     const confirmText = isDelete ? "You won't be able to revert this!" : "This will deactivate the record!";
     const confirmButtonText = isDelete ? "Yes, delete it!" : "Yes, deactivate it!";
-    const successText = isDelete ? "deleted" : "deactivated";
-    const errorText = isDelete ? "Failed to delete" : "Failed to deactivate";
 
     Swal.fire({
       title: `Are you sure?`,
@@ -81,7 +96,7 @@ const DataTable = ({
   const renderActionButton = (item) => {
     const buttonText = actionButtonText || (actionType === "delete" ? "Delete" : "Deactivate");
     const buttonClass = "bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700";
-    
+
     return (
       <button
         onClick={() => handleAction(item.uuid, item)}
@@ -94,7 +109,7 @@ const DataTable = ({
 
   const renderDocsButton = (item) => {
     if (!showDocsButton || !onDocsClick) return null;
-    
+
     return (
       <button
         onClick={() => onDocsClick(item)}
@@ -119,55 +134,82 @@ const DataTable = ({
   }
 
   return (
-    <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-      <table ref={tableRef} className={tableClassName}>
-        <thead>
-          <tr className={headerClassName}>
-            {columns.map((column, index) => (
-              <th key={index} className="border p-2">
-                {column.header}
-              </th>
-            ))}
-            <th className="border p-2">Action</th>
-            {showDocsButton && <th className="border p-2">Docs</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {data.length > 0 ? (
-            data.map((item, index) => (
-              <tr key={item.uuid || index} className={rowClassName}>
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="border p-2">
-                    {column.render ? column.render(item) : item[column.key]}
-                  </td>
-                ))}
-                <td className={actionColumnClassName}>
-                  {onEdit && (
-                    <button
-                      onClick={() => onEdit(item)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                    >
-                      Edit
-                    </button>
-                  )}
-                  {(onDelete || onDeactivate) && renderActionButton(item)}
-                </td>
-                {showDocsButton && (
-                  <td className="border p-2">
-                    {renderDocsButton(item)}
-                  </td>
-                )}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length + (showDocsButton ? 2 : 1)} className="p-3 text-start text-gray-500">
-                {emptyMessage}
-              </td>
+    <div className="bg-white mt-3 rounded-md shadow-md p-4 flex flex-col flex-1 overflow-hidden">
+      <div key={pagination ? `${pagination.page}-${pagination.total}` : 'static'} className="overflow-auto flex-1">
+        <table ref={tableRef} className={tableClassName}>
+          <thead>
+            <tr className={headerClassName}>
+              {columns.map((column, index) => (
+                <th key={index} className="border p-2">
+                  {column.header}
+                </th>
+              ))}
+              <th className="border p-2">Action</th>
+              {showDocsButton && <th className="border p-2">Docs</th>}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.length > 0 ? (
+              data.map((item, index) => (
+                <tr key={item.uuid || index} className={rowClassName}>
+                  {columns.map((column, colIndex) => (
+                    <td key={colIndex} className="border p-2">
+                      {column.render ? column.render(item) : item[column.key]}
+                    </td>
+                  ))}
+                  <td className={actionColumnClassName}>
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(item)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {(onDelete || onDeactivate) && renderActionButton(item)}
+                  </td>
+                  {showDocsButton && (
+                    <td className="border p-2">
+                      {renderDocsButton(item)}
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length + (showDocsButton ? 2 : 1)} className="p-3 text-start text-gray-500">
+                  {emptyMessage}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Server-side Pagination UI */}
+      {pagination && (
+        <div className="flex justify-between items-center mt-4 bg-gray-50 p-2 rounded-md border">
+          <span className="text-sm text-gray-600">
+            Showing page {pagination.page} of {pagination.totalPages} (Total: {pagination.total})
+          </span>
+          <div className="flex space-x-2">
+            <button
+              disabled={pagination.page === 1}
+              onClick={() => onPageChange(parseInt(pagination.page) - 1)}
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <button
+              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => onPageChange(parseInt(pagination.page) + 1)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

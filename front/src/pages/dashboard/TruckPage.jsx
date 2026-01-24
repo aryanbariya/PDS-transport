@@ -1,74 +1,59 @@
 import React, { useState, useEffect, useRef } from "react";
 import TruckForm from "./TruckForm";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import DataTable from "datatables.net-dt";
-import { Player } from "@lottiefiles/react-lottie-player";
-import truckLoader from "@/util/Animation.json";
 import { formatDate } from "@/util/libs/formatDate";
 import Navigation from "@/util/libs/navigation";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
+import DataTable from "@/components/common/DataTable";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
 const TruckPage = () => {
   const [trucks, setTrucks] = useState([]);
-  const [editData, setEditData] = useState(null);
-  const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
   const tableRef = useRef(null);
 
 
-  const fetchTrucks = async () => {
+  const fetchTrucks = async (page = 1) => {
     try {
       setLoading(true);
       let endpoint = `${URL}/api/trucks`;
       if (filter === "active") endpoint = `${URL}/api/trucks/active`;
       if (filter === "inactive") endpoint = `${URL}/api/trucks/inactive`;
 
-      const response = await fetch(endpoint);
+      const response = await fetch(`${endpoint}?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
 
-      const data = await response.json();
-      setTrucks(data || []);
-
-      setTimeout(() => {
-        if (tableRef.current) {
-          $(tableRef.current).DataTable().destroy(); // Destroy existing DataTable
-          $(tableRef.current).DataTable({
-            responsive: true,
-          });
-        }
-      }, 0);
+      const result = await response.json();
+      setTrucks(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
 
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-
   };
 
   useEffect(() => {
-    fetchTrucks();
-  }, [filter]);
+    fetchTrucks(pagination.page);
+  }, [filter, pagination.page]);
 
-  // Reinitialize DataTable when godowns data changes
-  useEffect(() => {
-    if (tableRef.current && trucks.length > 0) {
-      const dataTable = new DataTable(tableRef.current, {
-        destroy: true,
-        responsive: true,
-      });
-
-      return () => {
-        dataTable.destroy();
-      };
-    }
-  }, [trucks]);
+  // Removed jQuery logic
 
   const handleSave = () => {
     setShowForm(false);
@@ -144,68 +129,41 @@ const TruckPage = () => {
         </select>
       </div>
 
-      {loading && <div className="flex justify-center items-center h-64">
-        <Player autoplay loop src={truckLoader} className="w-48 h-48" />
-      </div>}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && (
-        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1" >
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">ID</th>
-                <th className="border p-2">Truck No.</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Empty Weight</th>
-                <th className="border p-2">Company</th>
-                <th className="border p-2">GVW</th>
-                <th className="border p-2">Reg Date</th>
-                <th className="border p-2">Owner</th>
-                <th className="border p-2">Tax Validity</th>
-                <th className="border p-2">Insurance Validity</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {trucks.length > 0 ? (
-                trucks.map((truck) => (
-                  <tr key={truck.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{truck.truck_id}</td>
-                    <td className="border p-2">{truck.truck_name}</td>
-                    <td className="border p-2">{truck.truck_status}</td>
-                    <td className="border p-2">{truck.empty_weight}</td>
-                    <td className="border p-2">{truck.company}</td>
-                    <td className="border p-2">{truck.gvw}</td>
-                    <td className="border p-2">{truck.reg_date ? formatDate(truck.reg_date) : "No Date Provided"}</td>
-                    <td className="border p-2">{truck.truck_owner_name}</td>
-                    <td className="border p-2">{truck.tax_validity ? formatDate(truck.tax_validity) : "No Date Provided"}</td>
-                    <td className="border p-2">{truck.insurance_validity ? formatDate(truck.insurance_validity) : "No Date Provided"}</td>
-                    <td className="border p-2">
-                      <div className="flex justify-start space-x-2">
-                        <button
-                          onClick={() => handleEdit(truck)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(truck.uuid)}
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                        >
-                          Deactivate
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="text-center p-4">No records found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>)}
+      <DataTable
+        data={trucks}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
+        columns={[
+          { key: "truck_id", header: "ID" },
+          { key: "truck_name", header: "Truck No." },
+          { key: "truck_status", header: "Status" },
+          { key: "empty_weight", header: "Empty Weight" },
+          { key: "company", header: "Company" },
+          { key: "gvw", header: "GVW" },
+          {
+            key: "reg_date",
+            header: "Reg Date",
+            render: (t) => t.reg_date ? formatDate(t.reg_date) : "No Date Provided"
+          },
+          { key: "truck_owner_name", header: "Owner" },
+          {
+            key: "tax_validity",
+            header: "Tax Validity",
+            render: (t) => t.tax_validity ? formatDate(t.tax_validity) : "No Date Provided"
+          },
+          {
+            key: "insurance_validity",
+            header: "Insurance Validity",
+            render: (t) => t.insurance_validity ? formatDate(t.insurance_validity) : "No Date Provided"
+          }
+        ]}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDeactivate={handleDelete}
+        actionType="deactivate"
+        emptyMessage="No records found"
+      />
     </div>
   );
 };

@@ -3,8 +3,29 @@ const DO = require("../models/doModel");
 // **Get All DO Records**
 exports.getAllDOs = async (req, res) => {
   try {
-    const dos = await DO.getAll();
-    res.json(dos);
+    if (req.query.nopagination === "true") {
+      const dos = await DO.getAll(99999, 0);
+      return res.json(dos);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [dos, total] = await Promise.all([
+      DO.getAll(limit, offset),
+      DO.getCount()
+    ]);
+
+    res.json({
+      data: dos,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching DO records:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -101,6 +122,17 @@ exports.getAllMSWCGodowns = async (req, res) => {
     res.json(godowns);
   } catch (error) {
     console.error("Error fetching MSWC godowns:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Get Next DO Number**
+exports.getNextDoNo = async (req, res) => {
+  try {
+    const nextDoNo = await DO.getNextDoNo();
+    res.json({ next_do_no: nextDoNo });
+  } catch (error) {
+    console.error("Error fetching next DO number:", error);
     res.status(500).json({ error: "Database fetch error" });
   }
 };

@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import DataTable from "datatables.net-dt";
-import { Player } from "@lottiefiles/react-lottie-player";
-import truckLoader from "@/util/Animation.json";
-import SubGodownForm from "./SubGodownForm";
 import Navigation from "@/util/libs/navigation";
-import Swal from "sweetalert2"; // Import SweetAlert2
+import Swal from "sweetalert2";
+import DataTable from "@/components/common/DataTable";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -18,28 +12,32 @@ const SubGodownPage = () => {
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("all");
-  const tableRef = useRef(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   // Fetch sub-godown data
-  const fetchGodowns = async () => {
+  const fetchGodowns = async (page = 1) => {
     try {
       setLoading(true);
       let endpoint = `${URL}/api/subgodowns`;
       if (filter === "active") endpoint = `${URL}/api/subgodowns/active`;
       if (filter === "inactive") endpoint = `${URL}/api/subgodowns/inactive`;
 
-      const response = await fetch(endpoint);
+      const response = await fetch(`${endpoint}?page=${page}&limit=${pagination.limit}`);
       if (!response.ok) throw new Error("Failed to fetch data");
 
-      const data = await response.json();
-      setGodowns(data || []);
-
-      setTimeout(() => {
-        if (tableRef.current) {
-          $(tableRef.current).DataTable().destroy(); // Destroy existing DataTable
-          $(tableRef.current).DataTable({ responsive: true });
-        }
-      }, 0);
+      const result = await response.json();
+      setGodowns(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
 
       setLoading(false);
     } catch (err) {
@@ -48,24 +46,10 @@ const SubGodownPage = () => {
     }
   };
 
-  // Fetch data when filter changes
+  // Fetch data when filter or page changes
   useEffect(() => {
-    fetchGodowns();
-  }, [filter]);
-
-  // Reinitialize DataTable when godowns data changes
-  useEffect(() => {
-    if (tableRef.current && godowns.length > 0) {
-      const dataTable = new DataTable(tableRef.current, {
-        destroy: true,
-        responsive: true,
-      });
-
-      return () => {
-        dataTable.destroy();
-      };
-    }
-  }, [godowns]);
+    fetchGodowns(pagination.page);
+  }, [filter, pagination.page]);
 
   // Handle delete (deactivate godown)
   const handleDelete = async (uuid) => {
@@ -144,60 +128,42 @@ const SubGodownPage = () => {
         </select>
       </div>
 
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Player autoplay loop src={truckLoader} className="w-48 h-48" />
-        </div>
-      )}
       {error && <p className="text-red-500">{error}</p>}
 
-      {!loading && (
-        <div className="bg-white mt-3 rounded-md shadow-md p-4 overflow-auto flex-1">
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">ID</th>
-                <th className="border p-2">MSWC Godown</th>
-                <th className="border p-2">Sub Godown Name</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {godowns.length > 0 ? (
-                godowns.map((g) => (
-                  <tr key={g.uuid} className="text-start hover:bg-gray-100">
-                    <td className="border p-2">{g.subgodown_id}</td>
-                    <td className="border p-2">{g.parentGodown}</td>
-                    <td className="border p-2">{g.subGodown}</td>
-                    <td className="border p-2">{g.status}</td>
-                    <td className="border p-2">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          onClick={() => handleEdit(g)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(g.uuid)}
-                          className="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-700"
-                        >
-                          Deactivate
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center p-4">No records found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        data={godowns}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
+        columns={[
+          {
+            key: "subgodown_id",
+            header: "ID",
+            render: (g) => g.subgodown_id
+          },
+          {
+            key: "parentGodown",
+            header: "MSWC Godown",
+            render: (g) => g.parentGodown
+          },
+          {
+            key: "subGodown",
+            header: "Sub Godown Name",
+            render: (g) => g.subGodown
+          },
+          {
+            key: "status",
+            header: "Status",
+            render: (g) => g.status
+          }
+        ]}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDeactivate={handleDelete}
+        actionType="deactivate"
+        emptyMessage="No records found"
+        actionColumnClassName="border p-2 flex justify-center space-x-2"
+      />
     </div>
   );
 };

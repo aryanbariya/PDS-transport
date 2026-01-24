@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get All Packaging Materials**
 exports.getAllPackaging = async (req, res) => {
   try {
-    const packaging = await Packaging.getAll();
-    res.json(packaging);
+    if (req.query.nopagination === "true") {
+      const packaging = await Packaging.getAll(99999, 0);
+      return res.json(packaging);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [packaging, total] = await Promise.all([
+      Packaging.getAll(limit, offset),
+      Packaging.getCount()
+    ]);
+
+    res.json({
+      data: packaging,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching packaging materials:", error);
     res.status(500).json({ error: "Database fetch error" });

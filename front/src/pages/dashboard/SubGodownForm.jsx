@@ -16,7 +16,7 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
   useEffect(() => {
     const fetchGodowns = async () => {
       try {
-        const response = await fetch(`${URL}/api/subgodowns/godowns`);
+        const response = await fetch(`${URL}/api/subgodowns/godowns?nopagination=true`);
         if (!response.ok) throw new Error("Failed to fetch godowns");
 
         const data = await response.json();
@@ -169,11 +169,10 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
             <button
               type="submit"
               disabled={loading}
-              className={`py-2 px-4 rounded-lg ${
-                !loading
+              className={`py-2 px-4 rounded-lg ${!loading
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
+                }`}
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}
             </button>

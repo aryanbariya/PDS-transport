@@ -4,8 +4,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get All Categories**
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.getAll();
-    res.json(categories);
+    if (req.query.nopagination === "true") {
+      const categories = await Category.getAll(99999, 0);
+      return res.json(categories);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [categories, total] = await Promise.all([
+      Category.getAll(limit, offset),
+      Category.getCount()
+    ]);
+
+    res.json({
+      data: categories,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ error: "Database fetch error" });

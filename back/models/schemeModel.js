@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
 class Scheme {
-  // Get all schemes
-  static getAll() {
+  // Get paginated schemes
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, scheme_id, scheme_name, scheme_status FROM scheme ORDER BY scheme_name DESC";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, scheme_id, scheme_name, scheme_status FROM scheme ORDER BY scheme_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total schemes count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM scheme";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

@@ -2,11 +2,32 @@ const { v4: uuidv4 } = require("uuid");
 const Owner = require("../models/ownerModel");
 const updateTableStats = require("../utils/updateTableStats");
 
-// **Get All Owners**
+// **Get Paginated Owners**
 exports.getAllOwners = async (req, res) => {
   try {
-    const owners = await Owner.getAll();
-    res.json(owners);
+    if (req.query.nopagination === "true") {
+      const owners = await Owner.getAll(99999, 0);
+      return res.json(owners);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [owners, total] = await Promise.all([
+      Owner.getAll(limit, offset),
+      Owner.getCount()
+    ]);
+
+    res.json({
+      data: owners,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching owners:", error);
     res.status(500).json({ error: "Database fetch error" });

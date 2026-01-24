@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
 class DO {
-  // Get all DO records
-  static getAll() {
+  // Get paginated DO records
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY do_no DESC";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT stock_id, do_no, scheme_id, cota, do_date, godown_id, grain_id, quintal, quantity, total_amount, expire_date FROM do ORDER BY do_no DESC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total DO records count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM do";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }
@@ -23,13 +34,23 @@ class DO {
     });
   }
 
+  // Get the next DO number
+  static getNextDoNo() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COALESCE(MAX(CAST(do_no AS UNSIGNED)), 0) + 1 AS next_do_no FROM do";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].next_do_no);
+      });
+    });
+  }
   // Get DO entries by DO ID
   static getEntriesByDOId(doNo) {
     return new Promise((resolve, reject) => {
       const sql = "SELECT * FROM do_entries WHERE do_id = ?";
       db.query(sql, [doNo], (err, results) => {
         if (err) return reject(err);
-        resolve(results[0]); // Return the first result
+        resolve(results[0]);
       });
     });
   }

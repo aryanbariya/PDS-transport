@@ -1,35 +1,68 @@
 const db = require("../config/db");
 
 class Driver {
-  // Get all active drivers
-  static getActive() {
+  // Get paginated active drivers
+  static getActive(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Active' ORDER BY driver_id";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Active' ORDER BY driver_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
       });
     });
   }
 
-  // Get all inactive drivers
-  static getInactive() {
+  // Get total active drivers count
+  static getActiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Inactive' ORDER BY driver_id";
+      const sql = "SELECT COUNT(*) as total FROM drivers WHERE status = 'Active'";
       db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Get paginated inactive drivers
+  static getInactive(limit = 10, offset = 0) {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers WHERE status = 'Inactive' ORDER BY driver_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
       });
     });
   }
 
-  // Get all drivers
-  static getAll() {
+  // Get total inactive drivers count
+  static getInactiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers ORDER BY driver_id";
+      const sql = "SELECT COUNT(*) as total FROM drivers WHERE status = 'Inactive'";
       db.query(sql, (err, results) => {
         if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Get paginated drivers
+  static getAll(limit = 10, offset = 0) {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers ORDER BY driver_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
+        if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total drivers count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM drivers";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

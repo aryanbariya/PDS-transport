@@ -22,7 +22,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     },
     entries: [],
   });
-  
+
 
   const [showSecondForm, setShowSecondForm] = useState(false);
   const [godowns, setGodowns] = useState([]);
@@ -37,6 +37,9 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     fetchSchemes();
     fetchGrains();
     fetchsubGodowns();
+    if (!editData) {
+      fetchNextDoNo();
+    }
     if (editData) {
       console.log("editData", editData);
       setFormData({
@@ -57,9 +60,20 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
 
 
+  const fetchNextDoNo = async () => {
+    try {
+      const response = await fetch(`${URL}/api/do/next-do`);
+      if (!response.ok) throw new Error("Failed to fetch next DO number");
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, doNo: data.next_do_no }));
+    } catch (err) {
+      console.error("Error fetching next DO number:", err);
+    }
+  };
+
   const fetchGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/mswc`);
+      const response = await fetch(`${URL}/api/mswc?nopagination=true`);
       if (!response.ok) throw new Error("Failed to fetch godowns");
       const data = await response.json();
       setGodowns(data || []);
@@ -69,7 +83,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   };
   const fetchsubGodowns = async () => {
     try {
-      const response = await fetch(`${URL}/api/subgodowns`);
+      const response = await fetch(`${URL}/api/subgodowns?nopagination=true`);
       if (!response.ok) throw new Error("Failed to fetch godowns");
       const data = await response.json();
       setsubGodowns(data || []);
@@ -80,7 +94,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const fetchSchemes = async () => {
     try {
-      const response = await fetch(`${URL}/api/schemes`);
+      const response = await fetch(`${URL}/api/schemes?nopagination=true`);
       if (!response.ok) throw new Error("Failed to fetch schemes");
       const data = await response.json();
       setSchemes(data || []);
@@ -91,7 +105,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const fetchGrains = async () => {
     try {
-      const response = await fetch(`${URL}/api/grains`);
+      const response = await fetch(`${URL}/api/grains?nopagination=true`);
       if (!response.ok) throw new Error("Failed to fetch grains");
       const data = await response.json();
       setGrains(data || []);
@@ -104,7 +118,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validation for numeric fields
     if (name === 'doNo' || name === 'quantity') {
       // Only allow numbers and empty string
@@ -138,7 +152,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       }));
     }
   };
-  
+
   const handleAddEntry = () => {
     const { godown, vahtuk, quantity } = secondForm.current;
     if (!godown || !vahtuk || !quantity) {
@@ -149,13 +163,13 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       });
       return;
     }
-  
+
     setSecondForm((prev) => ({
       current: { godown: "", vahtuk: "", quantity: "" },
       entries: [...prev.entries, { godown, vahtuk, quantity }],
     }));
   };
-  
+
   const handleFirstFormSubmit = async (e) => {
     e.preventDefault();
     setShowSecondForm(true);
@@ -169,14 +183,14 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       return { ...prev, entries: updatedEntries };
     });
   };
-  
+
 
   const handleFinalSubmit = async () => {
     try {
-      const url = editData 
+      const url = editData
         ? `${URL}/api/do/${editData.stock_id}`
         : `${URL}/api/do`;
-      
+
       const method = editData ? "PUT" : "POST";
 
       const requestData = {
@@ -225,8 +239,8 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
       });
     }
   };
-  console.log("second",secondForm);
-  
+  console.log("second", secondForm);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -499,7 +513,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {secondForm.entries.map((entry,index) => (
+                  {secondForm.entries.map((entry, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{entry.godown}</td>
@@ -543,7 +557,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
   );
 };
 
-export default DOGenerateForm; 
+export default DOGenerateForm;
 
 
 

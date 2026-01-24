@@ -28,8 +28,29 @@ exports.getSubGodowns = async (req, res) => {
 // **Get All Employees**
 exports.getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.getAll();
-    res.json(employees);
+    if (req.query.nopagination === "true") {
+      const employees = await Employee.getAll(99999, 0);
+      return res.json(employees);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [employees, total] = await Promise.all([
+      Employee.getAll(limit, offset),
+      Employee.getCount()
+    ]);
+
+    res.json({
+      data: employees,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching employees:", error);
     res.status(500).json({ error: "Database fetch error" });

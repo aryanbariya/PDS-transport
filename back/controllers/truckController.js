@@ -15,8 +15,29 @@ exports.getAllTrucksByOwner = async (req, res) => {
 // **Get All Trucks**
 exports.getAllTrucks = async (req, res) => {
   try {
-    const trucks = await Truck.getAll();
-    res.json(trucks);
+    if (req.query.nopagination === "true") {
+      const trucks = await Truck.getAll(99999, 0);
+      return res.json(trucks);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [trucks, total] = await Promise.all([
+      Truck.getAll(limit, offset),
+      Truck.getCount()
+    ]);
+
+    res.json({
+      data: trucks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching trucks:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -26,8 +47,29 @@ exports.getAllTrucks = async (req, res) => {
 // **Get Active Trucks**
 exports.getActiveTrucks = async (req, res) => {
   try {
-    const trucks = await Truck.getActive();
-    res.json(trucks);
+    if (req.query.nopagination === "true") {
+      const trucks = await Truck.getActive(99999, 0);
+      return res.json(trucks);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [trucks, total] = await Promise.all([
+      Truck.getActive(limit, offset),
+      Truck.getActiveCount()
+    ]);
+
+    res.json({
+      data: trucks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching active trucks:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -37,8 +79,29 @@ exports.getActiveTrucks = async (req, res) => {
 // **Get Inactive Trucks**
 exports.getInactiveTrucks = async (req, res) => {
   try {
-    const trucks = await Truck.getInactive();
-    res.json(trucks);
+    if (req.query.nopagination === "true") {
+      const trucks = await Truck.getInactive(99999, 0);
+      return res.json(trucks);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [trucks, total] = await Promise.all([
+      Truck.getInactive(limit, offset),
+      Truck.getInactiveCount()
+    ]);
+
+    res.json({
+      data: trucks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching inactive trucks:", error);
     res.status(500).json({ error: "Database fetch error" });

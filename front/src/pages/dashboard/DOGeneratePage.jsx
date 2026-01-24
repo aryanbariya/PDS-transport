@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@material-tailwind/react";
-import $ from "jquery";
-import "datatables.net-dt/css/dataTables.dataTables.min.css";
-import "datatables.net-dt";
-import "datatables.net-buttons-dt/css/buttons.dataTables.min.css";
-import "datatables.net-buttons-dt";
-import { Player } from "@lottiefiles/react-lottie-player";
-import loadingAnimation from "@/util/Animation.json";
 import DOGenerateForm from "./DOGenerateForm";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
-import {formatDate} from "@/util/libs/formatDate"; 
+import DataTable from "@/components/common/DataTable";
+import { formatDate } from "@/util/libs/formatDate";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 
@@ -23,60 +16,71 @@ const DOGeneratePage = () => {
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const tableRef = useRef(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
 
   useEffect(() => {
-    fetchData();
+    fetchLookups();
   }, []);
 
   useEffect(() => {
-    if (orders.length > 0 && tableRef.current) {
-      $(tableRef.current).DataTable({
-        destroy: true, // Important to prevent duplicate init
-        order: []      // This disables default sorting and keeps backend order
-      });
-    }
-  }, [orders]);
-  
+    fetchOrders(pagination.page);
+  }, [pagination.page]);
 
-  const fetchData = async () => {
+  // DataTable will handle its own re-initialization
+
+
+  const fetchLookups = async () => {
     try {
-      const [ordersRes, grainsRes, godownRes, schemeRes ] = await Promise.all([
-        fetch(`${URL}/api/do`),
-        fetch(`${URL}/api/grains`),
-        fetch(`${URL}/api/mswc`),
-        fetch(`${URL}/api/schemes`)
+      const [grainsRes, godownRes, schemeRes] = await Promise.all([
+        fetch(`${URL}/api/grains?nopagination=true`),
+        fetch(`${URL}/api/mswc?nopagination=true`),
+        fetch(`${URL}/api/schemes?nopagination=true`)
       ]);
 
-      if (!ordersRes.ok) throw new Error("Failed to fetch orders");
-      if (!grainsRes.ok) throw new Error("Failed to fetch grains");
-      if (!godownRes.ok) throw new Error("Failed to fetch mswc");
-      if (!schemeRes.ok) throw new Error("Failed to fetch scheme");
-
-      const ordersData = await ordersRes.json();
       const grainsData = await grainsRes.json();
       const godownData = await godownRes.json();
       const schemesData = await schemeRes.json();
 
-      setOrders(ordersData);
       setGrains(grainsData);
       setgodown(godownData);
       setSchemes(schemesData);
-     
+    } catch (err) {
+      console.error("Error fetching lookups:", err);
+    }
+  };
+
+  const fetchOrders = async (page = 1) => {
+    try {
+      setLoading(true);
+      const ordersRes = await fetch(`${URL}/api/do?page=${page}&limit=${pagination.limit}`);
+      if (!ordersRes.ok) throw new Error("Failed to fetch orders");
+
+      const result = await ordersRes.json();
+      setOrders(result.data || []);
+      setPagination(prev => ({
+        ...prev,
+        page: result.pagination.page,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages
+      }));
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  
   };
-  console.log("gogo",godowns);
+  console.log("gogo", godowns);
 
   const handleEdit = async (doNo) => {
     try {
       const response = await fetch(`${URL}/api/do/${doNo}`);
       if (!response.ok) throw new Error("Failed to fetch DO data");
-  
+
       const data = await response.json();
       setEditData(data); // Includes both the main DO data and the entries array
       setShowForm(true);
@@ -90,7 +94,7 @@ const DOGeneratePage = () => {
     }
   };
 
- 
+
 
 
   const handleDelete = async (uuid) => {
@@ -108,7 +112,7 @@ const DOGeneratePage = () => {
           const response = await fetch(`${URL}/api/do/${uuid}`, { method: "DELETE" });
           if (response.ok) {
             Swal.fire("Deleted!", "Order deleted successfully!", "success");
-            fetchData();
+            fetchOrders();
           } else {
             Swal.fire("Error", "Failed to delete order.", "error");
           }
@@ -135,12 +139,12 @@ const DOGeneratePage = () => {
     const group = godowns.find(j => String(j.mswc_id) === String(godownId));
     return group ? group.godownUnder : "Unknown";
   };
-  console.log("order",orders);
+  console.log("order", orders);
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
       <div className="bg-[#2A3042] text-white text-lg font-semibold py-2 px-6 rounded-md w-full flex justify-between items-center">
-        <span><Navigation/></span>
+        <span><Navigation /></span>
         <button
           className="ml-3 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
           onClick={() => setShowForm(!showForm)}
@@ -168,79 +172,76 @@ const DOGeneratePage = () => {
                 </svg>
               </button>
             </div>
-            <DOGenerateForm 
+            <DOGenerateForm
               onClose={() => {
                 setShowForm(false);
                 setEditData(null);
-              }} 
+              }}
               onSave={() => {
-                fetchData();
+                fetchOrders();
                 setShowForm(false);
                 setEditData(null);
-              }} 
-              editData={editData} 
+              }}
+              editData={editData}
             />
           </div>
         </div>
       )}
 
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <Player autoplay loop src={loadingAnimation} className="w-48 h-48" />
-        </div>
-      )}
-
       {error && <p className="text-red-500">{error}</p>}
-      
-      {!loading && (
-        <div className="bg-white mt-3 w-full rounded-md shadow-md p-4 overflow-auto flex-1">
-          <table ref={tableRef} className="display w-full border border-gray-300 bg-white shadow-md rounded-md">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2 text-left">D.O. No.</th>
-                <th className="border p-2 text-left">Base Godown</th>
-                <th className="border p-2 text-left">D.O. Date</th>
-                <th className="border p-2 text-left">Quota Validity Date</th>
-                <th className="border p-2 text-left">Scheme</th>
-                <th className="border p-2 text-left">Grain</th>
-                <th className="border p-2 text-left">Quantity</th>
-                <th className="border p-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order.stock_id} className="hover:bg-gray-100">
-                  <td className="border p-2 text-left">{`${order.do_no} - ${getGroupUnder(order.godown_id)}`}</td>
-                  <td className="border p-2 text-left">{getGodownName(order.godown_id)}</td>
-                  <td className="border p-2 text-left">{formatDate(order.do_date)}</td>
-                  <td className="border p-2 text-left">{formatDate(order.cota)}</td>
-                  <td className="border p-2 text-left">{getSchemeName(order.scheme_id)}</td>
-                  <td className="border p-2 text-left">{getGrainName(order.grain_id)}</td>
-                  <td className="border p-2 text-left">{order.quantity}</td>
-                  <td className="border p-2 text-left">
-                    <div className="flex justify-start space-x-2">
-                      <Button
-                        onClick={() => handleEdit(order.do_no)}
-                        
-                        className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(order.stock_id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                    <Button variant="text"  className="text-light-blue-500" >Allocation</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+
+      <DataTable
+        data={orders}
+        pagination={pagination}
+        onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
+        columns={[
+          {
+            key: "do_no",
+            header: "D.O. No.",
+            render: (order) => `${order.do_no} - ${getGroupUnder(order.godown_id)}`
+          },
+          {
+            key: "godown_id",
+            header: "Base Godown",
+            render: (order) => getGodownName(order.godown_id)
+          },
+          {
+            key: "do_date",
+            header: "D.O. Date",
+            render: (order) => formatDate(order.do_date)
+          },
+          {
+            key: "cota",
+            header: "Quota Validity Date",
+            render: (order) => formatDate(order.cota)
+          },
+          {
+            key: "scheme_id",
+            header: "Scheme",
+            render: (order) => getSchemeName(order.scheme_id)
+          },
+          {
+            key: "grain_id",
+            header: "Grain",
+            render: (order) => getGrainName(order.grain_id)
+          },
+          {
+            key: "quantity",
+            header: "Quantity"
+          }
+        ]}
+        loading={loading}
+        error={error}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        actionType="delete"
+        customActions={(order) => (
+          <button className="text-light-blue-500 hover:text-blue-700 font-medium px-2 py-1">
+            Allocation
+          </button>
+        )}
+        emptyMessage="No orders found"
+      />
     </div>
   );
 };

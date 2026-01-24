@@ -1,8 +1,8 @@
 const db = require("../config/db");
 
 class Truck {
-  
-  static getAllTrucksByOwner () {
+
+  static getAllTrucksByOwner() {
     return new Promise((resolve, reject) => {
       const sql = "SELECT uuid, ownerName, owner_id FROM owners ORDER BY owner_id";
       db.query(sql, (err, results) => {
@@ -11,35 +11,68 @@ class Truck {
       });
     });
   }
-  // Get all trucks
-  static getAll() {
+  // Get paginated trucks
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck ORDER BY truck_id";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
       });
     });
   }
 
-  // Get all active trucks
-  static getActive() {
+  // Get total trucks count
+  static getCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Active' ORDER BY truck_id";
+      const sql = "SELECT COUNT(*) as total FROM truck";
       db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Get paginated active trucks
+  static getActive(limit = 10, offset = 0) {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Active' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
       });
     });
   }
 
-  // Get all inactive trucks
-  static getInactive() {
+  // Get total active trucks count
+  static getActiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Inactive' ORDER BY truck_id";
+      const sql = "SELECT COUNT(*) as total FROM truck WHERE truck_status = 'Active'";
       db.query(sql, (err, results) => {
         if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Get paginated inactive trucks
+  static getInactive(limit = 10, offset = 0) {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Inactive' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
+        if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total inactive trucks count
+  static getInactiveCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM truck WHERE truck_status = 'Inactive'";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

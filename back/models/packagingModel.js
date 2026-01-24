@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
 class Packaging {
-  // Get all packaging materials
-  static getAll() {
+  // Get paginated packaging materials
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, pack_id, material_name, weight, status FROM packaging ORDER BY pack_id";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, pack_id, material_name, weight, status FROM packaging ORDER BY pack_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total packaging count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM packaging";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

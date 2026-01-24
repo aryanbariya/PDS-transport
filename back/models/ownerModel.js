@@ -1,13 +1,24 @@
 const db = require("../config/db");
 
 class Owner {
-  // Get all owners
-  static getAll() {
+  // Get paginated owners
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners ORDER BY owner_id DESC";
-      db.query(sql, (err, results) => {
+      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners ORDER BY owner_id ASC LIMIT ? OFFSET ?";
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total records count for pagination
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM owners";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }

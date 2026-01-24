@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get All Schemes**
 exports.getAllSchemes = async (req, res) => {
   try {
-    const schemes = await Scheme.getAll();
-    res.json(schemes);
+    if (req.query.nopagination === "true") {
+      const schemes = await Scheme.getAll(99999, 0);
+      return res.json(schemes);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [schemes, total] = await Promise.all([
+      Scheme.getAll(limit, offset),
+      Scheme.getCount()
+    ]);
+
+    res.json({
+      data: schemes,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching schemes:", error);
     res.status(500).json({ error: "Database fetch error" });

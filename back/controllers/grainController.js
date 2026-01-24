@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get All Grains**
 exports.getAllGrains = async (req, res) => {
   try {
-    const grains = await Grain.getAll();
-    res.json(grains);
+    if (req.query.nopagination === "true") {
+      const grains = await Grain.getAll(99999, 0);
+      return res.json(grains);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [grains, total] = await Promise.all([
+      Grain.getAll(limit, offset),
+      Grain.getCount()
+    ]);
+
+    res.json({
+      data: grains,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching grains:", error);
     res.status(500).json({ error: "Database query failed" });

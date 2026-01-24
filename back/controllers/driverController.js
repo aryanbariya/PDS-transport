@@ -5,8 +5,29 @@ const updateTableStats = require("../utils/updateTableStats");
 // **Get Active Drivers**
 exports.getActiveDrivers = async (req, res) => {
   try {
-    const drivers = await Driver.getActive();
-    res.json(drivers);
+    if (req.query.nopagination === "true") {
+      const drivers = await Driver.getActive(99999, 0);
+      return res.json(drivers);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [drivers, total] = await Promise.all([
+      Driver.getActive(limit, offset),
+      Driver.getActiveCount()
+    ]);
+
+    res.json({
+      data: drivers,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching active drivers:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -16,8 +37,29 @@ exports.getActiveDrivers = async (req, res) => {
 // **Get Inactive Drivers**
 exports.getInactiveDrivers = async (req, res) => {
   try {
-    const drivers = await Driver.getInactive();
-    res.json(drivers);
+    if (req.query.nopagination === "true") {
+      const drivers = await Driver.getInactive(99999, 0);
+      return res.json(drivers);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [drivers, total] = await Promise.all([
+      Driver.getInactive(limit, offset),
+      Driver.getInactiveCount()
+    ]);
+
+    res.json({
+      data: drivers,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching inactive drivers:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -27,8 +69,29 @@ exports.getInactiveDrivers = async (req, res) => {
 // **Get All Drivers**
 exports.getAllDrivers = async (req, res) => {
   try {
-    const drivers = await Driver.getAll();
-    res.json(drivers);
+    if (req.query.nopagination === "true") {
+      const drivers = await Driver.getAll(99999, 0);
+      return res.json(drivers);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [drivers, total] = await Promise.all([
+      Driver.getAll(limit, offset),
+      Driver.getCount()
+    ]);
+
+    res.json({
+      data: drivers,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching all drivers:", error);
     res.status(500).json({ error: "Database fetch error" });
