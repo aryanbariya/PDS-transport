@@ -48,7 +48,7 @@ export function Home() {
       ) : (
         <div className="mb-8 grid gap-y-8 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
           {data.map(({ icon, title, link, totalLabel, footer, ...rest }, index) => (
-            <div 
+            <div
               key={title}
               className="animate-fade-in"
               style={{
@@ -66,6 +66,7 @@ export function Home() {
                   className: "w-6 h-6 text-white",
                 })}
                 link={link}
+                footer={footer.value}
               />
             </div>
           ))}

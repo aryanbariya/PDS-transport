@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const MSWC = require("../models/mswcModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get Active MSWC Godowns**
 exports.getActiveGodowns = async (req, res) => {
@@ -62,6 +63,7 @@ exports.addGodown = async (req, res) => {
     const mswc_id = await MSWC.getNextId();
 
     await MSWC.add({ uuid, godownName, godownUnder, mswc_id, status });
+    updateTableStats('mswc_godowns');
 
     res.status(201).json({ message: "Godown added successfully", uuid, mswc_id, status });
   } catch (error) {
@@ -84,6 +86,7 @@ exports.updateGodown = async (req, res) => {
     const result = await MSWC.update(req.params.uuid, { godownName, godownUnder, status: updatedStatus });
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
+    updateTableStats('mswc_godowns');
     }
     res.json({ message: "Godown updated successfully" });
   } catch (error) {
@@ -99,6 +102,7 @@ exports.deleteGodown = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
     }
+    updateTableStats('mswc_godowns');
     res.json({ message: "Godown status updated to Inactive successfully!" });
   } catch (error) {
     console.error("Error deleting godown:", error);

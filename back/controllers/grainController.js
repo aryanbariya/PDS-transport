@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Grain = require("../models/grainModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Grains**
 exports.getAllGrains = async (req, res) => {
@@ -39,6 +40,7 @@ exports.addGrain = async (req, res) => {
     const nextGrainId = await Grain.getNextGrainId();
 
     await Grain.add({ uuid, grainName, godownName, grain_id: nextGrainId });
+    updateTableStats('grains');
 
     res.status(201).json({ message: "Grain added successfully", uuid, grain_id: nextGrainId });
   } catch (error) {
@@ -62,6 +64,7 @@ exports.updateGrain = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Grain not found" });
     }
+    updateTableStats('grains');
     res.json({ message: "Grain updated successfully" });
   } catch (error) {
     console.error("Error updating grain:", error);
@@ -78,6 +81,7 @@ exports.deleteGrain = async (req, res) => {
     }
 
     await Grain.resetGrainIds();
+    updateTableStats('grains');
     res.json({ message: "Grain deleted and grain IDs reset successfully!" });
   } catch (error) {
     console.error("Error deleting grain:", error);

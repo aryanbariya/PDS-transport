@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Packaging = require("../models/packagingModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Packaging Materials**
 exports.getAllPackaging = async (req, res) => {
@@ -39,6 +40,7 @@ exports.addPackaging = async (req, res) => {
     const pack_id = await Packaging.getNextPackId();
 
     await Packaging.add({ uuid, material_name, weight, status, pack_id });
+    updateTableStats('packaging');
 
     res.status(201).json({ message: "Packaging material added successfully", uuid, pack_id });
   } catch (error) {
@@ -60,6 +62,7 @@ exports.updatePackaging = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Packaging material not found" });
     }
+    updateTableStats('packaging');
     res.json({ message: "Packaging material updated successfully" });
   } catch (error) {
     console.error("Error updating packaging material:", error);
@@ -76,6 +79,7 @@ exports.deletePackaging = async (req, res) => {
     }
 
     await Packaging.resetPackIds();
+    updateTableStats('packaging');
     res.json({ message: "Packaging material deleted and pack_id reset successfully!" });
   } catch (error) {
     console.error("Error deleting packaging material:", error);

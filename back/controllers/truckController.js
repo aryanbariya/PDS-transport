@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Truck = require("../models/truckModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Trucks Ordered by Truck ID**
 exports.getAllTrucksByOwner = async (req, res) => {
@@ -75,6 +76,7 @@ exports.addTruck = async (req, res) => {
       tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null,
       permit_validity_date || null, direct_sale, truck_id
     ]);
+    updateTableStats('truck');
 
     res.status(201).json({ message: "Truck added successfully", uuid, truck_id });
   } catch (error) {
@@ -116,6 +118,7 @@ exports.updateTruck = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Truck not found" });
     }
+    updateTableStats('truck');
     res.json({ message: "Truck updated successfully" });
   } catch (error) {
     console.error("Error updating truck:", error);
@@ -130,6 +133,7 @@ exports.deleteTruck = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Truck not found" });
     }
+    updateTableStats('truck');
     res.json({ message: "Truck status updated to Inactive successfully!" });
   } catch (error) {
     console.error("Error deleting truck:", error);

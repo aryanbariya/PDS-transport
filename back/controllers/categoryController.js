@@ -1,4 +1,5 @@
 const Category = require("../models/categoryModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Categories**
 exports.getAllCategories = async (req, res) => {
@@ -35,6 +36,7 @@ exports.addCategory = async (req, res) => {
     }
 
     const result = await Category.add({ category_name, description });
+    updateTableStats('categories');
     res.status(201).json({ message: "Category added successfully", category_id: result.insertId });
   } catch (error) {
     console.error("Error adding category:", error);
@@ -55,6 +57,7 @@ exports.updateCategory = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Category not found" });
     }
+    updateTableStats('categories');
     res.json({ message: "Category updated successfully" });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -69,6 +72,7 @@ exports.deleteCategory = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Category not found" });
     }
+    updateTableStats('categories');
     res.json({ message: "Category deleted successfully" });
   } catch (error) {
     console.error("Error deleting category:", error);

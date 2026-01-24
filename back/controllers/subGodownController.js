@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const SubGodown = require("../models/subGodownModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get Active Sub-Godowns**
 exports.getActiveSubGodowns = async (req, res) => {
@@ -68,6 +69,7 @@ exports.addSubGodown = async (req, res) => {
     const subgodown_id = await SubGodown.getNextSubGodownId();
 
     await SubGodown.add({ uuid, parentGodown, subGodown, status, subgodown_id });
+    updateTableStats('sub_godown');
 
     res.status(201).json({ message: "Sub-Godown added successfully", uuid });
   } catch (error) {
@@ -87,6 +89,7 @@ exports.updateSubGodown = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
     }
+    updateTableStats('sub_godown');
     res.json({ message: "Godown updated successfully" });
   } catch (error) {
     console.error("Error updating sub-godown:", error);
@@ -101,6 +104,7 @@ exports.deleteSubGodown = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Godown not found" });
     }
+    updateTableStats('sub_godown');
     res.json({ message: "Godown status updated to Inactive successfully!" });
   } catch (error) {
     console.error("Error deleting sub-godown:", error);

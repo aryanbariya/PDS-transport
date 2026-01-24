@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Owner = require("../models/ownerModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Owners**
 exports.getAllOwners = async (req, res) => {
@@ -39,6 +40,7 @@ exports.addOwner = async (req, res) => {
     const owner_id = await Owner.getNextOwnerId();
 
     await Owner.add({ uuid, ownerName, contact, address, emailID, owner_id });
+    updateTableStats('owners');
 
     res.status(201).json({ message: "Owner added successfully", uuid, owner_id });
   } catch (error) {
@@ -78,6 +80,7 @@ exports.updateOwner = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Owner not found" });
     }
+    updateTableStats('owners');
     res.json({ message: "Owner updated successfully" });
   } catch (error) {
     console.error("Error updating owner:", error);
@@ -93,6 +96,7 @@ exports.deleteOwner = async (req, res) => {
       return res.status(404).json({ message: "Owner not found" });
     }
 
+    updateTableStats('owners');
     await Owner.resetOwnerIds();
     res.json({ message: "Owner deleted and owner_id reset successfully!" });
   } catch (error) {

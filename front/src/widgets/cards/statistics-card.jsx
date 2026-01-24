@@ -11,12 +11,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./card-styles.css"; // Import our custom styles
 
-export function StatisticsCard({ 
-  color, 
-  icon, 
-  title, 
-  value, 
-  footer, 
+export function StatisticsCard({
+  color,
+  icon,
+  title,
+  value,
+  footer,
   link,
   bgGradient,
   tooltipText,
@@ -24,14 +24,14 @@ export function StatisticsCard({
   totalLabel
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
 
   // Define default gradient if not provided
   const defaultGradient = `bg-gradient-to-br from-${color}-400 to-${color}-600`;
   const gradient = bgGradient || defaultGradient;
-  
+
   // Card wrapper to handle link navigation
   const CardWrapper = ({ children }) => {
     if (link) {
@@ -44,13 +44,13 @@ export function StatisticsCard({
   const formatTitle = (text) => {
     // If already contains spaces, assume it's already formatted
     if (text.includes(' ')) return text;
-    
+
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
   return (
     <CardWrapper>
-      <Card 
+      <Card
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={`
@@ -60,13 +60,13 @@ export function StatisticsCard({
         `}
       >
         {/* Background gradient with reduced opacity */}
-        <div 
+        <div
           className={`absolute inset-0 opacity-10 ${gradient}`}
         ></div>
-        
+
         {/* Glass effect overlay */}
         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-[2px]"></div>
-        
+
         <div className="relative z-10">
           <CardHeader
             className={`mx-4 mt-4 flex items-center justify-between p-0`}
@@ -74,7 +74,7 @@ export function StatisticsCard({
             shadow={false}
             floated={false}
           >
-            <div 
+            <div
               className={`
                 w-14 h-14 grid place-items-center rounded-lg shadow-lg
                 ${iconBgColor || gradient}
@@ -83,7 +83,7 @@ export function StatisticsCard({
             >
               {icon}
             </div>
-            
+
             <Tooltip content={tooltipText || `View ${title.toLowerCase()} details`} className="z-50">
               <div className={`
                 flex flex-col items-end 
@@ -99,8 +99,8 @@ export function StatisticsCard({
 
           <CardBody className="px-4 pt-2 pb-4">
             <div className="flex flex-col">
-              <Typography 
-                variant="paragraph" 
+              <Typography
+                variant="paragraph"
                 className={`
                   font-semibold tracking-normal text-sm
                   transition-colors duration-300
@@ -110,9 +110,10 @@ export function StatisticsCard({
                 {title}
               </Typography>
             </div>
+            <span>{footer}</span>
           </CardBody>
         </div>
-        
+
         {/* Highlight border on hover */}
         <div className={`
           absolute inset-0 border-2 rounded-xl pointer-events-none

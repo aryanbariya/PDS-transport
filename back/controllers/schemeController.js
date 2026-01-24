@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Scheme = require("../models/schemeModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Schemes**
 exports.getAllSchemes = async (req, res) => {
@@ -39,6 +40,7 @@ exports.addScheme = async (req, res) => {
     const scheme_id = await Scheme.getNextSchemeId();
 
     await Scheme.add({ uuid, scheme_name, scheme_status, scheme_id });
+    updateTableStats('scheme');
 
     res.status(201).json({ message: "Scheme added successfully", uuid, scheme_id });
   } catch (error) {
@@ -60,6 +62,7 @@ exports.updateScheme = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Scheme not found" });
     }
+    updateTableStats('scheme');
     res.json({ message: "Scheme updated successfully" });
   } catch (error) {
     console.error("Error updating scheme:", error);
@@ -76,6 +79,7 @@ exports.deleteScheme = async (req, res) => {
     }
 
     await Scheme.resetSchemeIds();
+    updateTableStats('scheme');
     res.json({ message: "Scheme deleted and scheme IDs reset successfully!" });
   } catch (error) {
     console.error("Error deleting scheme:", error);

@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { v4: uuidv4 } = require("uuid");
 const Employee = require("../models/employeeModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Categories**
 exports.getCategories = async (req, res) => {
@@ -63,6 +64,7 @@ exports.addEmployee = async (req, res) => {
     const nextOrder = await Employee.getNextOrderNumber();
 
     await Employee.add([uuid, category, fullName, username, hashedPassword, subGodown, address || null, aadharNo || null, panNo || null, bankName || null, accountNumber || null, ifscCode || null, branchName || null, contact || null, nextOrder]);
+    updateTableStats('employee');
 
     res.status(201).json({ message: "Employee added successfully", uuid, order_number: nextOrder });
   } catch (error) {
@@ -111,6 +113,7 @@ exports.updateEmployee = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Employee not found" });
     }
+    updateTableStats('employee');
 
     res.json({ message: "Employee updated successfully" });
   } catch (error) {
@@ -129,6 +132,7 @@ exports.deleteEmployee = async (req, res) => {
     }
 
     await Employee.resetOrderNumbers();
+    updateTableStats('employee');
     res.json({ message: "Employee deleted and order numbers reset successfully!" });
   } catch (error) {
     console.error("Error deleting employee:", error);

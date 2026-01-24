@@ -53,7 +53,7 @@ app.use("/api/alloc",allocRoutes );
 app.use('/api', firstreportRoutes);
 
 // Server Listening
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT ; 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

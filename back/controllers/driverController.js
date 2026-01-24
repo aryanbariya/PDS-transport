@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Driver = require("../models/driverModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get Active Drivers**
 exports.getActiveDrivers = async (req, res) => {
@@ -56,6 +57,7 @@ exports.addDriver = async (req, res) => {
     const driver_id = await Driver.getNextDriverId();
 
     await Driver.add({ uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id });
+    updateTableStats('drivers');
 
     res.json({ message: "Driver added successfully", uuid, driver_id, status });
   } catch (error) {
@@ -103,6 +105,7 @@ exports.updateDriver = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Driver not found" });
     }
+    updateTableStats('drivers');
     res.json({ message: "Driver updated successfully" });
   } catch (error) {
     console.error("Error updating driver:", error);
@@ -117,6 +120,7 @@ exports.deleteDriver = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Driver not found" });
     }
+    updateTableStats('drivers');
     res.json({ message: "Driver status updated to Inactive successfully!" });
   } catch (error) {
     console.error("Error deleting driver:", error);
