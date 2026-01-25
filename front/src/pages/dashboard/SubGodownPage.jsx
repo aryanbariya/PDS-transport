@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Navigation from "@/util/libs/navigation";
 import Swal from "sweetalert2";
 import DataTable from "@/components/common/DataTable";
+import SubGodownForm from "./SubGodownForm";
 
 const URL = import.meta.env.VITE_API_BACK_URL;
 

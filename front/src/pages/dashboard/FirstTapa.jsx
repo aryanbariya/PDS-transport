@@ -111,7 +111,7 @@ const TransportPage = () => {
     fetchTransportData();
   };
 
-const generatePDF = (transport) => {
+  const generatePDF = (transport) => {
     Swal.fire({
       title: "Download PDF",
       text: "Do you want to download the transport details as PDF?",
@@ -125,12 +125,12 @@ const generatePDF = (transport) => {
       if (result.isConfirmed) {
         try {
           const doc = new jsPDF();
-          
+
           // Add title with larger font and centered
           doc.setFontSize(20);
           doc.setTextColor(0, 0, 0); // Black color
           doc.text("Transport Details", 105, 20, { align: 'center' });
-          
+
           // Add transport details with improved formatting
           doc.setFontSize(14);
           const details = [
@@ -152,7 +152,7 @@ const generatePDF = (transport) => {
             head: [['Field', 'Value']],
             body: details,
             theme: 'grid',
-            headStyles: { 
+            headStyles: {
               fillColor: [42, 48, 66],
               textColor: [255, 255, 255],
               fontSize: 14,
@@ -180,7 +180,7 @@ const generatePDF = (transport) => {
 
           // Save the PDF
           doc.save(`Transport_${transport.tpNo || 'Details'}.pdf`);
-          
+
           // Show success message
           Swal.fire({
             icon: "success",
@@ -199,7 +199,7 @@ const generatePDF = (transport) => {
         }
       }
     });
-  };  
+  };
 
   return (
     <div className="flex flex-col h-full w-full p-4 bg-gray-100">
@@ -217,8 +217,10 @@ const generatePDF = (transport) => {
       </div>
 
       {showForm && (
-        <div className="mt-3 bg-white p-4 rounded-md shadow-md">
-          <TransportForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <TransportForm onClose={() => setShowForm(false)} onSave={handleSave} editData={editData} />
+          </div>
         </div>
       )}
       {/* Filter Dropdown */}
@@ -229,9 +231,9 @@ const generatePDF = (transport) => {
           className="px-2 py-2 border border-gray-300 rounded-md bg-white shadow-md focus:outline-none"
         >
           {/* <option value="all">All</option> */}
-          {/* <option value="active">Active</option>
+        {/* <option value="active">Active</option>
           <option value="inactive">Inactive</option> */}
-        {/* </select> */} 
+        {/* </select> */}
       </div>
 
       {loading && (

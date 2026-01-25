@@ -122,7 +122,7 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
               <label className="block text-sm font-medium text-gray-700">MSWCGodown </label>
               <input
                 type="text"
-                name="MSWCGodown"
+                name="parentGodown"
                 placeholder="Search or Select Godown"
                 value={search}
                 onClick={() => setShowDropdown(true)}
@@ -170,8 +170,8 @@ const SubGodownForm = ({ onClose, onSave, editData }) => {
               type="submit"
               disabled={loading}
               className={`py-2 px-4 rounded-lg ${!loading
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-400 text-gray-700 cursor-not-allowed"
                 }`}
             >
               {loading ? "Submitting..." : editData ? "Update" : "Submit"}

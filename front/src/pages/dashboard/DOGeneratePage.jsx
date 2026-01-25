@@ -76,9 +76,9 @@ const DOGeneratePage = () => {
   };
   console.log("gogo", godowns);
 
-  const handleEdit = async (doNo) => {
+  const handleEdit = async (order) => {
     try {
-      const response = await fetch(`${URL}/api/do/${doNo}`);
+      const response = await fetch(`${URL}/api/do/${order.do_no}`);
       if (!response.ok) throw new Error("Failed to fetch DO data");
 
       const data = await response.json();

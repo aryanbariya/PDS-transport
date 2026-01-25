@@ -120,9 +120,12 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
     const { name, value } = e.target;
 
     // Validation for numeric fields
-    if (name === 'doNo' || name === 'quantity') {
-      // Only allow numbers and empty string
+    if (name === 'doNo') {
       if (value === '' || /^\d+$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else if (name === 'quantity') {
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
     } else {
@@ -267,7 +270,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 inputMode="numeric"
                 required
               />
-              {formData.doNo && !/^\d+$/.test(formData.doNo) && (
+              {formData.doNo && !/^\d+$/.test(String(formData.doNo).trim()) && (
                 <p className="mt-1 text-sm text-red-600">Please enter only numbers</p>
               )}
             </div>
@@ -387,7 +390,7 @@ const DOGenerateForm = ({ onClose, onSave, editData }) => {
                 inputMode="numeric"
                 required
               />
-              {formData.quantity && !/^\d+$/.test(formData.quantity) && (
+              {formData.quantity && !/^\d*\.?\d*$/.test(String(formData.quantity).trim()) && (
                 <p className="mt-1 text-sm text-red-600">Please enter only numbers</p>
               )}
             </div>
