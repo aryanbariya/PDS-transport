@@ -7,7 +7,12 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   build: {
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
+      onwarn(warning, defaultHandler) {
+        if (warning.code === "EVAL") return;
+        defaultHandler(warning);
+      },
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
@@ -20,13 +25,28 @@ export default defineConfig({
             if (id.includes("datatables.net") || id.includes("jquery")) {
               return "vendor_datatables";
             }
-            if (id.includes("jspdf") || id.includes("html2canvas")) {
-              return "vendor_pdf";
+            if (id.includes("jspdf")) {
+              return "vendor_jspdf";
+            }
+            if (id.includes("html2canvas")) {
+              return "vendor_html2canvas";
             }
             if (id.includes("apexcharts") || id.includes("react-apexcharts")) {
               return "vendor_charts";
             }
-            return "vendor";
+            if (id.includes("lottie") || id.includes("lottie-react")) {
+              return "vendor_lottie";
+            }
+            if (id.includes("react-icons")) {
+              return "vendor_icons";
+            }
+            if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
+              return "vendor_react_core";
+            }
+            if (id.includes("axios") || id.includes("sweetalert2")) {
+              return "vendor_utils";
+            }
+            return "vendor_others";
           }
         },
       },

@@ -1,3 +1,4 @@
+import React, { lazy } from "react";
 import {
   HomeIcon,
   UserCircleIcon,
@@ -14,33 +15,32 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdWarehouse } from "react-icons/md";
 import { GiSteeringWheel } from "react-icons/gi";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { MdMiscellaneousServices, MdEditNote, MdLocalShipping } from "react-icons/md"
 import { TbReport, TbFileInvoice } from "react-icons/tb";
 import { FaClipboardCheck } from "react-icons/fa6";
-import { SignIn, SignUp } from "@/pages/auth";
-import Manage from "./pages/dashboard/Manage";
-import FirstTapa from "./pages/dashboard/FirstTapa";
-import FirstTapaReport from "./pages/dashboard/FirstTapaReport";
-import SecondDispatchReport from "./pages/dashboard/SecondDispatchReport";
-import SecondDispatch from "./pages/dashboard/SecondDispatch";
-import SecondTapa from "./pages/dashboard/SecondTapa";
-import MSWCGodownPage from "./pages/dashboard/MSWCGodown";
-import SubGodownPage from "./pages/dashboard/SubGodownPage";
-import OwnerNamePage from "./pages/dashboard/OwnerNamePage";
-import EmployeePage from "./pages/dashboard/EmployeePage";
-import DriverPage from "./pages/dashboard/DriverPage";
-import TruckPage from "./pages/dashboard/TruckPage";
-import PackagingPage from "./pages/dashboard/PackagingPage";
-import SchemePage from "./pages/dashboard/SchemePage";
-import CategoryPage from "./pages/dashboard/CategoryPage";
-import DOPage from "./pages/dashboard/DOCards";
-import DOCards from "./pages/dashboard/DOCards";
-import DOGenerateForm from "./pages/dashboard/DOGenerateForm";
-import DOGeneratePage from "./pages/dashboard/DOGeneratePage";
-import DOAllocationPage from "./pages/dashboard/DOAllocationPage";
-import GrainPage from "./pages/dashboard/GrainPage";
-import FirstTransport from "@/pages/dashboard/FirstTransport";
+
+// Lazy loading pages
+const Home = lazy(() => import("@/pages/dashboard").then(module => ({ default: module.Home })));
+const Manage = lazy(() => import("./pages/dashboard/Manage"));
+const FirstTapa = lazy(() => import("./pages/dashboard/FirstTapa"));
+const FirstTapaReport = lazy(() => import("./pages/dashboard/FirstTapaReport"));
+const SecondDispatchReport = lazy(() => import("./pages/dashboard/SecondDispatchReport"));
+const SecondDispatch = lazy(() => import("./pages/dashboard/SecondDispatch"));
+const SecondTapa = lazy(() => import("./pages/dashboard/SecondTapa"));
+const MSWCGodownPage = lazy(() => import("./pages/dashboard/MSWCGodown"));
+const SubGodownPage = lazy(() => import("./pages/dashboard/SubGodownPage"));
+const OwnerNamePage = lazy(() => import("./pages/dashboard/OwnerNamePage"));
+const EmployeePage = lazy(() => import("./pages/dashboard/EmployeePage"));
+const DriverPage = lazy(() => import("./pages/dashboard/DriverPage"));
+const TruckPage = lazy(() => import("./pages/dashboard/TruckPage"));
+const PackagingPage = lazy(() => import("./pages/dashboard/PackagingPage"));
+const SchemePage = lazy(() => import("./pages/dashboard/SchemePage"));
+const CategoryPage = lazy(() => import("./pages/dashboard/CategoryPage"));
+const DOCards = lazy(() => import("./pages/dashboard/DOCards"));
+const DOGeneratePage = lazy(() => import("./pages/dashboard/DOGeneratePage"));
+const DOAllocationPage = lazy(() => import("./pages/dashboard/DOAllocationPage"));
+const GrainPage = lazy(() => import("./pages/dashboard/GrainPage"));
+const FirstTransport = lazy(() => import("@/pages/dashboard/FirstTransport"));
 
 const icon = {
   className: "w-5 h-5 text-inherit",

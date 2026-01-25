@@ -24,7 +24,14 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.14.0",
     "nodemon": "^3.1.9",
-    "uuid": "^11.0.5",
-    "vercel": "^28.18.5"
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "vercel": "^50.5.0"
+  },
+  "overrides": {
+    "path-to-regexp": "^6.3.0",
+    "undici": "^6.13.0",
+    "tar": "^7.4.3"
   }
 }
