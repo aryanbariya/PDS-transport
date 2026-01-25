@@ -30,7 +30,15 @@
     "vercel": "^50.5.0"
   },
   "overrides": {
-    "path-to-regexp": "^6.3.0",
+    "vercel": {
+      "path-to-regexp": "^6.3.0"
+    },
+    "@vercel/node": {
+      "path-to-regexp": "^6.3.0"
+    },
+    "@vercel/remix-builder": {
+      "path-to-regexp": "^6.3.0"
+    },
     "undici": "^6.13.0",
     "tar": "^7.4.3"
   }
