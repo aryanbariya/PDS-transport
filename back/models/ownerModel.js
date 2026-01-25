@@ -4,7 +4,7 @@ class Owner {
   // Get paginated owners
   static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners ORDER BY owner_id ASC LIMIT ? OFFSET ?";
+      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id, status FROM owners ORDER BY owner_id ASC LIMIT ? OFFSET ?";
       db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
@@ -26,7 +26,7 @@ class Owner {
   // Get owner by UUID
   static getById(uuid) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id FROM owners WHERE uuid = ?";
+      const sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id, status FROM owners WHERE uuid = ?";
       db.query(sql, [uuid], (err, results) => {
         if (err) return reject(err);
         resolve(results[0]); // Return the first result
@@ -35,10 +35,10 @@ class Owner {
   }
 
   // Add a new owner
-  static add({ uuid, ownerName, contact, address, emailID, owner_id }) {
+  static add({ uuid, ownerName, contact, address, emailID, owner_id, status = 'Active' }) {
     return new Promise((resolve, reject) => {
-      const sql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, owner_id) VALUES (?, ?, ?, ?, ?, ?)";
-      db.query(sql, [uuid, ownerName, contact, address, emailID, owner_id], (err, result) => {
+      const sql = "INSERT INTO owners (uuid, ownerName, contact, address, emailID, owner_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+      db.query(sql, [uuid, ownerName, contact, address, emailID, owner_id, status], (err, result) => {
         if (err) return reject(err);
         resolve(result);
       });
