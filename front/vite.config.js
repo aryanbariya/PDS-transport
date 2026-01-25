@@ -7,7 +7,7 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   build: {
-    chunkSizeWarningLimit: 800,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       onwarn(warning, defaultHandler) {
         if (warning.code === "EVAL") return;
@@ -16,11 +16,13 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("@mui") || id.includes("@emotion")) {
-              return "vendor_mui";
-            }
-            if (id.includes("@material-tailwind") || id.includes("@heroicons")) {
-              return "vendor_mt";
+            if (
+              id.includes("@mui") ||
+              id.includes("@emotion") ||
+              id.includes("@material-tailwind") ||
+              id.includes("@heroicons")
+            ) {
+              return "vendor_ui";
             }
             if (id.includes("datatables.net") || id.includes("jquery")) {
               return "vendor_datatables";
@@ -43,7 +45,7 @@ export default defineConfig({
             if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
               return "vendor_react_core";
             }
-            if (id.includes("axios") || id.includes("sweetalert2")) {
+            if (id.includes("axios") || id.includes("sweetalert2") || id.includes("lobibox")) {
               return "vendor_utils";
             }
             return "vendor_others";
