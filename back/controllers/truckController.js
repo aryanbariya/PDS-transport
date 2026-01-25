@@ -125,7 +125,7 @@ exports.getTruckById = async (req, res) => {
 // **Add New Truck**
 exports.addTruck = async (req, res) => {
   try {
-    const { truck_name, truck_status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+    const { truck_name, status = "Active", empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
 
     if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
       return res.status(400).json({ error: "All required fields must be filled" });
@@ -135,7 +135,7 @@ exports.addTruck = async (req, res) => {
     const truck_id = await Truck.getNextTruckId();
 
     await Truck.add([
-      uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id,
+      uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id,
       tax_validity_date || null, insurance_validity_date || null, fitness_validity_date || null,
       permit_validity_date || null, direct_sale, truck_id
     ]);
@@ -151,7 +151,7 @@ exports.addTruck = async (req, res) => {
 // **Update Truck**
 exports.updateTruck = async (req, res) => {
   try {
-    const { truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, truck_status = "Active", tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
+    const { truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, status = "Active", tax_validity_date, insurance_validity_date, fitness_validity_date, permit_validity_date, direct_sale } = req.body;
 
     if (!truck_name || !empty_weight || !company || !gvw || !reg_date || !truck_owner_name || !owner_id) {
       return res.status(400).json({ error: "Required fields: truck_name, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id" });
@@ -166,7 +166,7 @@ exports.updateTruck = async (req, res) => {
     if (reg_date) updates.fields.push("reg_date = ?"), updates.values.push(reg_date);
     if (truck_owner_name) updates.fields.push("truck_owner_name = ?"), updates.values.push(truck_owner_name);
     if (owner_id) updates.fields.push("owner_id = ?"), updates.values.push(owner_id);
-    if (truck_status) updates.fields.push("truck_status = ?"), updates.values.push(truck_status);
+    if (status) updates.fields.push("status = ?"), updates.values.push(status);
     if (tax_validity_date) updates.fields.push("tax_validity = ?"), updates.values.push(tax_validity_date);
     if (insurance_validity_date) updates.fields.push("insurance_validity = ?"), updates.values.push(insurance_validity_date);
     if (fitness_validity_date) updates.fields.push("fitness_validity = ?"), updates.values.push(fitness_validity_date);

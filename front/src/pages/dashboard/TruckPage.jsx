@@ -136,7 +136,7 @@ const TruckPage = () => {
         columns={[
           { key: "truck_id", header: "ID" },
           { key: "truck_name", header: "Truck No." },
-          { key: "truck_status", header: "Status" },
+          { key: "status", header: "Status" },
           { key: "empty_weight", header: "Empty Weight" },
           { key: "company", header: "Company" },
           { key: "gvw", header: "GVW" },

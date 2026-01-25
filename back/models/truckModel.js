@@ -14,7 +14,7 @@ class Truck {
   // Get paginated trucks
   static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      const sql = "SELECT uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck ORDER BY truck_id ASC LIMIT ? OFFSET ?";
       db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
@@ -36,7 +36,7 @@ class Truck {
   // Get paginated active trucks
   static getActive(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Active' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      const sql = "SELECT uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE status = 'Active' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
       db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
@@ -47,7 +47,7 @@ class Truck {
   // Get total active trucks count
   static getActiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT COUNT(*) as total FROM truck WHERE truck_status = 'Active'";
+      const sql = "SELECT COUNT(*) as total FROM truck WHERE status = 'Active'";
       db.query(sql, (err, results) => {
         if (err) return reject(err);
         resolve(results[0].total);
@@ -58,7 +58,7 @@ class Truck {
   // Get paginated inactive trucks
   static getInactive(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE truck_status = 'Inactive' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      const sql = "SELECT uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck WHERE status = 'Inactive' ORDER BY truck_id ASC LIMIT ? OFFSET ?";
       db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
@@ -69,7 +69,7 @@ class Truck {
   // Get total inactive trucks count
   static getInactiveCount() {
     return new Promise((resolve, reject) => {
-      const sql = "SELECT COUNT(*) as total FROM truck WHERE truck_status = 'Inactive'";
+      const sql = "SELECT COUNT(*) as total FROM truck WHERE status = 'Inactive'";
       db.query(sql, (err, results) => {
         if (err) return reject(err);
         resolve(results[0].total);
@@ -91,7 +91,7 @@ class Truck {
   // Add a new truck
   static add(data) {
     return new Promise((resolve, reject) => {
-      const sql = "INSERT INTO truck (uuid, truck_name, truck_status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      const sql = "INSERT INTO truck (uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       db.query(sql, data, (err, result) => {
         if (err) return reject(err);
         resolve(result);
@@ -124,7 +124,7 @@ class Truck {
   // Soft delete a truck
   static softDelete(uuid) {
     return new Promise((resolve, reject) => {
-      const sql = "UPDATE truck SET truck_status = 'Inactive' WHERE uuid = ?";
+      const sql = "UPDATE truck SET status = 'Inactive' WHERE uuid = ?";
       db.query(sql, [uuid], (err, result) => {
         if (err) return reject(err);
         resolve(result);
