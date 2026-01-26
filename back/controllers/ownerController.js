@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require("uuid");
 const Owner = require("../models/ownerModel");
 const updateTableStats = require("../utils/updateTableStats");
 
+
+
 // **Get Paginated Owners**
 exports.getAllOwners = async (req, res) => {
   try {
@@ -123,5 +125,47 @@ exports.deleteOwner = async (req, res) => {
   } catch (error) {
     console.error("Error deleting owner:", error);
     res.status(500).json({ error: "Database deletion failed" });
+  }
+};
+
+// **Toggle Owner Status (Active <-> Inactive)**
+exports.toggleOwnerStatus = async (req, res) => {
+  try {
+    const result = await Owner.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+    updateTableStats('owners');
+    res.json({ message: "Owner status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling owner status:", error);
+    res.status(500).json({ error: "Failed to toggle owner status" });
+  }
+};
+// **Get Owners Unified (Filtered by Status)**
+exports.getOwnersUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10 } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const offset = (pageNum - 1) * limitNum;
+
+    const [owners, total] = await Promise.all([
+      Owner.fetch({ status, limit: limitNum, offset }),
+      Owner.fetchCount({ status })
+    ]);
+
+    res.json({
+      data: owners,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching owners unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
   }
 };

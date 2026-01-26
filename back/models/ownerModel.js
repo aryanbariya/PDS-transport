@@ -1,6 +1,7 @@
 const db = require("../config/db");
 
 class Owner {
+
   // Get paginated owners
   static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
@@ -67,6 +68,17 @@ class Owner {
     });
   }
 
+  // Toggle owner status between Active and Inactive
+  static toggleStatus(uuid) {
+    return new Promise((resolve, reject) => {
+      const sql = "UPDATE owners SET status = IF(status = 'Active', 'Inactive', 'Active') WHERE uuid = ?";
+      db.query(sql, [uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  }
+
   // Delete an owner
   static delete(uuid) {
     return new Promise((resolve, reject) => {
@@ -90,6 +102,45 @@ class Owner {
           if (err2) return reject(err2);
           resolve();
         });
+      });
+    });
+  }
+
+  // Unified fetch with optional status filtering
+  static fetch({ status, limit = 10, offset = 0 }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT uuid, ownerName, contact, address, emailID, owner_id, status FROM owners";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY owner_id ASC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Unified count with optional status filtering
+  static fetchCount({ status }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM owners";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }
