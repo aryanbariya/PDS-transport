@@ -160,3 +160,51 @@ exports.deleteEmployee = async (req, res) => {
     res.status(500).json({ error: "Database deletion error" });
   }
 };
+
+// **Get Employees Unified (Filtered by Status)**
+exports.getEmployeesUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10, nopagination } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = nopagination === "true" ? 99999 : parseInt(limit);
+    const offset = nopagination === "true" ? 0 : (pageNum - 1) * limitNum;
+
+    const [employees, total] = await Promise.all([
+      Employee.fetch({ status, limit: limitNum, offset }),
+      Employee.fetchCount({ status })
+    ]);
+
+    const response = {
+      data: employees,
+    };
+
+    if (nopagination !== "true") {
+      response.pagination = {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      };
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching employees unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Toggle Employee Status (Active <-> Inactive)**
+exports.toggleEmployeeStatus = async (req, res) => {
+  try {
+    const result = await Employee.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    updateTableStats('employee');
+    res.json({ message: "Employee status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling employee status:", error);
+    res.status(500).json({ error: "Failed to toggle employee status" });
+  }
+};
