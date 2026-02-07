@@ -121,6 +121,56 @@ class MSWC {
       });
     });
   }
+
+  // Unified fetch with optional status filtering
+  static fetch({ status, limit = 10, offset = 0 }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT uuid, godownName, godownUnder, mswc_id, status FROM mswc_godowns";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY mswc_id ASC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Unified count with optional status filtering
+  static fetchCount({ status }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM mswc_godowns";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Toggle godown status between Active and Inactive
+  static toggleStatus(uuid) {
+    return new Promise((resolve, reject) => {
+      const sql = "UPDATE mswc_godowns SET status = IF(status = 'Active', 'Inactive', 'Active') WHERE uuid = ?";
+      db.query(sql, [uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  }
 }
 
 module.exports = MSWC;

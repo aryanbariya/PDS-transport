@@ -203,3 +203,51 @@ exports.deleteTruck = async (req, res) => {
     res.status(500).json({ error: "Failed to update truck status" });
   }
 };
+
+// **Get Trucks Unified (Filtered by Status)**
+exports.getTrucksUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10, nopagination } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = nopagination === "true" ? 99999 : parseInt(limit);
+    const offset = nopagination === "true" ? 0 : (pageNum - 1) * limitNum;
+
+    const [trucks, total] = await Promise.all([
+      Truck.fetch({ status, limit: limitNum, offset }),
+      Truck.fetchCount({ status })
+    ]);
+
+    const response = {
+      data: trucks,
+    };
+
+    if (nopagination !== "true") {
+      response.pagination = {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      };
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching trucks unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Toggle Truck Status (Active <-> Inactive)**
+exports.toggleTruckStatus = async (req, res) => {
+  try {
+    const result = await Truck.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Truck not found" });
+    }
+    updateTableStats('truck');
+    res.json({ message: "Truck status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling truck status:", error);
+    res.status(500).json({ error: "Failed to toggle truck status" });
+  }
+};

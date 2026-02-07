@@ -124,6 +124,56 @@ class Driver {
       });
     });
   }
+
+  // Unified fetch with optional status filtering
+  static fetch({ status, limit = 10, offset = 0 }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT uuid, driver_name, aadhar_card_no, contact, driving_license_no, status, driver_id FROM drivers";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY driver_id ASC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Unified count with optional status filtering
+  static fetchCount({ status }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM drivers";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Toggle driver status between Active and Inactive
+  static toggleStatus(uuid) {
+    return new Promise((resolve, reject) => {
+      const sql = "UPDATE drivers SET status = IF(status = 'Active', 'Inactive', 'Active') WHERE uuid = ?";
+      db.query(sql, [uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  }
 }
 
 module.exports = Driver;
