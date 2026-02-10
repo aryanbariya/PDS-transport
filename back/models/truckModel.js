@@ -131,6 +131,56 @@ class Truck {
       });
     });
   }
+
+  // Unified fetch with optional status filtering
+  static fetch({ status, limit = 10, offset = 0 }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT uuid, truck_name, status, empty_weight, company, gvw, reg_date, truck_owner_name, owner_id, tax_validity, insurance_validity, fitness_validity, permit_validity, direct_sale, truck_id FROM truck";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY truck_id ASC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Unified count with optional status filtering
+  static fetchCount({ status }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM truck";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Toggle truck status between Active and Inactive
+  static toggleStatus(uuid) {
+    return new Promise((resolve, reject) => {
+      const sql = "UPDATE truck SET status = IF(status = 'Active', 'Inactive', 'Active') WHERE uuid = ?";
+      db.query(sql, [uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  }
 }
 
 module.exports = Truck;

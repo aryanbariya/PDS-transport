@@ -174,3 +174,51 @@ exports.deleteSubGodown = async (req, res) => {
     res.status(500).json({ error: "Failed to update godown status" });
   }
 };
+
+// **Get Sub-Godowns Unified (Filtered by Status)**
+exports.getSubGodownsUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10, nopagination } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = nopagination === "true" ? 99999 : parseInt(limit);
+    const offset = nopagination === "true" ? 0 : (pageNum - 1) * limitNum;
+
+    const [subGodowns, total] = await Promise.all([
+      SubGodown.fetch({ status, limit: limitNum, offset }),
+      SubGodown.fetchCount({ status })
+    ]);
+
+    const response = {
+      data: subGodowns,
+    };
+
+    if (nopagination !== "true") {
+      response.pagination = {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      };
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching sub-godowns unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Toggle Sub-Godown Status (Active <-> Inactive)**
+exports.toggleSubGodownStatus = async (req, res) => {
+  try {
+    const result = await SubGodown.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Godown not found" });
+    }
+    updateTableStats('sub_godown');
+    res.json({ message: "Godown status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling sub-godown status:", error);
+    res.status(500).json({ error: "Failed to toggle sub-godown status" });
+  }
+};

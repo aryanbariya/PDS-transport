@@ -172,3 +172,51 @@ exports.deleteGodown = async (req, res) => {
     res.status(500).json({ error: "Failed to update godown status" });
   }
 };
+
+// **Get Godowns Unified (Filtered by Status)**
+exports.getGodownsUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10, nopagination } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = nopagination === "true" ? 99999 : parseInt(limit);
+    const offset = nopagination === "true" ? 0 : (pageNum - 1) * limitNum;
+
+    const [godowns, total] = await Promise.all([
+      MSWC.fetch({ status, limit: limitNum, offset }),
+      MSWC.fetchCount({ status })
+    ]);
+
+    const response = {
+      data: godowns,
+    };
+
+    if (nopagination !== "true") {
+      response.pagination = {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      };
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching godowns unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Toggle Godown Status (Active <-> Inactive)**
+exports.toggleGodownStatus = async (req, res) => {
+  try {
+    const result = await MSWC.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Godown not found" });
+    }
+    updateTableStats('mswc_godowns');
+    res.json({ message: "Godown status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling godown status:", error);
+    res.status(500).json({ error: "Failed to toggle godown status" });
+  }
+};
