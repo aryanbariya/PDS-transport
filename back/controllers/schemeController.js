@@ -107,3 +107,31 @@ exports.deleteScheme = async (req, res) => {
     res.status(500).json({ error: "Database deletion failed" });
   }
 };
+
+// **Get All Schemes Unified (with status filter)**
+exports.getAllSchemesUnified = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const status = req.query.status || null; // "Start", "Pending", "Completed"
+
+    const [schemes, total] = await Promise.all([
+      Scheme.getAllFiltered(limit, offset, status),
+      Scheme.getCountFiltered(status)
+    ]);
+
+    res.json({
+      data: schemes,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching unified schemes:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};

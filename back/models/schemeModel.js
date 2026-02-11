@@ -93,6 +93,45 @@ class Scheme {
       });
     });
   }
+
+  // Get all schemes with optional status filter and pagination
+  static getAllFiltered(limit = 10, offset = 0, status = null) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT uuid, scheme_id, scheme_name, scheme_status FROM scheme";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE scheme_status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY scheme_id ASC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Get count of schemes with optional status filter
+  static getCountFiltered(status = null) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM scheme";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE scheme_status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
 }
 
 module.exports = Scheme;
