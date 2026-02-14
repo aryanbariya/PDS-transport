@@ -23,8 +23,8 @@ class Transport {
     });
   }
 
-  // Get all transport records
-  static getAll() {
+  // Get all transport records with pagination
+  static getAll(limit = 10, offset = 0) {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT 
@@ -47,10 +47,22 @@ class Transport {
         LEFT JOIN scheme s ON t.scheme = s.scheme_id
         LEFT JOIN packaging p ON t.packaging = p.pack_id
         ORDER BY t.trans_id DESC
+        LIMIT ? OFFSET ?
       `;
-      db.query(sql, (err, results) => {
+      db.query(sql, [limit, offset], (err, results) => {
         if (err) return reject(err);
         resolve(results);
+      });
+    });
+  }
+
+  // Get total transport count
+  static getCount() {
+    return new Promise((resolve, reject) => {
+      const sql = "SELECT COUNT(*) as total FROM transport";
+      db.query(sql, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
       });
     });
   }
@@ -109,6 +121,76 @@ class Transport {
   static softDelete(uuid) {
     return new Promise((resolve, reject) => {
       const sql = "UPDATE transport SET status = 'Inactive' WHERE uuid = ?";
+      db.query(sql, [uuid], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+  }
+
+  // Unified fetch with optional status filtering
+  static fetch({ status, limit = 10, offset = 0 }) {
+    return new Promise((resolve, reject) => {
+      let sql = `
+        SELECT 
+          t.*,
+          f.do_no AS donumber,
+          bd.godownName AS baseDepoName,
+          g.subGodown AS godownName,
+          tr.truck_name AS truckName,
+          o.ownerName AS ownerName,
+          d.driver_name AS driverName,
+          s.scheme_name AS schemeName,
+          p.material_name AS packagingName
+        FROM transport t
+        LEFT JOIN do f ON t.doNo = f.stock_id
+        LEFT JOIN mswc_godowns bd ON t.baseDepo = bd.mswc_id
+        LEFT JOIN sub_godown g ON t.godown = g.subgodown_id
+        LEFT JOIN truck tr ON t.truck = tr.truck_id
+        LEFT JOIN owners o ON t.owner = o.owner_id
+        LEFT JOIN drivers d ON t.driver = d.driver_id
+        LEFT JOIN scheme s ON t.scheme = s.scheme_id
+        LEFT JOIN packaging p ON t.packaging = p.pack_id
+      `;
+      const params = [];
+
+      if (status) {
+        sql += " WHERE t.status = ?";
+        params.push(status);
+      }
+
+      sql += " ORDER BY t.trans_id DESC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  }
+
+  // Unified count with optional status filtering
+  static fetchCount({ status }) {
+    return new Promise((resolve, reject) => {
+      let sql = "SELECT COUNT(*) as total FROM transport";
+      const params = [];
+
+      if (status) {
+        sql += " WHERE status = ?";
+        params.push(status);
+      }
+
+      db.query(sql, params, (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].total);
+      });
+    });
+  }
+
+  // Toggle transport status between Active and Inactive
+  static toggleStatus(uuid) {
+    return new Promise((resolve, reject) => {
+      const sql = "UPDATE transport SET status = IF(status = 'Active', 'Inactive', 'Active') WHERE uuid = ?";
       db.query(sql, [uuid], (err, result) => {
         if (err) return reject(err);
         resolve(result);

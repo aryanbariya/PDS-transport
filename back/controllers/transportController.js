@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const Transport = require("../models/transportModel");
+const updateTableStats = require("../utils/updateTableStats");
 
 // **Get All Active Transport Records**
 exports.getActiveTransports = async (req, res) => {
@@ -26,8 +27,29 @@ exports.getInactiveTransports = async (req, res) => {
 // **Get All Transport Records**
 exports.getAllTransports = async (req, res) => {
   try {
-    const transports = await Transport.getAll();
-    res.json(transports);
+    if (req.query.nopagination === "true") {
+      const transports = await Transport.getAll(99999, 0);
+      return res.json(transports);
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const [transports, total] = await Promise.all([
+      Transport.getAll(limit, offset),
+      Transport.getCount()
+    ]);
+
+    res.json({
+      data: transports,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error fetching transport records:", error);
     res.status(500).json({ error: "Database fetch error" });
@@ -59,8 +81,8 @@ exports.addTransport = async (req, res) => {
     } = req.body;
 
     if (!baseDepo || !doNo || !godown || !truck || !owner || !driver || !emptyWeight || !grossWeight ||
-        !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
-        !dispatchDate || !quota || !tpNo || !allocation) {
+      !scheme || !packaging || !noOfBags || !bardanWeight || !loadedNetWeight || !netWeight ||
+      !dispatchDate || !quota || !tpNo || !allocation) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
@@ -70,6 +92,7 @@ exports.addTransport = async (req, res) => {
       grossWeight, scheme, packaging, noOfBags, bardanWeight, loadedNetWeight,
       netWeight, dispatchDate, quota, tpNo, allocation, status
     ]);
+    updateTableStats('transport');
 
     res.status(201).json({ message: "Transport record added successfully", uuid, trans_id });
   } catch (error) {
@@ -94,17 +117,17 @@ exports.updateTransport = async (req, res) => {
     if (truck) updates.fields.push("truck = ?"), updates.values.push(truck);
     if (owner) updates.fields.push("owner = ?"), updates.values.push(owner);
     if (driver) updates.fields.push("driver = ?"), updates.values.push(driver);
-    if (emptyWeight) updates.fields.push("emptyWeight = ?"), updates.values.push(emptyWeight);
-    if (grossWeight) updates.fields.push("grossWeight = ?"), updates.values.push(grossWeight);
+    if (emptyWeight) updates.fields.push("empty_weight = ?"), updates.values.push(emptyWeight);
+    if (grossWeight) updates.fields.push("gross_weight = ?"), updates.values.push(grossWeight);
     if (scheme) updates.fields.push("scheme = ?"), updates.values.push(scheme);
     if (packaging) updates.fields.push("packaging = ?"), updates.values.push(packaging);
-    if (noOfBags) updates.fields.push("noOfBags = ?"), updates.values.push(noOfBags);
-    if (bardanWeight) updates.fields.push("bardanWeight = ?"), updates.values.push(bardanWeight);
-    if (loadedNetWeight) updates.fields.push("loadedNetWeight = ?"), updates.values.push(loadedNetWeight);
-    if (netWeight) updates.fields.push("netWeight = ?"), updates.values.push(netWeight);
-    if (dispatchDate) updates.fields.push("dispatchDate = ?"), updates.values.push(dispatchDate);
+    if (noOfBags) updates.fields.push("no_of_bags = ?"), updates.values.push(noOfBags);
+    if (bardanWeight) updates.fields.push("bardan_weight = ?"), updates.values.push(bardanWeight);
+    if (loadedNetWeight) updates.fields.push("loaded_net_weight = ?"), updates.values.push(loadedNetWeight);
+    if (netWeight) updates.fields.push("net_weight = ?"), updates.values.push(netWeight);
+    if (dispatchDate) updates.fields.push("dispatch_date = ?"), updates.values.push(dispatchDate);
     if (quota) updates.fields.push("quota = ?"), updates.values.push(quota);
-    if (tpNo) updates.fields.push("tpNo = ?"), updates.values.push(tpNo);
+    if (tpNo) updates.fields.push("tp_no = ?"), updates.values.push(tpNo);
     if (allocation) updates.fields.push("allocation = ?"), updates.values.push(allocation);
     if (status) updates.fields.push("status = ?"), updates.values.push(status);
 
@@ -116,6 +139,7 @@ exports.updateTransport = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Record not found" });
     }
+    updateTableStats('transport');
     res.json({ message: "Transport record updated successfully" });
   } catch (error) {
     console.error("Error updating transport record:", error);
@@ -130,9 +154,58 @@ exports.deleteTransport = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Transport not found" });
     }
+    updateTableStats('transport');
     res.json({ message: "Transport status updated to Inactive successfully!" });
   } catch (error) {
     console.error("Error deleting transport record:", error);
     res.status(500).json({ error: "Failed to update transport status" });
+  }
+};
+
+// **Get Transports Unified (Filtered by Status)**
+exports.getTransportsUnified = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10, nopagination } = req.query;
+    const pageNum = parseInt(page);
+    const limitNum = nopagination === "true" ? 99999 : parseInt(limit);
+    const offset = nopagination === "true" ? 0 : (pageNum - 1) * limitNum;
+
+    const [transports, total] = await Promise.all([
+      Transport.fetch({ status, limit: limitNum, offset }),
+      Transport.fetchCount({ status })
+    ]);
+
+    const response = {
+      data: transports,
+    };
+
+    if (nopagination !== "true") {
+      response.pagination = {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      };
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Error fetching transports unified:", error);
+    res.status(500).json({ error: "Database fetch error" });
+  }
+};
+
+// **Toggle Transport Status (Active <-> Inactive)**
+exports.toggleTransportStatus = async (req, res) => {
+  try {
+    const result = await Transport.toggleStatus(req.params.uuid);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Transport not found" });
+    }
+    updateTableStats('transport');
+    res.json({ message: "Transport status toggled successfully!" });
+  } catch (error) {
+    console.error("Error toggling transport status:", error);
+    res.status(500).json({ error: "Failed to toggle transport status" });
   }
 };
